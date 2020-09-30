@@ -12,16 +12,27 @@ Features:
 * Host player could make anyone to be in debug mod, which gives him full access to game features for easier debugging
 * It is possible to zoom in some range depending on the player's mod
 * Player can claim some number of chunks (square area) into his base and configure access for other players to protect his property.
+* Dynamic objects that can be thrown/dropped, be a part of static environment, some objects have despawn time and some is not, some can be destroyed
+* Effects (short animations) can be spawned in huge amounts and can cause glowing, depending
+* Chunks - square area of blocks can be loaded dyna
+* Average visible map size 200x150 blocks and map size 4000 x 3000
+* Suggestion to render patches of blocks over chunks and to dynamically load/unload them based on visibility area
+* Items can be thrown, used, destroyed, crafted, placed as static-entity in the world
+* One static-entity can occupy multiple blocks and player can destroy that entity from any side and any part
 
 Server configuration:
+* Server name: The name
 * Difficulty: Easy, Normal, Hard
-* Max players: 1-1024
-* 
+* Max players: 1-256
+* Tickrate: Poor, Normal, Ultra
+* Server password: qwerty
+* Blocklisted users: [SillyBilly2000, Destroyer, BriefGrief69]
+* Port: 27215
 
 Settings:
 * Controls: bindings for keyboard and mouse
 * Graphical settings: 
-* Audio settings: master volume, music volume,
+* Audio settings: master, music, ambient, dialogs, effects
 
 Player Inventory:
 * Active panel 1-0
@@ -29,10 +40,10 @@ Player Inventory:
 
 Items:
 * Teleport that allows to travel between planets. Consumes a lot of electricity.
-* 
-
+* Glowing sticks which can be thrown and they should have physics i.e. rotating, bouncing etc (dynamic physical object)
+* Decorations: Table, Chair in different variants
 
 Light system:
 * (X,Y) BFS propogation using radius from static light sources to achieve arbicular light
 * Ray tracing delta pie for directed light to achieve dynamic far-light objects i.e. flashlights, glowing movable objects
-* Particle light aura for fast dynamical objects, just overlapping lightmask with light sprite
+* Rough light (aura) for fast dynamic objects, just overlapping lightmask with light sprite
