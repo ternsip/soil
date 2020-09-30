@@ -1,5 +1,38 @@
+General concept:
+The player spawns on planet Earth and begins to develop his own base.
+He is going to face different monsters across the map and upgrade technology tree.
+As soon as he evolve enough to leave the planet, other planets will be accessible trough navigation panel in the Solar system.
+Each planet should keep it's own bunch of resources that is required for progress in specific branch of technology tree.
+
+Features:
+* The player has a unique login(nickname), recovery-email and password on each server he plays. It could be saved locally.
+* It is possible to host server by starting dedicated server right from console or from launching it via in-game gui.
+* Next player mods are available: survival, creative, debug
+* Host player could make anyone to be in creative mod, which gives him invulnerability and unlimited access to resources.
+* Host player could make anyone to be in debug mod, which gives him full access to game features for easier debugging
+* It is possible to zoom in some range depending on the player's mod
+* Player can claim some number of chunks (square area) into his base and configure access for other players to protect his property.
+
+Server configuration:
+* Difficulty: Easy, Normal, Hard
+* Max players: 1-1024
+* 
+
+Settings:
+* Controls: bindings for keyboard and mouse
+* Graphical settings: 
+* Audio settings: master volume, music volume,
+
+Player Inventory:
+* Active panel 1-0
+* Cells for items
+
+Items:
+* Teleport that allows to travel between planets. Consumes a lot of electricity.
+* 
+
+
 Light system:
 * (X,Y) BFS propogation using radius from static light sources to achieve arbicular light
 * Ray tracing delta pie for directed light to achieve dynamic far-light objects i.e. flashlights, glowing movable objects
 * Particle light aura for fast dynamical objects, just overlapping lightmask with light sprite
- 
