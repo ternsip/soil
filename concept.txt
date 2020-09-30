@@ -1,0 +1,5 @@
+Light system:
+* (X,Y) BFS propogation using radius from static light sources to achieve arbicular light
+* Ray tracing delta pie for directed light to achieve dynamic far-light objects i.e. flashlights, glowing movable objects
+* Particle light aura for fast dynamical objects, just overlapping lightmask with light sprite
+ 
