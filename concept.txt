@@ -15,10 +15,16 @@ Features:
 * Dynamic objects that can be thrown/dropped, be a part of static environment, some objects have despawn time and some is not, some can be destroyed
 * Effects (short animations) can be spawned in huge amounts and can cause glowing, depending
 * Chunks - square area of blocks can be loaded dyna
-* Average visible map size 200x150 blocks and map size 4000 x 3000
+* Average visible map size 200x150 blocks and map size 4000 x 3000 (not exact and differs for planets)
 * Suggestion to render patches of blocks over chunks and to dynamically load/unload them based on visibility area
 * Items can be thrown, used, destroyed, crafted, placed as static-entity in the world
 * One static-entity can occupy multiple blocks and player can destroy that entity from any side and any part
+* Entity's moving types: flying (noclip|clip), walking, swimming, physical (with some geometric form)
+* In case of flying, walking or swimming entity, it is controlled by AI and can be hostile of friendly to the players.
+* Blocks occupy more space that grid defines in order to let them infuse with each other. Bigger blocks have semi-transparent patterned edges. (Question about blocks draw order)
+* Background layer is the same as normal blocks (Question about 1.5x sized blocks) could be destroted above some level in the ground. Could be set by player as normal blocks (including all variants of blocks).
+* Foreground layer of blocks must be split into two layers: first - behind the player, second - over the player. And has to be drawn exactly in that way.
+* Some kinds of items can have different decorative variants but without changing gamepaly.
 
 Server configuration:
 * Server name: The name
@@ -28,6 +34,7 @@ Server configuration:
 * Server password: qwerty
 * Blocklisted users: [SillyBilly2000, Destroyer, BriefGrief69]
 * Port: 27215
+* Friedny fire: true/false
 
 Settings:
 * Controls: bindings for keyboard and mouse
@@ -41,7 +48,12 @@ Player Inventory:
 Items:
 * Teleport that allows to travel between planets. Consumes a lot of electricity.
 * Glowing sticks which can be thrown and they should have physics i.e. rotating, bouncing etc (dynamic physical object)
-* Decorations: Table, Chair in different variants
+* Table. It is possible to set items over it. Player can stand on it and fall down using move-down command.
+* Plank. Same with table, but another geometry and does not require blocks to set it over. Only requires background.
+* Chair. Player can sit on it if it's not occupied.
+* Bed. Player can sleep on it.
+* Static light source (Lamp, Candle, Torch). Static blocks. Emits light in (X,Y) BFS style.
+* Dynamic light source. Emit light in ray-tracing style from one point. It is not attached to the blocks. But occluded by them.
 
 Light system:
 * (X,Y) BFS propogation using radius from static light sources to achieve arbicular light
