@@ -1,4 +1,13 @@
 ##############################
+# In case you have problems with refreshing .gitignore checkout nested .gitignore files
+# This project must contain only one global .gitignore (this one)
+# Or try using the following commands:
+# git rm -r --cached .
+# git add .
+# git status
+##############################
+
+##############################
 ## Java
 ##############################
 .mtj.tmp/
@@ -48,6 +57,7 @@ out/
 !.idea/dictionaries/*
 !.idea/codeStyles/
 !.idea/codeStyles/*
+!.idea/runConfigurations/*
 
 ##############################
 ## Eclipse
