@@ -42,7 +42,7 @@ public class UniverseClient implements Threadable {
 
     @Override
     public void update() {
-        getEventIOReceiver().update();
+        eventIOReceiver.update();
         networkEventReceiver.update();
     }
 

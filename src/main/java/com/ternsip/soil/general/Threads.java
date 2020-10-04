@@ -1,6 +1,6 @@
 package com.ternsip.soil.general;
 
-import com.ternsip.soil.network.NetworkAcceptor;
+import com.ternsip.soil.network.NetworkServerAcceptor;
 import com.ternsip.soil.network.NetworkClient;
 import com.ternsip.soil.network.NetworkServer;
 
@@ -15,7 +15,7 @@ public class Threads {
     private final ThreadWrapper<UniverseServer> universeServerThreadWrapper = new ThreadWrapper<>(UniverseServer::new, 1000L / 128);
     private final ThreadWrapper<NetworkClient> networkClientThreadWrapper = new ThreadWrapper<>(NetworkClient::new);
     private final ThreadWrapper<NetworkServer> networkServerThreadWrapper = new ThreadWrapper<>(NetworkServer::new);
-    private final ThreadWrapper<NetworkAcceptor> networkAcceptorThread = new ThreadWrapper<>(NetworkAcceptor::new);
+    private final ThreadWrapper<NetworkServerAcceptor> networkServerAcceptorThread = new ThreadWrapper<>(NetworkServerAcceptor::new);
 
     public void runClient() {
         universeClientThreadWrapper.start();
@@ -28,17 +28,18 @@ public class Threads {
         networkClientThreadWrapper.stop();
         networkClientThreadWrapper.join();
         graphics.finish();
+        universeClientThreadWrapper.stop();
     }
 
     public void runServer() {
         networkServerThreadWrapper.start();
         universeServerThreadWrapper.start();
-        networkAcceptorThread.start();
+        networkServerAcceptorThread.start();
         while (scanner.hasNext()) {
             String inputMessage = scanner.next();
             if (inputMessage.equalsIgnoreCase("exit")) {
                 System.out.println("Stopping the sever...");
-                networkAcceptorThread.stop();
+                networkServerAcceptorThread.stop();
                 universeServerThreadWrapper.stop();
                 networkServerThreadWrapper.getObjective().stop();
                 networkServerThreadWrapper.stop();

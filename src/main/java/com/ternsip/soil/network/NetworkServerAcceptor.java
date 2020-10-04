@@ -5,8 +5,7 @@ import com.ternsip.soil.general.Threadable;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-// TODO rename to network server acceptor
-public class NetworkAcceptor implements Threadable {
+public class NetworkServerAcceptor implements Threadable {
 
     @Override
     public void init() {}
