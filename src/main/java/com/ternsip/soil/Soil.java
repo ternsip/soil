@@ -1,6 +1,8 @@
 package com.ternsip.soil;
 
 import com.google.common.collect.Sets;
+import com.ternsip.soil.general.Threads;
+
 import java.util.Set;
 
 /**
@@ -20,13 +22,15 @@ import java.util.Set;
  */
 public class Soil {
 
+    public static final Threads THREADS = new Threads();
+
     public static void main(String[] args) {
         Set<String> input = Sets.newHashSet(args);
-        //if (input.contains("--server")) {
-        //    IUniverseServer.run();
-        //} else {
-        //    IGraphics.run();
-        //}
+        if (input.contains("--server")) {
+            THREADS.runServer();
+        } else {
+            THREADS.runClient();
+        }
     }
 
 }
