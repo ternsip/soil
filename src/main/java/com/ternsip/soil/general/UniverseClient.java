@@ -8,33 +8,28 @@ import com.ternsip.soil.common.events.network.OnConnectedToServer;
 import com.ternsip.soil.universe.audio.SoundRepository;
 import com.ternsip.soil.universe.bindings.Bind;
 import com.ternsip.soil.universe.bindings.Bindings;
-import com.ternsip.soil.universe.common.Settings;
+import com.ternsip.soil.universe.common.SettingsRepository;
 import com.ternsip.soil.universe.protocol.ConsoleMessageServerPacket;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.SneakyThrows;
 
-@Getter
-@Setter
 public class UniverseClient implements Threadable {
 
+    private final Callback<OnConnectedToServer> onConnectedToServerCallback = this::whenConnected;
     public Bindings bindings; // TODO move bindings inside settings
-    public Settings settings;
+    public SettingsRepository settingsRepository;
     public SoundRepository soundRepository;
     public EventIOReceiver eventIOReceiver;
     public EventReceiver networkEventReceiver;
 
-    private final Callback<OnConnectedToServer> onConnectedToServerCallback = this::whenConnected;
-
     @Override
     public void init() {
-        settings = new Settings();
+        settingsRepository = new SettingsRepository();
         soundRepository = new SoundRepository();
         eventIOReceiver = new EventIOReceiver();
         bindings = new Bindings();
         networkEventReceiver = new EventReceiver();
         spawnMenu();
-        networkEventReceiver.registerCallback(OnConnectedToServer.class, getOnConnectedToServerCallback());
+        networkEventReceiver.registerCallback(OnConnectedToServer.class, onConnectedToServerCallback);
     }
 
     @Override
@@ -46,8 +41,8 @@ public class UniverseClient implements Threadable {
     @SneakyThrows
     @Override
     public void finish() {
-        networkEventReceiver.unregisterCallback(OnConnectedToServer.class, getOnConnectedToServerCallback());
-        getBindings().finish();
+        networkEventReceiver.unregisterCallback(OnConnectedToServer.class, onConnectedToServerCallback);
+        bindings.finish();
     }
 
     public void startClient() {
@@ -63,7 +58,7 @@ public class UniverseClient implements Threadable {
     }
 
     private void spawnEntities() {
-        getBindings().addBindCallback(Bind.TEST_BUTTON, () -> Soil.THREADS.getNetworkClient().send(new ConsoleMessageServerPacket("HELLO 123")));
+        bindings.addBindCallback(Bind.TEST_BUTTON, () -> Soil.THREADS.getNetworkClient().send(new ConsoleMessageServerPacket("HELLO 123")));
     }
 
     private void whenConnected(OnConnectedToServer onConnectedToServer) {

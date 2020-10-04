@@ -24,8 +24,6 @@ public abstract class Shader {
 
     private int programID;
 
-    protected abstract void construct();
-
     @SneakyThrows
     public static <T extends Shader> T createShader(Class<T> clazz) {
         Constructor<T> constructor = clazz.getDeclaredConstructor();
@@ -44,6 +42,30 @@ public abstract class Shader {
             throw new IllegalArgumentException(String.format("Could not compile shader %s - %s", file.getName(), error));
         }
         return shaderID;
+    }
+
+    static void bindAttributes(int programID, Collection<AttributeData> attributeData) {
+        for (AttributeData data : attributeData) {
+            glBindAttribLocation(programID, data.getIndex(), data.getName());
+        }
+    }
+
+    public void start() {
+        // XXX Use caching for optimisation purposes
+        if (ACTIVE_PROGRAM_ID != programID) {
+            glUseProgram(programID);
+            ACTIVE_PROGRAM_ID = programID;
+        }
+    }
+
+    public void finish() {
+        stop();
+        glDeleteProgram(programID);
+    }
+
+    public void stop() {
+        glUseProgram(0);
+        ACTIVE_PROGRAM_ID = -1;
     }
 
     @SneakyThrows
@@ -69,12 +91,6 @@ public abstract class Shader {
         return attributeData;
     }
 
-    static void bindAttributes(int programID, Collection<AttributeData> attributeData) {
-        for (AttributeData data : attributeData) {
-            glBindAttribLocation(programID, data.getIndex(), data.getName());
-        }
-    }
-
     @SneakyThrows
     void locateInputs(int programID) {
         for (Field field : this.getClass().getDeclaredFields()) {
@@ -90,21 +106,5 @@ public abstract class Shader {
         }
     }
 
-    public void start() {
-        // XXX Use caching for optimisation purposes
-        if (ACTIVE_PROGRAM_ID != programID) {
-            glUseProgram(programID);
-            ACTIVE_PROGRAM_ID = programID;
-        }
-    }
-
-    public void finish() {
-        stop();
-        glDeleteProgram(programID);
-    }
-
-    public void stop() {
-        glUseProgram(0);
-        ACTIVE_PROGRAM_ID = -1;
-    }
+    protected abstract void construct();
 }

@@ -2,21 +2,17 @@ package com.ternsip.soil.general;
 
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.events.base.EventReceiver;
-import com.ternsip.soil.universe.common.Settings;
-import lombok.Getter;
-import lombok.Setter;
+import com.ternsip.soil.universe.common.SettingsRepository;
 import lombok.SneakyThrows;
 
-@Getter
-@Setter
 public class UniverseServer implements Threadable {
 
-    public Settings settings;
+    public SettingsRepository settingsRepository;
     public EventReceiver networkEventReceiver;
 
     @Override
     public void init() {
-        settings = new Settings();
+        settingsRepository = new SettingsRepository();
         networkEventReceiver = new EventReceiver();
         spawnEntities();
     }

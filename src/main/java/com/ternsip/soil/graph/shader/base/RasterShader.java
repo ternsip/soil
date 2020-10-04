@@ -18,8 +18,8 @@ public abstract class RasterShader extends Shader {
 
     @Override
     protected void construct() {
-        int vertexShaderID = loadShader((File)findHeader("VERTEX_SHADER"), GL_VERTEX_SHADER);
-        int fragmentShaderID = loadShader((File)findHeader("FRAGMENT_SHADER"), GL_FRAGMENT_SHADER);
+        int vertexShaderID = loadShader((File) findHeader("VERTEX_SHADER"), GL_VERTEX_SHADER);
+        int fragmentShaderID = loadShader((File) findHeader("FRAGMENT_SHADER"), GL_FRAGMENT_SHADER);
         Collection<AttributeData> attributeData = collectAttributeData();
         int programID = glCreateProgram();
         glAttachShader(programID, vertexShaderID);

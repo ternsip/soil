@@ -84,6 +84,11 @@ public class NetworkServer implements Threadable {
         }
     }
 
+    public void addConnection(Connection connection) {
+        getConnections().add(connection);
+        Soil.THREADS.getUniverseServer().networkEventReceiver.registerEvent(OnClientConnect.class, new OnClientConnect(connection));
+    }
+
     private void removeInactiveConnections() {
         getConnections().removeIf(connection -> {
             if (!connection.isActive()) {
@@ -114,11 +119,6 @@ public class NetworkServer implements Threadable {
         Thread.sleep(RETRY_INTERVAL);
     }
 
-    public void addConnection(Connection connection) {
-        getConnections().add(connection);
-        Soil.THREADS.getUniverseServer().networkEventReceiver.registerEvent(OnClientConnect.class, new OnClientConnect(connection));
-    }
-
     private void disconnectClient(Connection connection) {
         if (connection.isActive()) {
             connection.close();
@@ -134,7 +134,6 @@ public class NetworkServer implements Threadable {
         disconnectClient(connection);
         log.debug("Connection to client has been terminated", e);
     }
-
 
 
 }

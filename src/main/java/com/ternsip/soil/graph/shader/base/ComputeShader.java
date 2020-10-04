@@ -21,6 +21,20 @@ public abstract class ComputeShader extends Shader {
 
     private Vector3ic workgroupCounts = new Vector3i(1);
 
+    public void compute(int size) {
+        int rest = size;
+        int x = Maths.clamp(1, workgroupCounts.x(), rest);
+        rest = rest / x + (rest % x > 0 ? 1 : 0);
+        int y = Maths.clamp(1, workgroupCounts.y(), rest);
+        rest = rest / y + (rest % y > 0 ? 1 : 0);
+        int z = Maths.clamp(1, workgroupCounts.z(), rest);
+        rest = rest / z + (rest % z > 0 ? 1 : 0);
+        if (rest != 1) {
+            throw new IllegalArgumentException(String.format("Size %s can not be packet into GPU workgroup %s", size, workgroupCounts));
+        }
+        glDispatchCompute(x, y, z);
+    }
+
     @Override
     protected void construct() {
         int computeShaderID = loadShader((File) findHeader("COMPUTE_SHADER"), GL_COMPUTE_SHADER);
@@ -43,20 +57,6 @@ public abstract class ComputeShader extends Shader {
         glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, workGroupsY);
         glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, workGroupsZ);
         setWorkgroupCounts(new Vector3i(workGroupsX.get(), workGroupsY.get(), workGroupsZ.get()));
-    }
-
-    public void compute(int size) {
-        int rest = size;
-        int x = Maths.clamp(1, workgroupCounts.x(), rest);
-        rest = rest / x + (rest % x > 0 ? 1 : 0);
-        int y = Maths.clamp(1, workgroupCounts.y(), rest);
-        rest = rest / y + (rest % y > 0 ? 1 : 0);
-        int z = Maths.clamp(1, workgroupCounts.z(), rest);
-        rest = rest / z + (rest % z > 0 ? 1 : 0);
-        if (rest != 1) {
-            throw new IllegalArgumentException(String.format("Size %s can not be packet into GPU workgroup %s", size, workgroupCounts));
-        }
-        glDispatchCompute(x, y, z);
     }
 
 }

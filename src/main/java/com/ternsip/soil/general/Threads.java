@@ -1,8 +1,8 @@
 package com.ternsip.soil.general;
 
-import com.ternsip.soil.network.NetworkServerAcceptor;
 import com.ternsip.soil.network.NetworkClient;
 import com.ternsip.soil.network.NetworkServer;
+import com.ternsip.soil.network.NetworkServerAcceptor;
 
 import java.util.Scanner;
 
