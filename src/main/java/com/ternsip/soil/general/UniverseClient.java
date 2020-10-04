@@ -8,7 +8,6 @@ import com.ternsip.soil.common.events.network.OnConnectedToServer;
 import com.ternsip.soil.universe.audio.SoundRepository;
 import com.ternsip.soil.universe.bindings.Bind;
 import com.ternsip.soil.universe.bindings.Bindings;
-import com.ternsip.soil.universe.collisions.base.Collisions;
 import com.ternsip.soil.universe.common.Settings;
 import com.ternsip.soil.universe.protocol.ConsoleMessageServerPacket;
 import lombok.Getter;
@@ -19,7 +18,6 @@ import lombok.SneakyThrows;
 @Setter
 public class UniverseClient implements Threadable {
 
-    public Collisions collisions;
     public Bindings bindings; // TODO move bindings inside settings
     public Settings settings;
     public SoundRepository soundRepository;
@@ -30,7 +28,6 @@ public class UniverseClient implements Threadable {
 
     @Override
     public void init() {
-        collisions = new Collisions();
         settings = new Settings();
         soundRepository = new SoundRepository();
         eventIOReceiver = new EventIOReceiver();

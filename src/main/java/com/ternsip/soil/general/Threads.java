@@ -45,6 +45,8 @@ public class Threads {
                 networkServerThreadWrapper.stop();
                 networkServerThreadWrapper.join();
                 break;
+            } else {
+                System.out.println("Unknown command");
             }
         }
     }
