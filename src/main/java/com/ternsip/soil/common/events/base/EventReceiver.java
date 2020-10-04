@@ -24,7 +24,6 @@ public class EventReceiver {
 
     private final ConcurrentHashMap<Class<?>, EventProcessor> eventProcessors = new ConcurrentHashMap<>();
 
-    // TODO checkout it had been called when inherited
     public EventReceiver() {
         for (Class<? extends Event> clazz : Utils.getAllClasses(Event.class)) {
             eventProcessors.computeIfAbsent(clazz, e -> new EventProcessor());
