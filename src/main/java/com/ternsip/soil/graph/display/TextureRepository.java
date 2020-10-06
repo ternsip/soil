@@ -1,4 +1,4 @@
-package com.ternsip.soil.graph.visual.repository;
+package com.ternsip.soil.graph.display;
 
 import com.ternsip.soil.common.logic.Utils;
 import lombok.Getter;
@@ -150,14 +150,6 @@ public class TextureRepository {
             this.height = h.get();
         }
 
-    }
-
-    @RequiredArgsConstructor
-    @Getter
-    public static class Texture {
-        private final int atlasNumber;
-        private final int layer;
-        private final Vector2f maxUV;
     }
 
 }

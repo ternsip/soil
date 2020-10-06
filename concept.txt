@@ -14,9 +14,8 @@ Features:
 * Player can claim some number of chunks (square area) into his base and configure access for other players to protect his property.
 * Dynamic objects that can be thrown/dropped, be a part of static environment, some objects have despawn time and some is not, some can be destroyed
 * Effects (short animations) can be spawned in huge amounts and can cause glowing, depending
-* Chunks - square area of blocks can be loaded dyna
 * Average visible map size 200x150 blocks and map size 4000 x 3000 (not exact and differs for planets)
-* Suggestion to render patches of blocks over chunks and to dynamically load/unload them based on visibility area
+* Render blocks by rendering single quad fully stretched on view area based on visibility area, taking block indices from ssbo, taking texture by block indices from ssbo
 * Items can be thrown, used, destroyed, crafted, placed as static-entity in the world
 * One static-entity can occupy multiple blocks and player can destroy that entity from any side and any part
 * Entity's moving types: flying (noclip|clip), walking, swimming, physical (with some geometric form)

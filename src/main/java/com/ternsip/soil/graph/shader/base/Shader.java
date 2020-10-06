@@ -1,39 +1,48 @@
 package com.ternsip.soil.graph.shader.base;
 
 import com.ternsip.soil.common.logic.Utils;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.SneakyThrows;
 import org.lwjgl.opengl.GL11;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import static org.lwjgl.opengl.GL20.*;
 
-@Setter(AccessLevel.PROTECTED)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class Shader {
+public final class Shader {
 
-    private static int ACTIVE_PROGRAM_ID = -1;
+    private static final File VERTEX_SHADER = new File("shaders/VertexShader.glsl");
+    private static final File FRAGMENT_SHADER = new File("shaders/FragmentShader.glsl");
 
-    private int programID;
+    private final int programID;
 
-    @SneakyThrows
-    public static <T extends Shader> T createShader(Class<T> clazz) {
-        Constructor<T> constructor = clazz.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        T shader = constructor.newInstance();
-        shader.construct();
-        return shader;
+    private final Mesh mesh = new Mesh();
+
+    // TODO finish all finishables, implement finishable
+    private final BufferLayout blocksBuffer = new BufferLayout(512);
+    private final BufferLayout blockTextureBuffer = new BufferLayout(128);
+
+    public Shader() {
+        int vertexShaderID = loadShader(VERTEX_SHADER, GL_VERTEX_SHADER);
+        int fragmentShaderID = loadShader(FRAGMENT_SHADER, GL_FRAGMENT_SHADER);
+        int programID = glCreateProgram();
+        glAttachShader(programID, vertexShaderID);
+        glAttachShader(programID, fragmentShaderID);
+        bindAttribute(programID, Mesh.INDICES);
+        bindAttribute(programID, Mesh.VERTICES);
+        glLinkProgram(programID);
+        glDetachShader(programID, vertexShaderID);
+        glDetachShader(programID, fragmentShaderID);
+        glDeleteShader(vertexShaderID);
+        glDeleteShader(fragmentShaderID);
+        locateInputs(programID);
+        glValidateProgram(programID);
+        this.programID = programID;
+        glUseProgram(programID);
     }
 
-    static int loadShader(File file, int type) {
+    private static int loadShader(File file, int type) {
         int shaderID = glCreateShader(type);
         glShaderSource(shaderID, new String(Utils.loadResourceAsByteArray(file)));
         glCompileShader(shaderID);
@@ -44,55 +53,24 @@ public abstract class Shader {
         return shaderID;
     }
 
-    static void bindAttributes(int programID, Collection<AttributeData> attributeData) {
-        for (AttributeData data : attributeData) {
-            glBindAttribLocation(programID, data.getIndex(), data.getName());
-        }
+    private static void bindAttribute(int programID, AttributeData attributeData) {
+        glBindAttribLocation(programID, attributeData.getIndex(), attributeData.getName());
     }
 
-    public void start() {
-        // XXX Use caching for optimisation purposes
-        if (ACTIVE_PROGRAM_ID != programID) {
-            glUseProgram(programID);
-            ACTIVE_PROGRAM_ID = programID;
-        }
+    public void render() {
+        mesh.render(); // todo ensure it doesn't need  glUseProgram(0);
     }
 
     public void finish() {
-        stop();
+        glUseProgram(0);
+        mesh.finish();
+        blocksBuffer.finish();
+        blockTextureBuffer.finish();
         glDeleteProgram(programID);
     }
 
-    public void stop() {
-        glUseProgram(0);
-        ACTIVE_PROGRAM_ID = -1;
-    }
-
     @SneakyThrows
-    Object findHeader(String fieldName) {
-        for (Field field : this.getClass().getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers()) && field.getName().equals(fieldName)) {
-                field.setAccessible(true);
-                return field.get(this);
-            }
-        }
-        throw new IllegalArgumentException(String.format("Can't find header %s", fieldName));
-    }
-
-    @SneakyThrows
-    Collection<AttributeData> collectAttributeData() {
-        Collection<AttributeData> attributeData = new ArrayList<>();
-        for (Field field : this.getClass().getFields()) {
-            if (Modifier.isStatic(field.getModifiers()) && field.getType() == AttributeData.class) {
-                field.setAccessible(true);
-                attributeData.add((AttributeData) field.get(this));
-            }
-        }
-        return attributeData;
-    }
-
-    @SneakyThrows
-    void locateInputs(int programID) {
+    private void locateInputs(int programID) {
         for (Field field : this.getClass().getDeclaredFields()) {
             if (!Modifier.isStatic(field.getModifiers())) {
                 field.setAccessible(true);
@@ -106,5 +84,4 @@ public abstract class Shader {
         }
     }
 
-    protected abstract void construct();
 }

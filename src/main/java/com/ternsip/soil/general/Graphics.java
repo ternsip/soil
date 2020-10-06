@@ -1,14 +1,8 @@
 package com.ternsip.soil.general;
 
 import com.ternsip.soil.common.events.base.EventIOReceiver;
-import com.ternsip.soil.graph.camera.Camera;
-import com.ternsip.soil.graph.display.AudioRepository;
-import com.ternsip.soil.graph.display.FrameBuffers;
-import com.ternsip.soil.graph.display.WindowData;
-import com.ternsip.soil.graph.visual.repository.EffigyRepository;
-import com.ternsip.soil.graph.visual.repository.ModelRepository;
-import com.ternsip.soil.graph.visual.repository.ShaderRepository;
-import com.ternsip.soil.graph.visual.repository.TextureRepository;
+import com.ternsip.soil.graph.display.*;
+import com.ternsip.soil.graph.shader.base.Shader;
 
 /**
  * Provides full control over user Input/Output channels
@@ -22,9 +16,7 @@ public class Graphics implements Threadable {
     public FrameBuffers frameBuffers;
     public Camera camera;
     public TextureRepository textureRepository;
-    public ModelRepository modelRepository;
-    public ShaderRepository shaderRepository;
-    public EffigyRepository effigyRepository;
+    public Shader shader;
     public AudioRepository audioRepository;
 
     @Override
@@ -34,9 +26,7 @@ public class Graphics implements Threadable {
         frameBuffers = new FrameBuffers();
         camera = new Camera();
         textureRepository = new TextureRepository();
-        modelRepository = new ModelRepository();
-        shaderRepository = new ShaderRepository();
-        effigyRepository = new EffigyRepository();
+        shader = new Shader();
         audioRepository = new AudioRepository();
     }
 
@@ -45,7 +35,7 @@ public class Graphics implements Threadable {
         frameBuffers.bindBuffer();
         windowData.clear();
         eventIOReceiver.update();
-        effigyRepository.render();
+        shader.render();
         windowData.getFpsCounter().updateFps();
         frameBuffers.resolveBuffer();
         windowData.swapBuffers();
@@ -55,12 +45,10 @@ public class Graphics implements Threadable {
 
     @Override
     public void finish() {
-        modelRepository.finish();
-        shaderRepository.finish();
+        shader.finish();
         textureRepository.finish();
         windowData.finish();
         audioRepository.finish();
-        effigyRepository.finish();
     }
 
 }
