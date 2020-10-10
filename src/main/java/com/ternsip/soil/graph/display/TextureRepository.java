@@ -102,6 +102,10 @@ public class TextureRepository {
         return fileToTexture.get(file);
     }
 
+    public int[] getAtlases() {
+        return atlases;
+    }
+
     public boolean isTextureExists(File file) {
         return fileToTexture.containsKey(file);
     }

@@ -6,6 +6,7 @@ import com.ternsip.soil.common.logic.Utils;
 import com.ternsip.soil.graph.display.Texture;
 import com.ternsip.soil.graph.display.TextureRepository;
 import com.ternsip.soil.graph.shader.uniforms.UniformInteger;
+import com.ternsip.soil.graph.shader.uniforms.UniformSamplers2DArray;
 import com.ternsip.soil.universe.EntityQuad;
 import lombok.SneakyThrows;
 import org.lwjgl.opengl.GL11;
@@ -33,6 +34,7 @@ public final class Shader implements Finishable {
     private final Mesh mesh = new Mesh();
 
     private final UniformInteger layer = new UniformInteger();
+    private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
 
     public final BufferLayout blocksBuffer = new BufferLayout(512);
     public final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length * TEXTURE_BUFFER_CELL_SIZE);
@@ -54,7 +56,7 @@ public final class Shader implements Finishable {
         glValidateProgram(programID);
         this.programID = programID;
         glUseProgram(programID);
-        fillStaticBuffers();
+        loadDefaultData();
     }
 
     private static int loadShader(File file, int type) {
@@ -87,7 +89,7 @@ public final class Shader implements Finishable {
         glDeleteProgram(programID);
     }
 
-    private void fillStaticBuffers() {
+    private void loadDefaultData() {
         int index = 0;
         TextureRepository textureRepository = Soil.THREADS.getGraphics().textureRepository;
         for (TextureType textureType : TextureType.values()) {
@@ -99,6 +101,7 @@ public final class Shader implements Finishable {
             index += TEXTURE_BUFFER_CELL_SIZE;
         }
         textureBuffer.writeToGpu(0, TextureType.values().length * TEXTURE_BUFFER_CELL_SIZE);
+        samplers.loadDefault();
     }
 
     @SneakyThrows

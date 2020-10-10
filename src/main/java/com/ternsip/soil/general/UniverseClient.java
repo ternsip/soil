@@ -62,6 +62,8 @@ public class UniverseClient implements Threadable {
 
     private void spawnMenu() {
         new EntityQuad(0, TextureType.PLAYER_IDLE, 0, 0, 0.9f, 0, 0.9f, 0.5f, 0, 0.5f).register();
+        new EntityQuad(0, TextureType.PLAYER_IDLE, 0, 0, -0.2f, 0, -0.2f, 0.2f, 0, 0.2f).register();
+        new EntityQuad(1, TextureType.PLAYER_IDLE, 0, 0, -0.9f, -0, -0.9f, -0.5f, 0, -0.5f).register();
     }
 
     private void spawnEntities() {
