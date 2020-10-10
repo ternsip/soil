@@ -23,7 +23,7 @@ public final class Shader implements Finishable {
     public static final int QUAD_BUFFER_CELL_SIZE = 1;
     public static final int VERTEX_BUFFER_CELL_SIZE = 2;
     public static final int QUAD_BUFFER_SIZE = Mesh.MAX_QUADS * QUAD_BUFFER_CELL_SIZE;
-    public static final int VERTEX_BUFFER_SIZE = Mesh.MAX_QUADS * Mesh.QUAD_VERTICES * VERTEX_BUFFER_CELL_SIZE;
+    public static final int VERTEX_BUFFER_SIZE = Mesh.MAX_VERTICES * VERTEX_BUFFER_CELL_SIZE;
 
     private static final File VERTEX_SHADER = new File("shaders/VertexShader.glsl");
     private static final File FRAGMENT_SHADER = new File("shaders/FragmentShader.glsl");
@@ -76,8 +76,8 @@ public final class Shader implements Finishable {
                 continue;
             }
             this.layer.load(layerIndex);
-            quadBuffer.writeToGpu(layerIndex * QUAD_BUFFER_SIZE, layerIndex * QUAD_BUFFER_SIZE + quads);
-            vertexBuffer.writeToGpu(layerIndex * VERTEX_BUFFER_SIZE, layerIndex * VERTEX_BUFFER_SIZE + quads * Mesh.QUAD_VERTICES);
+            quadBuffer.writeToGpu(layerIndex * QUAD_BUFFER_SIZE, layerIndex * QUAD_BUFFER_SIZE + quads * QUAD_BUFFER_CELL_SIZE);
+            vertexBuffer.writeToGpu(layerIndex * VERTEX_BUFFER_SIZE, layerIndex * VERTEX_BUFFER_SIZE + quads * Mesh.QUAD_VERTICES * VERTEX_BUFFER_CELL_SIZE);
             mesh.render(quads);
         }
         // todo ensure it doesn't need  glUseProgram(0); each call

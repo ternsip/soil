@@ -1,13 +1,23 @@
 #version 430 core
 
+const int MAX_VERTICES = 1 << 16;
+
+struct Vertex {
+    float x;
+    float y;
+};
+
 layout (std430, binding = 3) buffer vertexBuffer {
-	float positions[];
+    Vertex vertices[];
 };
 
 //in int index;
 
 uniform int layer;
 
-void main(void){
-	gl_Position = vec4(layer, gl_VertexID, gl_VertexID, 1.0);
+void main(void) {
+
+	Vertex v = vertices[layer * MAX_VERTICES + gl_VertexID];
+    gl_Position = vec4(v.x, v.y, 0, 1.0);
+
 }
