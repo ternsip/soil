@@ -45,7 +45,6 @@ public final class Shader implements Finishable {
         int programID = glCreateProgram();
         glAttachShader(programID, vertexShaderID);
         glAttachShader(programID, fragmentShaderID);
-        glBindAttribLocation(programID, Mesh.INDICES_ATTRIBUTE_POINTER,  "index"); // TODO not sure if this needed, use gl_VertexID
         glLinkProgram(programID);
         glDetachShader(programID, vertexShaderID);
         glDetachShader(programID, fragmentShaderID);

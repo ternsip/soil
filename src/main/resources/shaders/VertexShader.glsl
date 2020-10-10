@@ -11,8 +11,6 @@ layout (std430, binding = 3) buffer vertexBuffer {
     Vertex vertices[];
 };
 
-//in int index;
-
 uniform int layer;
 
 void main(void) {

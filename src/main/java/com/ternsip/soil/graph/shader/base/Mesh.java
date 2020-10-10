@@ -7,7 +7,6 @@ import java.nio.IntBuffer;
 import java.util.stream.IntStream;
 
 import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glDrawArrays;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
@@ -28,7 +27,6 @@ public final class Mesh implements Finishable {
         glBindVertexArray(vao);
         this.indicesVBO = glGenBuffers();
         IntBuffer indices = Utils.arrayToBuffer(IntStream.range(0, MAX_VERTICES).toArray());
-        indices.rewind(); // TODO is this needed?
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesVBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
         glBindVertexArray(0);
