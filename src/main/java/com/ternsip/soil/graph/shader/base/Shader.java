@@ -79,7 +79,6 @@ public final class Shader implements Finishable {
             vertexBuffer.writeToGpu(layerIndex * VERTEX_BUFFER_SIZE, layerIndex * VERTEX_BUFFER_SIZE + quads * Mesh.QUAD_VERTICES * VERTEX_BUFFER_CELL_SIZE);
             mesh.render(quads);
         }
-        // todo ensure it doesn't need  glUseProgram(0); each call
     }
 
     public void finish() {
