@@ -25,7 +25,7 @@ layout (std430, binding = 2) buffer quadBuffer {
     Quad quadData[];
 };
 
-in float quad; // TODO consider gl_PrimitiveID
+in float quadIndex;
 in vec2 texture_xy;
 
 out vec4 out_Color;
@@ -56,8 +56,8 @@ int roundFloat(float value) {
 
 void main(void) {
 
-    Quad q = quadData[roundFloat(quad)];
-    TextureData t = textures[q.type];
-    out_Color = getTexture(t.atlasNumber, vec3(texture_xy * vec2(t.maxU, t.maxV), t.layer));
+    Quad quad = quadData[roundFloat(quadIndex)];
+    TextureData textureData = textures[quad.type];
+    out_Color = getTexture(textureData.atlasNumber, vec3(texture_xy * vec2(textureData.maxU, textureData.maxV), textureData.layer));
 
 }
