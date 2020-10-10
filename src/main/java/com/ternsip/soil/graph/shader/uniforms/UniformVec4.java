@@ -10,6 +10,7 @@ public class UniformVec4 extends Uniform<Vector4fc> {
 
     private Vector4fc value;
 
+    @Override
     public void load(Vector4fc value) {
         if (this.value == null || !this.value.equals(value)) {
             this.value = new Vector4f(value);

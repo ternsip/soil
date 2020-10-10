@@ -14,7 +14,7 @@ public abstract class Uniform<T> extends Locatable {
     public void locate(int programID, String name) {
         int location = glGetUniformLocation(programID, name);
         if (location == NOT_LOCATED) {
-            log.debug("Uniform variable not found - {}", name);
+            log.error("Uniform variable not found - {}", name);
         } else {
             setLocation(location);
         }

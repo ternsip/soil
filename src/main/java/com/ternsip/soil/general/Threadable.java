@@ -13,7 +13,11 @@ public interface Threadable {
     @SneakyThrows
     default void lock() {
         synchronized (this) {
-            this.wait();
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 

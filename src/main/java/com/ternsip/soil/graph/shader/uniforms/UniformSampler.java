@@ -8,6 +8,7 @@ public class UniformSampler extends Uniform<Integer> {
 
     private Integer value;
 
+    @Override
     public void load(Integer value) {
         if (this.value == null || !this.value.equals(value)) {
             this.value = value;

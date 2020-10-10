@@ -8,6 +8,7 @@ public class UniformFloat extends Uniform<Float> {
 
     private Float value;
 
+    @Override
     public void load(Float value) {
         if (this.value == null || !this.value.equals(value)) {
             this.value = value;

@@ -4,7 +4,11 @@ import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.events.base.Callback;
 import com.ternsip.soil.common.events.base.EventIOReceiver;
 import com.ternsip.soil.common.events.base.EventReceiver;
+import com.ternsip.soil.common.events.display.ShaderRegisteredEvent;
 import com.ternsip.soil.common.events.network.OnConnectedToServer;
+import com.ternsip.soil.graph.shader.base.TextureType;
+import com.ternsip.soil.universe.EntityQuad;
+import com.ternsip.soil.universe.EntityRepository;
 import com.ternsip.soil.universe.audio.SoundRepository;
 import com.ternsip.soil.universe.bindings.Bind;
 import com.ternsip.soil.universe.bindings.Bindings;
@@ -14,12 +18,14 @@ import lombok.SneakyThrows;
 
 public class UniverseClient implements Threadable {
 
+    // TODO make this callbacks automatic
     private final Callback<OnConnectedToServer> onConnectedToServerCallback = this::whenConnected;
+    private final Callback<ShaderRegisteredEvent> registerShaderCallback = this::registerShader;
     public Bindings bindings; // TODO move bindings inside settings
     public SettingsRepository settingsRepository;
     public SoundRepository soundRepository;
     public EventIOReceiver eventIOReceiver;
-    public EventReceiver networkEventReceiver;
+    public EntityRepository entityRepository;
 
     @Override
     public void init() {
@@ -27,21 +33,21 @@ public class UniverseClient implements Threadable {
         soundRepository = new SoundRepository();
         eventIOReceiver = new EventIOReceiver();
         bindings = new Bindings();
-        networkEventReceiver = new EventReceiver();
-        spawnMenu();
-        networkEventReceiver.registerCallback(OnConnectedToServer.class, onConnectedToServerCallback);
+        entityRepository = new EntityRepository();
+        eventIOReceiver.registerCallback(OnConnectedToServer.class, onConnectedToServerCallback);
+        eventIOReceiver.registerCallback(ShaderRegisteredEvent.class, registerShaderCallback);
     }
 
     @Override
     public void update() {
         eventIOReceiver.update();
-        networkEventReceiver.update();
     }
 
     @SneakyThrows
     @Override
     public void finish() {
-        networkEventReceiver.unregisterCallback(OnConnectedToServer.class, onConnectedToServerCallback);
+        eventIOReceiver.unregisterCallback(OnConnectedToServer.class, onConnectedToServerCallback);
+        eventIOReceiver.unregisterCallback(ShaderRegisteredEvent.class, registerShaderCallback);
         bindings.finish();
     }
 
@@ -55,6 +61,7 @@ public class UniverseClient implements Threadable {
     }
 
     private void spawnMenu() {
+        new EntityQuad(0, TextureType.PLAYER_IDLE, 0, 0, 100, 0, 100, 100, 0, 100).register();
     }
 
     private void spawnEntities() {
@@ -63,6 +70,11 @@ public class UniverseClient implements Threadable {
 
     private void whenConnected(OnConnectedToServer onConnectedToServer) {
         spawnEntities();
+    }
+
+    private void registerShader(ShaderRegisteredEvent shaderRegisteredEvent) {
+        EntityQuad.SHADER = shaderRegisteredEvent.getShader();
+        spawnMenu();
     }
 
 }

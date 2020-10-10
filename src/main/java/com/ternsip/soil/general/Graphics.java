@@ -1,6 +1,8 @@
 package com.ternsip.soil.general;
 
+import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.events.base.EventIOReceiver;
+import com.ternsip.soil.common.events.display.ShaderRegisteredEvent;
 import com.ternsip.soil.graph.display.*;
 import com.ternsip.soil.graph.shader.base.Shader;
 
@@ -27,6 +29,7 @@ public class Graphics implements Threadable {
         camera = new Camera();
         textureRepository = new TextureRepository();
         shader = new Shader();
+        Soil.THREADS.getUniverseClient().eventIOReceiver.registerEvent(ShaderRegisteredEvent.class, new ShaderRegisteredEvent(shader));
         audioRepository = new AudioRepository();
     }
 

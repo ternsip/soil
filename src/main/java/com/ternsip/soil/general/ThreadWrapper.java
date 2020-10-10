@@ -4,11 +4,15 @@ import com.ternsip.soil.common.logic.Timer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
+import static org.reflections.Reflections.log;
+
 @RequiredArgsConstructor
+@Slf4j
 @Getter
 public class ThreadWrapper<T extends Threadable> {
 
@@ -29,36 +33,36 @@ public class ThreadWrapper<T extends Threadable> {
     }
 
     public void stop() {
-        getTask().deactivate();
+        task.deactivate();
     }
 
     @SneakyThrows
     public void join() {
-        getThread().join();
+        thread.join();
     }
 
     public boolean isActive() {
-        return getTask().isActive();
+        return task.active.get();
     }
 
     public T getObjective() {
-        return getTask().getObjective();
+        return task.objective;
+    }
+
+    public void waitInitialization() {
+        task.lock();
     }
 
     public void setTimeout(long timeout) {
-        getTask().getTimer().setTimeout(timeout);
+        task.timer.setTimeout(timeout);
     }
 
-    @RequiredArgsConstructor
-    @Getter
     private static final class Task<T extends Threadable> implements Runnable {
 
         private final AtomicBoolean active = new AtomicBoolean(true);
         private final Supplier<T> supplier;
         private final Timer timer;
-
-        @Getter(lazy = true)
-        private final T objective = supplier.get();
+        private T objective = null;
 
         Task(Supplier<T> supplier, long timeout) {
             this.supplier = supplier;
@@ -67,22 +71,36 @@ public class ThreadWrapper<T extends Threadable> {
 
         @Override
         public final void run() {
-            getObjective().init();
-            while (isActive()) {
-                getObjective().update();
-                getTimer().rest();
+            objective = supplier.get();
+            objective.init();
+            unlock();
+            while (active.get()) {
+                objective.update();
+                timer.rest();
             }
-            getObjective().finish();
-        }
-
-        final boolean isActive() {
-            return getActive().get();
+            objective.finish();
         }
 
         final void deactivate() {
-            getActive().set(false);
-            getObjective().unlock();
+            active.set(false);
+            if (objective != null) {
+                objective.unlock();
+            }
         }
+
+        final synchronized void lock() {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Thread interrupted", e);
+            }
+        }
+
+        final synchronized void unlock() {
+            notify();
+        }
+
     }
 
 }

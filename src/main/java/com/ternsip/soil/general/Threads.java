@@ -3,9 +3,11 @@ package com.ternsip.soil.general;
 import com.ternsip.soil.network.NetworkClient;
 import com.ternsip.soil.network.NetworkServer;
 import com.ternsip.soil.network.NetworkServerAcceptor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Scanner;
 
+@Slf4j
 public class Threads {
 
     private final Thread mainThread = Thread.currentThread();
@@ -19,7 +21,9 @@ public class Threads {
 
     public void runClient() {
         universeClientThreadWrapper.start();
+        universeClientThreadWrapper.waitInitialization();
         networkClientThreadWrapper.start();
+        networkClientThreadWrapper.waitInitialization();
         graphics.init();
         while (graphics.windowData.isActive() && universeClientThreadWrapper.isActive()) {
             graphics.update();
@@ -33,8 +37,11 @@ public class Threads {
 
     public void runServer() {
         networkServerThreadWrapper.start();
+        networkServerThreadWrapper.waitInitialization();
         universeServerThreadWrapper.start();
+        universeServerThreadWrapper.waitInitialization();
         networkServerAcceptorThread.start();
+        networkServerAcceptorThread.waitInitialization();
         while (scanner.hasNext()) {
             String inputMessage = scanner.next();
             if (inputMessage.equalsIgnoreCase("exit")) {

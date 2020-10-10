@@ -1,4 +1,16 @@
-#version 130
+#version 430 core
+
+layout (std430, binding = 0) buffer blocksBuffer {
+    int blocks[];
+};
+
+layout (std430, binding = 1) buffer textureBuffer {
+    float textures[];
+};
+
+layout (std430, binding = 2) buffer quadBuffer {
+    float quadData[];
+};
 
 out vec4 out_Color;
 

@@ -10,6 +10,7 @@ public class UniformVec3 extends Uniform<Vector3fc> {
 
     private Vector3fc value;
 
+    @Override
     public void load(Vector3fc value) {
         if (this.value == null || !this.value.equals(value)) {
             this.value = new Vector3f(value);

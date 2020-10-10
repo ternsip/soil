@@ -8,6 +8,7 @@ public class UniformBoolean extends Uniform<Boolean> {
 
     private Boolean value;
 
+    @Override
     public void load(Boolean value) {
         if (this.value == null || !this.value.equals(value)) {
             this.value = value;

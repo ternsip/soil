@@ -11,6 +11,7 @@ public class UniformVec2 extends Uniform<Vector2fc> {
 
     private Vector2fc value;
 
+    @Override
     public void load(Vector2fc value) {
         if (this.value == null || !this.value.equals(value)) {
             this.value = new Vector2f(value);

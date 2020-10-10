@@ -1,5 +1,8 @@
 package com.ternsip.soil.graph.shader.base;
 
+import com.ternsip.soil.common.logic.Finishable;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.BufferUtils;
 
@@ -8,14 +11,8 @@ import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.ARBShaderStorageBufferObject.GL_SHADER_STORAGE_BUFFER;
-import static org.lwjgl.opengl.GL15C.GL_DYNAMIC_DRAW;
-import static org.lwjgl.opengl.GL15C.glBindBuffer;
-import static org.lwjgl.opengl.GL15C.glBufferSubData;
-import static org.lwjgl.opengl.GL15C.glGenBuffers;
-import static org.lwjgl.opengl.GL15C.glGetBufferSubData;
-import static org.lwjgl.opengl.GL43.glBufferData;
-import static org.lwjgl.opengl.GL43.glDeleteBuffers;
-import static org.lwjgl.opengl.GL43.*;
+import static org.lwjgl.opengl.GL43C.*;
+
 
 /*
  * NOTE: You might need to write vec4 here, because SSBOs have specific
@@ -24,29 +21,33 @@ import static org.lwjgl.opengl.GL43.*;
  * "https://www.safaribooksonline.com/library/view/opengl-programming-guide/9780132748445/app09lev1sec3.html"
  */
 @Slf4j
-public class BufferLayout extends Locatable {
+public class BufferLayout extends Locatable implements Finishable {
 
+    // TODO think about heap buffer instead of direct
+    // TODO http://voidptr.io/blog/2016/04/28/ldEngine-Part-1.html
     private static final int FOUR_BYTES = 4;
     private static final int VEC4_BYTES = FOUR_BYTES * 4;
     private static final ByteOrder BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
 
     private final int ssbo;
-    private ByteBuffer data;
+    private final ByteBuffer data;
 
     public BufferLayout(int size) {
-        if (size % VEC4_BYTES != 0) {
-            throw new IllegalArgumentException("SSBO should be always multiple of 16 (vec4 in memory)");
+        int bytesSize = size * FOUR_BYTES;
+        if (bytesSize % VEC4_BYTES != 0) {
+            throw new IllegalArgumentException("SSBO should be always multiple of 16 (vec4 in memory)"); // TODO mb vec3 in memory? depends
         }
         this.ssbo = glGenBuffers();
-        this.data = ByteBuffer.allocateDirect(size * FOUR_BYTES);
+        this.data = ByteBuffer.allocateDirect(bytesSize);
         this.data.order(BYTE_ORDER);
         allocateBuffer();
     }
 
+    @Override
     public void locate(int programID, String name) {
         int boxesResourceIndex = glGetProgramResourceIndex(programID, GL_SHADER_STORAGE_BLOCK, name);
         if (boxesResourceIndex == NOT_LOCATED) {
-            log.debug("Buffer layout not found - {}", name);
+            log.error("Buffer layout not found - {}", name);
         } else {
             IntBuffer props = BufferUtils.createIntBuffer(1);
             IntBuffer params = BufferUtils.createIntBuffer(1);
@@ -58,13 +59,13 @@ public class BufferLayout extends Locatable {
         }
     }
 
-    public void updateSubBuffer(int offset, int size) {
+    void writeToGpu(int offset, int size) {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, FOUR_BYTES * offset, sliceData(offset, size));
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
-    public void read(int offset, int size) {
+    void readFromGpu(int offset, int size) {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
         glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, FOUR_BYTES * offset, sliceData(offset, size));
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
@@ -86,22 +87,9 @@ public class BufferLayout extends Locatable {
         data.putFloat(index * FOUR_BYTES, value);
     }
 
+    @Override
     public void finish() {
         glDeleteBuffers(ssbo);
-    }
-
-    public void fill(int offset, int size, int value) {
-        int end = offset + size;
-        for (int i = offset; i < end; ++i) {
-            writeInt(i, value); // TODO use array fill
-        }
-    }
-
-    public void fill(int offset, int size, float value) {
-        int end = offset + size;
-        for (int i = offset; i < end; ++i) {
-            writeFloat(i, value); // TODO use array fill
-        }
     }
 
     private void allocateBuffer() {
@@ -117,5 +105,6 @@ public class BufferLayout extends Locatable {
         byteBuffer.limit(size * FOUR_BYTES);
         return byteBuffer;
     }
+
 
 }

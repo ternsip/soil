@@ -12,6 +12,7 @@ public class UniformMatrix4 extends Uniform<Matrix4fc> {
 
     private static FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
+    @Override
     public void load(Matrix4fc value) {
         value.get(matrixBuffer);
         glUniformMatrix4fv(getLocation(), false, matrixBuffer);
