@@ -5,6 +5,7 @@ import com.ternsip.soil.common.logic.Finishable;
 import com.ternsip.soil.common.logic.Utils;
 import com.ternsip.soil.graph.display.Texture;
 import com.ternsip.soil.graph.display.TextureRepository;
+import com.ternsip.soil.graph.shader.uniforms.UniformFloat;
 import com.ternsip.soil.graph.shader.uniforms.UniformInteger;
 import com.ternsip.soil.graph.shader.uniforms.UniformSamplers2DArray;
 import com.ternsip.soil.universe.EntityQuad;
@@ -19,8 +20,10 @@ import static org.lwjgl.opengl.GL20.*;
 
 public final class Shader implements Finishable {
 
+    public static final long TIME_PERIOD_MILLISECONDS = 1_000L;
+    public static final float TIME_PERIOD_DIVISOR = 1000f;
     public static final int MAX_LAYERS = 16;
-    public static final int TEXTURE_BUFFER_CELL_SIZE = 4;
+    public static final int TEXTURE_BUFFER_CELL_SIZE = 5;
     public static final int QUAD_BUFFER_CELL_SIZE = 1;
     public static final int VERTEX_BUFFER_CELL_SIZE = 2;
     public static final int QUAD_BUFFER_SIZE = Mesh.MAX_QUADS * QUAD_BUFFER_CELL_SIZE;
@@ -34,6 +37,7 @@ public final class Shader implements Finishable {
     private final Mesh mesh = new Mesh();
 
     private final UniformInteger layer = new UniformInteger();
+    private final UniformFloat time = new UniformFloat();
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
 
     public final BufferLayout blocksBuffer = new BufferLayout(512);
@@ -77,6 +81,7 @@ public final class Shader implements Finishable {
                 continue;
             }
             this.layer.load(layerIndex);
+            this.time.load((System.currentTimeMillis() % TIME_PERIOD_MILLISECONDS) / TIME_PERIOD_DIVISOR);
             quadBuffer.writeToGpu(layerIndex * QUAD_BUFFER_SIZE, layerIndex * QUAD_BUFFER_SIZE + quads * QUAD_BUFFER_CELL_SIZE);
             vertexBuffer.writeToGpu(layerIndex * VERTEX_BUFFER_SIZE, layerIndex * VERTEX_BUFFER_SIZE + quads * Mesh.QUAD_VERTICES * VERTEX_BUFFER_CELL_SIZE);
             mesh.render(quads);
@@ -94,10 +99,11 @@ public final class Shader implements Finishable {
         TextureRepository textureRepository = Soil.THREADS.getGraphics().textureRepository;
         for (TextureType textureType : TextureType.values()) {
             Texture texture = textureRepository.getTexture(textureType.file);
-            textureBuffer.writeInt(index, texture.getLayer());
-            textureBuffer.writeInt(index + 1, texture.getAtlasNumber());
-            textureBuffer.writeFloat(index + 2, texture.getMaxU());
-            textureBuffer.writeFloat(index + 3, texture.getMaxV());
+            textureBuffer.writeInt(index, texture.getLayerStart());
+            textureBuffer.writeInt(index + 1, texture.getLayerEnd());
+            textureBuffer.writeInt(index + 2, texture.getAtlasNumber());
+            textureBuffer.writeFloat(index + 3, texture.getMaxU());
+            textureBuffer.writeFloat(index + 4, texture.getMaxV());
             index += TEXTURE_BUFFER_CELL_SIZE;
         }
         textureBuffer.writeToGpu(0, TextureType.values().length * TEXTURE_BUFFER_CELL_SIZE);

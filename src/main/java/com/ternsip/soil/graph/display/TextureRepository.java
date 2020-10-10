@@ -1,15 +1,21 @@
 package com.ternsip.soil.graph.display;
 
+import com.sun.imageio.plugins.gif.GIFImageReader;
+import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
 import com.ternsip.soil.common.logic.Utils;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,7 +37,7 @@ public class TextureRepository {
 
     public final static int MIPMAP_LEVELS = 4;
     public final static File MISSING_TEXTURE = new File("tools/missing.jpg");
-    public final static String[] EXTENSIONS = {"jpg", "png", "bmp", "jpeg"};
+    public final static String[] EXTENSIONS = {"jpg", "png", "bmp", "jpeg", "gif"};
     public final static int[] ATLAS_RESOLUTIONS = new int[]{16, 32, 64, 128, 256, 512, 1024, 2048, 4096};
 
     private final int[] atlases;
@@ -69,16 +75,22 @@ public class TextureRepository {
 
             usedImages.addAll(suitableImages);
 
-            glTexStorage3D(GL_TEXTURE_2D_ARRAY, MIPMAP_LEVELS, GL_RGBA8, atlasResolution, atlasResolution, Math.max(1, suitableImages.size()));
+            int depth = suitableImages.stream().mapToInt(e -> e.frameData.length).sum();
+
+            glTexStorage3D(GL_TEXTURE_2D_ARRAY, MIPMAP_LEVELS, GL_RGBA8, atlasResolution, atlasResolution, Math.max(1, depth));
             ByteBuffer cleanData = Utils.arrayToBuffer(new byte[atlasResolution * atlasResolution * 4]);
 
-            for (int layer = 0; layer < suitableImages.size(); ++layer) {
-                Image image = suitableImages.get(layer);
-                cleanData.rewind();
-                // set the whole texture to transparent (so min/mag filters don't find bad data off the edge of the actual image data)
-                glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, atlasResolution, atlasResolution, 1, GL_RGBA, GL_UNSIGNED_BYTE, cleanData);
-                glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, image.getWidth(), image.getHeight(), 1, GL_RGBA, GL_UNSIGNED_BYTE, Utils.arrayToBuffer(image.getData()));
-                Texture texture = new Texture(atlasNumber, layer, image.getWidth() / (float) atlasResolution, image.getHeight() / (float) atlasResolution);
+            int layer = 0;
+            for (Image image : suitableImages) {
+                int layerStart = layer;
+                for (int frame = 0; frame < image.frameData.length; ++frame) {
+                    cleanData.rewind();
+                    // set the whole texture to transparent (so min/mag filters don't find bad data off the edge of the actual image data)
+                    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, atlasResolution, atlasResolution, 1, GL_RGBA, GL_UNSIGNED_BYTE, cleanData);
+                    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, image.getWidth(), image.getHeight(), 1, GL_RGBA, GL_UNSIGNED_BYTE, Utils.arrayToBuffer(image.frameData[frame]));
+                    layer++;
+                }
+                Texture texture = new Texture(atlasNumber, layerStart, layer - 1, image.getWidth() / (float) atlasResolution, image.getHeight() / (float) atlasResolution);
                 this.fileToTexture.put(image.getFile(), texture);
             }
             glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
@@ -131,7 +143,6 @@ public class TextureRepository {
         }
     }
 
-    @RequiredArgsConstructor
     @Getter
     private static class Image {
 
@@ -140,17 +151,58 @@ public class TextureRepository {
         private final File file;
         private final int width;
         private final int height;
-        private final byte[] data;
+        private final byte[][] frameData;
 
+        @SneakyThrows
         Image(File file) {
             this.file = file;
-            ByteBuffer imageData = Utils.loadResourceToByteBuffer(file);
-            IntBuffer w = BufferUtils.createIntBuffer(1);
-            IntBuffer h = BufferUtils.createIntBuffer(1);
-            IntBuffer avChannels = BufferUtils.createIntBuffer(1);
-            this.data = Utils.bufferToArray(stbi_load_from_memory(imageData, w, h, avChannels, COMPONENT_RGBA));
-            this.width = w.get();
-            this.height = h.get();
+            if (file.getName().endsWith("gif")) {
+                List<BufferedImage> frames = new ArrayList<>();
+                ImageReader imageReader = new GIFImageReader(new GIFImageReaderSpi());
+                imageReader.setInput(ImageIO.createImageInputStream(Utils.loadResourceAsStream(file)));
+                for (int i = 0; i < imageReader.getNumImages(true); i++) {
+                    frames.add(imageReader.read(i));
+                }
+                frameData = new byte[frames.size()][]; // TODO MAKE THIS BETTER + case with transparent (not overlapping), imageReader.getImageMetadata(0) transparentColorFlag
+                BufferedImage lastImage = frames.remove(0);
+                int pointer = 0;
+                frameData[pointer++] = bufferedImageToBitmapRGBA(lastImage);
+                this.width = lastImage.getWidth();
+                this.height = lastImage.getHeight();
+                for (BufferedImage frame : frames) {
+                    BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                    Graphics graphics = img.getGraphics();
+                    graphics.drawImage(lastImage, 0, 0, null);
+                    graphics.drawImage(frame, 0, 0, null);
+                    frameData[pointer++] = bufferedImageToBitmapRGBA(img);
+                    lastImage = img;
+                }
+            } else {
+                ByteBuffer imageData = Utils.loadResourceToByteBuffer(file);
+                IntBuffer w = BufferUtils.createIntBuffer(1);
+                IntBuffer h = BufferUtils.createIntBuffer(1);
+                IntBuffer avChannels = BufferUtils.createIntBuffer(1);
+                this.frameData = new byte[][]{Utils.bufferToArray(stbi_load_from_memory(imageData, w, h, avChannels, COMPONENT_RGBA))};
+                this.width = w.get();
+                this.height = h.get();
+            }
+        }
+
+        private static byte[] bufferedImageToBitmapRGBA(BufferedImage image) {
+            int width = image.getWidth();
+            int height = image.getHeight();
+            byte[] dataRGBA = new byte[width * height * COMPONENT_RGBA];
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    int argb = image.getRGB(x, y);
+                    int offset = (y * width + x) * COMPONENT_RGBA;
+                    dataRGBA[offset] = (byte) (argb >>> 16);
+                    dataRGBA[offset + 1] = (byte) (argb >>> 8);
+                    dataRGBA[offset + 2] = (byte) argb;
+                    dataRGBA[offset + 3] = (byte) (argb >>> 24);
+                }
+            }
+            return dataRGBA;
         }
 
     }

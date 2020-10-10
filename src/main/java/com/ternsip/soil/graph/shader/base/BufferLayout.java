@@ -33,6 +33,7 @@ public class BufferLayout extends Locatable implements Finishable {
     private final ByteBuffer data;
 
     public BufferLayout(int size) {
+        size += (4 - size % 4) % 4; // TODO think about that
         int bytesSize = size * FOUR_BYTES;
         if (bytesSize % VEC4_BYTES != 0) {
             throw new IllegalArgumentException("SSBO should be always multiple of 16 (vec4 in memory)"); // TODO mb vec3 in memory? depends
