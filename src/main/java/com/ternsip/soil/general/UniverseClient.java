@@ -3,7 +3,6 @@ package com.ternsip.soil.general;
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.events.base.Callback;
 import com.ternsip.soil.common.events.base.EventIOReceiver;
-import com.ternsip.soil.common.events.base.EventReceiver;
 import com.ternsip.soil.common.events.display.ShaderRegisteredEvent;
 import com.ternsip.soil.common.events.network.OnConnectedToServer;
 import com.ternsip.soil.graph.shader.base.TextureType;
@@ -61,13 +60,13 @@ public class UniverseClient implements Threadable {
     }
 
     private void spawnMenu() {
-        new EntityQuad(2, TextureType.BACKGROUND, -1, -1, 1, -1, 1, 1, -1, 1).register();
-        new EntityQuad(1, TextureType.PLAYER_IDLE, 0, 0, 0.9f, 0, 0.9f, 0.5f, 0, 0.5f).register();
-        new EntityQuad(1, TextureType.PLAYER_ATTACK, -0.2f, 0.2f, 0, 0.2f, 0, 0, -0.2f, 0).register();
-        new EntityQuad(1, TextureType.HOMER, -0.4f, 0.2f, -0.2f, 0.2f, -0.2f, 0, -0.4f, 0).register();
-        new EntityQuad(1, TextureType.TEST, -0.8f, 0.2f, -0.4f, 0.2f, -0.4f, 0, -0.8f, 0).register();
-        new EntityQuad(1, TextureType.KITTY, -0.8f, 0.4f, -0.4f, 0.4f, -0.4f, 0.2f, -0.8f, 0.2f).register();
-        new EntityQuad(0, TextureType.PLAYER_IDLE, 0, 0, -0.9f, -0, -0.9f, -0.5f, 0, -0.5f).register();
+        new EntityQuad(2, TextureType.BACKGROUND, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1).register();
+        new EntityQuad(1, TextureType.PLAYER_IDLE, 1000.0f, 0, 0, 0.9f, 0, 0.9f, 0.5f, 0, 0.5f).register();
+        new EntityQuad(1, TextureType.PLAYER_ATTACK, 5000.0f, -0.2f, 0.2f, 0, 0.2f, 0, 0, -0.2f, 0).register();
+        new EntityQuad(1, TextureType.HOMER, 1000.0f, -0.4f, 0.2f, -0.2f, 0.2f, -0.2f, 0, -0.4f, 0).register();
+        new EntityQuad(1, TextureType.TEST, 1000.0f, -0.8f, 0.2f, -0.4f, 0.2f, -0.4f, 0, -0.8f, 0).register();
+        new EntityQuad(1, TextureType.KITTY, 1000.0f, -0.8f, 0.4f, -0.4f, 0.4f, -0.4f, 0.2f, -0.8f, 0.2f).register();
+        new EntityQuad(0, TextureType.PLAYER_IDLE, 1000.0f, 0, 0, -0.9f, -0, -0.9f, -0.5f, 0, -0.5f).register();
     }
 
     private void spawnEntities() {

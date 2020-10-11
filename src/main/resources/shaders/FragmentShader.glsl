@@ -12,6 +12,7 @@ struct TextureData {
 
 struct Quad {
     int type;
+    float period;
 };
 
 layout (std430, binding = 0) buffer blocksBuffer {
@@ -40,8 +41,8 @@ int roundFloat(float value) {
 
 void main(void) {
 
-    float timeDelta = mod(time, 4000) / 4000.0;
     Quad quad = quadData[roundFloat(quadIndex)];
+    float timeDelta = mod(time, quad.period) / quad.period;
     TextureData textureData = textures[quad.type];
     int count = textureData.layerEnd - textureData.layerStart + 1;
     int textureLayer = textureData.layerStart + clamp(int(timeDelta * count), 0, count - 1);

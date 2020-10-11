@@ -20,13 +20,15 @@ public class EntityQuad {
     public int index = UNASSIGNED;
     public TextureType textureType;
     public float x1, y1, x2, y2, x3, y3, x4, y4;
+    public float period;
 
-    public EntityQuad(int layer, TextureType textureType, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
+    public EntityQuad(int layer, TextureType textureType, float period, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
         if (layer < 0 || layer > Shader.MAX_LAYERS) {
             throw new IllegalArgumentException("Layer number is out of bound!");
         }
         this.layer = layer;
         this.textureType = textureType;
+        this.period = period;
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
@@ -46,6 +48,7 @@ public class EntityQuad {
         int quadOffset = layer * Shader.QUAD_BUFFER_SIZE + index * Shader.QUAD_BUFFER_CELL_SIZE;
         int vertexOffset = layer * Shader.VERTEX_BUFFER_SIZE + index * Mesh.QUAD_VERTICES * Shader.VERTEX_BUFFER_CELL_SIZE;
         quadBuffer.writeInt(quadOffset, textureType.ordinal());
+        quadBuffer.writeFloat(quadOffset + 1, period);
         vertexBuffer.writeFloat(vertexOffset, x1);
         vertexBuffer.writeFloat(vertexOffset + 1, y1);
         vertexBuffer.writeFloat(vertexOffset + 2, x2);
