@@ -68,8 +68,7 @@ void main(void) {
         }
         int blockX = int(realX);
         int blockY = int(realY);
-        int block = blocks[blockY * BLOCKS_X + blockX];
-        out_Color = resolveQuadTexel(block, quad.period, vec2(realX - blockX, 1 - (realY - blockY)));
+        out_Color = resolveQuadTexel(blocks[blockY * BLOCKS_X + blockX], quad.period, vec2(realX - blockX, 1 - (realY - blockY)));
         return;
     }
     out_Color = resolveQuadTexel(quad.type, quad.period, texture_xy);
