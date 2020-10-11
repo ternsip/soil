@@ -32,6 +32,8 @@ in vec2 texture_xy;
 
 out vec4 out_Color;
 
+uniform vec2 cameraPos;
+uniform vec2 cameraScale;
 uniform int time;
 uniform sampler2DArray[MAX_SAMPLERS] samplers;
 

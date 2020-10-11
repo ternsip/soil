@@ -15,6 +15,8 @@ layout (std430, binding = 3) buffer vertexBuffer {
 };
 
 uniform int layer;
+uniform vec2 cameraPos;
+uniform vec2 cameraScale;
 
 out float quadIndex;
 out vec2 texture_xy;
@@ -22,7 +24,7 @@ out vec2 texture_xy;
 void main(void) {
 
 	Vertex v = vertices[layer * MAX_VERTICES + gl_VertexID];
-    gl_Position = vec4(v.x, v.y, 0, 1.0);
+    gl_Position = vec4((v.x + cameraPos.x) * cameraScale.x, (v.y + cameraPos.y) * cameraScale.y, 0, 1.0);
     texture_xy = vec2(TEXTURE_X[gl_VertexID % 4], TEXTURE_Y[gl_VertexID % 4]);
     quadIndex = MAX_QUADS * layer + gl_VertexID / 4;
 

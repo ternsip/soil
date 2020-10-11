@@ -8,6 +8,7 @@ import com.ternsip.soil.graph.display.TextureRepository;
 import com.ternsip.soil.graph.shader.uniforms.UniformFloat;
 import com.ternsip.soil.graph.shader.uniforms.UniformInteger;
 import com.ternsip.soil.graph.shader.uniforms.UniformSamplers2DArray;
+import com.ternsip.soil.graph.shader.uniforms.UniformVec2;
 import com.ternsip.soil.universe.BlocksRepository;
 import com.ternsip.soil.universe.EntityQuad;
 import lombok.SneakyThrows;
@@ -36,6 +37,8 @@ public final class Shader implements Finishable {
 
     private final Mesh mesh = new Mesh();
 
+    private final UniformVec2 cameraPos = new UniformVec2();
+    private final UniformVec2 cameraScale = new UniformVec2();
     private final UniformInteger layer = new UniformInteger();
     private final UniformInteger time = new UniformInteger();
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
@@ -80,6 +83,8 @@ public final class Shader implements Finishable {
             BufferUpdate bufferUpdate = blocksUpdates.poll();
             blocksBuffer.writeToGpu(bufferUpdate.start, bufferUpdate.end - bufferUpdate.start + 1);
         }
+        cameraPos.load(Soil.THREADS.getGraphics().camera.getPos());
+        cameraScale.load(Soil.THREADS.getGraphics().camera.getScale());
         for (int layerIndex = 0; layerIndex < MAX_LAYERS; ++layerIndex) {
             int quads = EntityQuad.getCountThreadSafe(layerIndex);
             if (quads <= 0) {
