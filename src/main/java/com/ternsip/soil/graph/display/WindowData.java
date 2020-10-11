@@ -71,20 +71,16 @@ public class WindowData {
         // Disable vertical synchronization
         glfwSwapInterval(0);
 
-        //glEnable(GL_BLEND);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glEnable(GL_DEBUG_OUTPUT);
         registerDebugEvent();
         //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         OpenGlSettings.antialias(true);
-        OpenGlSettings.enableDepthTesting(true);
+        OpenGlSettings.enableDepthTesting(false);
         OpenGlSettings.goWireframe(false);
 
-        glDepthFunc(GL_LESS);
-        glDepthRange(0, 1);
-        glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
-        //glEnable(GL_CULL_FACE);
         glClearColor(BACKGROUND_COLOR.x(), BACKGROUND_COLOR.y(), BACKGROUND_COLOR.z(), BACKGROUND_COLOR.w());
 
         enableCursor();

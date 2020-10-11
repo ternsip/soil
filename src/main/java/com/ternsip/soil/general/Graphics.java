@@ -15,7 +15,6 @@ public class Graphics implements Threadable {
 
     public WindowData windowData;
     public EventIOReceiver eventIOReceiver;
-    public FrameBuffers frameBuffers;
     public Camera camera;
     public TextureRepository textureRepository;
     public Shader shader;
@@ -25,7 +24,6 @@ public class Graphics implements Threadable {
     public void init() {
         eventIOReceiver = new EventIOReceiver();
         windowData = new WindowData();
-        frameBuffers = new FrameBuffers();
         camera = new Camera();
         textureRepository = new TextureRepository();
         shader = new Shader();
@@ -35,12 +33,10 @@ public class Graphics implements Threadable {
 
     @Override
     public void update() {
-        frameBuffers.bindBuffer();
         windowData.clear();
         eventIOReceiver.update();
         shader.render();
         windowData.getFpsCounter().updateFps();
-        frameBuffers.resolveBuffer();
         windowData.swapBuffers();
         windowData.pollEvents();
         audioRepository.update();
