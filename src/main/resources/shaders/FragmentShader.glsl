@@ -1,6 +1,11 @@
 #version 430 core
 
 const int MAX_SAMPLERS = 16;
+const int BLOCKS_X = 4000;
+const int BLOCKS_Y = 3000;
+
+const int QUAD_TYPE_EMPTY = 0;
+const int QUAD_TYPE_BLOCKS = 1;
 
 struct TextureData {
     int layerStart;
@@ -41,13 +46,31 @@ int roundFloat(float value) {
     return int(round(value));
 }
 
+vec4 getTexture(float timeDelta, TextureData textureData, vec2 pos) {
+    int count = textureData.layerEnd - textureData.layerStart + 1;
+    int textureLayer = textureData.layerStart + clamp(int(timeDelta * count), 0, count - 1);
+    return texture(samplers[textureData.atlasNumber], vec3(pos * vec2(textureData.maxU, textureData.maxV), textureLayer));
+}
+
 void main(void) {
 
     Quad quad = quadData[roundFloat(quadIndex)];
     float timeDelta = mod(time, quad.period) / quad.period;
-    TextureData textureData = textures[quad.type];
-    int count = textureData.layerEnd - textureData.layerStart + 1;
-    int textureLayer = textureData.layerStart + clamp(int(timeDelta * count), 0, count - 1);
-    out_Color = texture(samplers[textureData.atlasNumber], vec3(texture_xy * vec2(textureData.maxU, textureData.maxV), textureLayer));
+    if (quad.type == QUAD_TYPE_EMPTY) {
+        discard;
+    }
+    if (quad.type == QUAD_TYPE_BLOCKS) {
+        float realX = (texture_xy.x * 2 - 1) / cameraScale.x - cameraPos.x;
+        float realY = (texture_xy.y * 2 - 1) / cameraScale.y - cameraPos.y;
+        if (realX < 0 || realY < 0 || realX >= BLOCKS_X || realY >= BLOCKS_Y) {
+            discard;
+        }
+        int blockX = int(realX);
+        int blockY = int(realY);
+        int block = blocks[blockY * BLOCKS_X + blockX];
+        out_Color = getTexture(timeDelta, textures[block], vec2(realX - blockX, 1 - (realY - blockY)));
+        return;
+    }
+    out_Color = getTexture(timeDelta, textures[quad.type], texture_xy);
 
 }

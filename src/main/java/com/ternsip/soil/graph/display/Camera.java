@@ -54,8 +54,8 @@ public class Camera {
     }
 
     private void recalculateZoom(ScrollEvent event) {
-        scale.x += event.getYOffset() / 100.0f;
-        scale.y += event.getYOffset() / 100.0f;
+        scale.x += event.getYOffset() / 25.0f;
+        scale.y += event.getYOffset() / 25.0f;
         scale.x = Math.max(MIN_SCALE, scale.x);
         scale.y = Math.max(MIN_SCALE, scale.y);
     }

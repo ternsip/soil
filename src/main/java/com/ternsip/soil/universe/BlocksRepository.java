@@ -14,14 +14,12 @@ import java.util.stream.Collectors;
 public class BlocksRepository implements Finishable {
 
     private static final List<ChunkGenerator> CHUNK_GENERATORS = constructChunkGenerators();
-    public static final int MAX_SIZE_X = 4000;
-    public static final int MAX_SIZE_Y = 3000;
+    public static final int SIZE_X = 4000;
+    public static final int SIZE_Y = 3000;
     public static Shader SHADER;
 
-    public final int sizeX = 4000;
-    public final int sizeY = 3000;
-    public final Indexer indexer = new Indexer(sizeX, sizeY);
-    public final Block[][] blocks = new Block[sizeX][sizeY];
+    public static final Indexer INDEXER = new Indexer(SIZE_X, SIZE_Y);
+    public final Block[][] blocks = new Block[SIZE_X][SIZE_Y];
 
     public void init() {
         for (ChunkGenerator chunkGenerator : CHUNK_GENERATORS) {
@@ -44,23 +42,23 @@ public class BlocksRepository implements Finishable {
         int endY = startX + sizeY - 1;
         for (int y = startY; y <= endY; ++y) {
             for (int x = startX; x <= endX; ++x) {
-                int index = (int) indexer.getIndex(startX, y);
+                int index = (int) INDEXER.getIndex(startX, y);
                 SHADER.blocksBuffer.writeInt(index, blocks[x][y].textureType.ordinal());
             }
-            int startIndex = (int) indexer.getIndex(startX, y);
-            int endIndex = (int) indexer.getIndex(endX, y);
+            int startIndex = (int) INDEXER.getIndex(startX, y);
+            int endIndex = (int) INDEXER.getIndex(endX, y);
             SHADER.blocksUpdates.add(new BufferUpdate(startIndex, endIndex));
         }
     }
 
     public void fullVisualUpdate() {
-        for (int y = 0; y < sizeY; ++y) {
-            for (int x = 0; x < sizeX; ++x) {
-                int index = (int) indexer.getIndex(x, y);
+        for (int y = 0; y < SIZE_Y; ++y) {
+            for (int x = 0; x < SIZE_X; ++x) {
+                int index = (int) INDEXER.getIndex(x, y);
                 SHADER.blocksBuffer.writeInt(index, blocks[x][y].textureType.ordinal());
             }
         }
-        SHADER.blocksUpdates.add(new BufferUpdate(0, (int) indexer.getVolume() - 1));
+        SHADER.blocksUpdates.add(new BufferUpdate(0, (int) INDEXER.getVolume() - 1));
     }
 
 

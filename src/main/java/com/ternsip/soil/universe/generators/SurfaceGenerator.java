@@ -4,10 +4,13 @@ import com.ternsip.soil.universe.Block;
 import com.ternsip.soil.universe.BlocksRepository;
 import lombok.Getter;
 
+import static com.ternsip.soil.universe.BlocksRepository.SIZE_X;
+import static com.ternsip.soil.universe.BlocksRepository.SIZE_Y;
+
 @Getter
 public class SurfaceGenerator implements ChunkGenerator {
 
-    private final int height = 30;
+    private final int height = 4;
 
     @Override
     public int getPriority() {
@@ -16,8 +19,8 @@ public class SurfaceGenerator implements ChunkGenerator {
 
     @Override
     public void populate(BlocksRepository blocksRepository) {
-        for (int x = 0; x < blocksRepository.sizeX; ++x) {
-            for (int y = 0; y < blocksRepository.sizeY; ++y) {
+        for (int x = 0; x < SIZE_X; ++x) {
+            for (int y = 0; y < SIZE_Y; ++y) {
                 blocksRepository.blocks[x][y] = y > height ? Block.AIR : Block.DIRT;
                 if (y == height) {
                     blocksRepository.blocks[x][y] = Block.LAWN;

@@ -5,7 +5,6 @@ import com.ternsip.soil.common.logic.Finishable;
 import com.ternsip.soil.common.logic.Utils;
 import com.ternsip.soil.graph.display.Texture;
 import com.ternsip.soil.graph.display.TextureRepository;
-import com.ternsip.soil.graph.shader.uniforms.UniformFloat;
 import com.ternsip.soil.graph.shader.uniforms.UniformInteger;
 import com.ternsip.soil.graph.shader.uniforms.UniformSamplers2DArray;
 import com.ternsip.soil.graph.shader.uniforms.UniformVec2;
@@ -44,7 +43,7 @@ public final class Shader implements Finishable {
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
 
     public final LinkedBlockingQueue<BufferUpdate> blocksUpdates = new LinkedBlockingQueue<>();
-    public final BufferLayout blocksBuffer = new BufferLayout(BlocksRepository.MAX_SIZE_X * BlocksRepository.MAX_SIZE_Y);
+    public final BufferLayout blocksBuffer = new BufferLayout(BlocksRepository.SIZE_X * BlocksRepository.SIZE_Y);
     public final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length * TEXTURE_BUFFER_CELL_SIZE);
     public final BufferLayout quadBuffer = new BufferLayout(MAX_LAYERS * QUAD_BUFFER_SIZE);
     public final BufferLayout vertexBuffer = new BufferLayout(MAX_LAYERS * VERTEX_BUFFER_SIZE);

@@ -8,12 +8,15 @@ import java.io.File;
 public enum TextureType {
 
     EMPTY(new File("interface/button.png")),
+    BLOCKS(new File("interface/blocks.jpg")),
     BLOCK_WATER(new File("interface/button.png")),
-    BLOCK_DIRT(new File("interface/button.png")),
+    BLOCK_DIRT(new File("interface/dirt.png")),
+    BLOCK_LAWN(new File("interface/lawn.png")),
     PLAYER_IDLE(new File("interface/button.png")),
     PLAYER_ATTACK(new File("interface/player-attack.gif")),
     HOMER(new File("interface/homer.gif")),
     TEST(new File("interface/test.gif")),
+    GRASS(new File("interface/grass.gif")),
     KITTY(new File("interface/kitty.gif")),
     BACKGROUND(new File("interface/scrollbar_background.jpg"));
 
