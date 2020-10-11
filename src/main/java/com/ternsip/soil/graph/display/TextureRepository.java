@@ -1,5 +1,6 @@
 package com.ternsip.soil.graph.display;
 
+import com.sun.imageio.plugins.gif.GIFImageMetadata;
 import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
 import com.ternsip.soil.common.logic.Utils;
@@ -15,7 +16,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -157,26 +157,42 @@ public class TextureRepository {
         Image(File file) {
             this.file = file;
             if (file.getName().endsWith("gif")) {
-                List<BufferedImage> frames = new ArrayList<>();
                 ImageReader imageReader = new GIFImageReader(new GIFImageReaderSpi());
                 imageReader.setInput(ImageIO.createImageInputStream(Utils.loadResourceAsStream(file)));
-                for (int i = 0; i < imageReader.getNumImages(true); i++) {
-                    frames.add(imageReader.read(i));
+                int frameCount = imageReader.getNumImages(true);
+                if (frameCount <= 0) {
+                    throw new IllegalArgumentException(String.format("File %s has 0 animation frames", file.getName()));
                 }
-                frameData = new byte[frames.size()][]; // TODO MAKE THIS BETTER + case with transparent (not overlapping), imageReader.getImageMetadata(0) transparentColorFlag
-                BufferedImage lastImage = frames.remove(0);
-                int pointer = 0;
-                frameData[pointer++] = bufferedImageToBitmapRGBA(lastImage);
-                this.width = lastImage.getWidth();
-                this.height = lastImage.getHeight();
-                for (BufferedImage frame : frames) {
-                    BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                    Graphics graphics = img.getGraphics();
-                    graphics.drawImage(lastImage, 0, 0, null);
-                    graphics.drawImage(frame, 0, 0, null);
-                    frameData[pointer++] = bufferedImageToBitmapRGBA(img);
-                    lastImage = img;
+                this.frameData = new byte[frameCount][];
+                this.width = imageReader.getWidth(0);
+                this.height = imageReader.getHeight(0);
+                BufferedImage prevFrame = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                BufferedImage canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                Graphics graphics = canvas.getGraphics();
+                for (int i = 0; i < frameCount; i++) {
+                    BufferedImage frame = imageReader.read(i);
+                    GIFImageMetadata meta = (GIFImageMetadata) imageReader.getImageMetadata(i);
+                    if (meta.disposalMethod == 1) {
+                        // Do Not Dispose (Leave As Is), meaning leave canvas from previous frame
+                        graphics.drawImage(frame, meta.imageLeftPosition, meta.imageTopPosition, null);
+                    } else if (meta.disposalMethod == 2) {
+                        // Restore to background, meaning clear canvas to background color
+                        fillBufferImage(canvas, 0);
+                        graphics.drawImage(frame, meta.imageLeftPosition, meta.imageTopPosition, null);
+                    } else if (meta.disposalMethod == 3) {
+                        // Restore to previous, meaning clear canvas to frame before last
+                        fillBufferImage(canvas, 0);
+                        graphics.drawImage(prevFrame, 0, 0, null);
+                        graphics.drawImage(frame, meta.imageLeftPosition, meta.imageTopPosition, null);
+                    } else {
+                        // Unspecified disposal method, full replace
+                        fillBufferImage(canvas, 0);
+                        graphics.drawImage(frame, meta.imageLeftPosition, meta.imageTopPosition, null);
+                    }
+                    prevFrame = frame;
+                    frameData[i] = bufferedImageToBitmapRGBA(canvas);
                 }
+                graphics.dispose();
             } else {
                 ByteBuffer imageData = Utils.loadResourceToByteBuffer(file);
                 IntBuffer w = BufferUtils.createIntBuffer(1);
@@ -203,6 +219,14 @@ public class TextureRepository {
                 }
             }
             return dataRGBA;
+        }
+
+        private static void fillBufferImage(BufferedImage bufferedImage, int argb) {
+            for (int x = 0; x < bufferedImage.getWidth(); x++) {
+                for (int y = 0; y < bufferedImage.getHeight(); y++) {
+                    bufferedImage.setRGB(x, y, argb);
+                }
+            }
         }
 
     }

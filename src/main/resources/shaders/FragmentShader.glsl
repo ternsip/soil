@@ -31,7 +31,7 @@ in vec2 texture_xy;
 
 out vec4 out_Color;
 
-uniform float time;
+uniform int time;
 uniform sampler2DArray[MAX_SAMPLERS] samplers;
 
 int roundFloat(float value) {
@@ -40,10 +40,11 @@ int roundFloat(float value) {
 
 void main(void) {
 
+    float timeDelta = mod(time, 4000) / 4000.0;
     Quad quad = quadData[roundFloat(quadIndex)];
     TextureData textureData = textures[quad.type];
     int count = textureData.layerEnd - textureData.layerStart + 1;
-    int textureLayer = textureData.layerStart + clamp(int(time * count), 0, count - 1);
+    int textureLayer = textureData.layerStart + clamp(int(timeDelta * count), 0, count - 1);
     out_Color = texture(samplers[textureData.atlasNumber], vec3(texture_xy * vec2(textureData.maxU, textureData.maxV), textureLayer));
 
 }

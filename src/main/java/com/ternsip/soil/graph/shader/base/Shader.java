@@ -20,8 +20,6 @@ import static org.lwjgl.opengl.GL20.*;
 
 public final class Shader implements Finishable {
 
-    public static final long TIME_PERIOD_MILLISECONDS = 1_000L;
-    public static final float TIME_PERIOD_DIVISOR = 1000f;
     public static final int MAX_LAYERS = 16;
     public static final int TEXTURE_BUFFER_CELL_SIZE = 5;
     public static final int QUAD_BUFFER_CELL_SIZE = 1;
@@ -37,7 +35,7 @@ public final class Shader implements Finishable {
     private final Mesh mesh = new Mesh();
 
     private final UniformInteger layer = new UniformInteger();
-    private final UniformFloat time = new UniformFloat();
+    private final UniformInteger time = new UniformInteger();
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
 
     public final BufferLayout blocksBuffer = new BufferLayout(512);
@@ -81,7 +79,7 @@ public final class Shader implements Finishable {
                 continue;
             }
             this.layer.load(layerIndex);
-            this.time.load((System.currentTimeMillis() % TIME_PERIOD_MILLISECONDS) / TIME_PERIOD_DIVISOR);
+            this.time.load((int) (System.currentTimeMillis() % Integer.MAX_VALUE));
             quadBuffer.writeToGpu(layerIndex * QUAD_BUFFER_SIZE, layerIndex * QUAD_BUFFER_SIZE + quads * QUAD_BUFFER_CELL_SIZE);
             vertexBuffer.writeToGpu(layerIndex * VERTEX_BUFFER_SIZE, layerIndex * VERTEX_BUFFER_SIZE + quads * Mesh.QUAD_VERTICES * VERTEX_BUFFER_CELL_SIZE);
             mesh.render(quads);
