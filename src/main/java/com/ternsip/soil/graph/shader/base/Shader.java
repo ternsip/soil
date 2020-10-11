@@ -8,6 +8,7 @@ import com.ternsip.soil.graph.display.TextureRepository;
 import com.ternsip.soil.graph.shader.uniforms.UniformFloat;
 import com.ternsip.soil.graph.shader.uniforms.UniformInteger;
 import com.ternsip.soil.graph.shader.uniforms.UniformSamplers2DArray;
+import com.ternsip.soil.universe.BlocksRepository;
 import com.ternsip.soil.universe.EntityQuad;
 import lombok.SneakyThrows;
 import org.lwjgl.opengl.GL11;
@@ -15,6 +16,7 @@ import org.lwjgl.opengl.GL11;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.lwjgl.opengl.GL20.*;
 
@@ -38,7 +40,8 @@ public final class Shader implements Finishable {
     private final UniformInteger time = new UniformInteger();
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
 
-    public final BufferLayout blocksBuffer = new BufferLayout(512);
+    public final LinkedBlockingQueue<BufferUpdate> blocksUpdates = new LinkedBlockingQueue<>();
+    public final BufferLayout blocksBuffer = new BufferLayout(BlocksRepository.MAX_SIZE_X * BlocksRepository.MAX_SIZE_Y);
     public final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length * TEXTURE_BUFFER_CELL_SIZE);
     public final BufferLayout quadBuffer = new BufferLayout(MAX_LAYERS * QUAD_BUFFER_SIZE);
     public final BufferLayout vertexBuffer = new BufferLayout(MAX_LAYERS * VERTEX_BUFFER_SIZE);
@@ -73,6 +76,10 @@ public final class Shader implements Finishable {
     }
 
     public void render() {
+        while (!blocksUpdates.isEmpty()) {
+            BufferUpdate bufferUpdate = blocksUpdates.poll();
+            blocksBuffer.writeToGpu(bufferUpdate.start, bufferUpdate.end - bufferUpdate.start + 1);
+        }
         for (int layerIndex = 0; layerIndex < MAX_LAYERS; ++layerIndex) {
             int quads = EntityQuad.getCountThreadSafe(layerIndex);
             if (quads <= 0) {

@@ -6,6 +6,7 @@ import com.ternsip.soil.common.events.base.EventIOReceiver;
 import com.ternsip.soil.common.events.display.ShaderRegisteredEvent;
 import com.ternsip.soil.common.events.network.OnConnectedToServer;
 import com.ternsip.soil.graph.shader.base.TextureType;
+import com.ternsip.soil.universe.BlocksRepository;
 import com.ternsip.soil.universe.EntityQuad;
 import com.ternsip.soil.universe.EntityRepository;
 import com.ternsip.soil.universe.audio.SoundRepository;
@@ -25,6 +26,7 @@ public class UniverseClient implements Threadable {
     public SoundRepository soundRepository;
     public EventIOReceiver eventIOReceiver;
     public EntityRepository entityRepository;
+    public BlocksRepository blocksRepository;
 
     @Override
     public void init() {
@@ -33,6 +35,8 @@ public class UniverseClient implements Threadable {
         eventIOReceiver = new EventIOReceiver();
         bindings = new Bindings();
         entityRepository = new EntityRepository();
+        blocksRepository = new BlocksRepository();
+        blocksRepository.init();
         eventIOReceiver.registerCallback(OnConnectedToServer.class, onConnectedToServerCallback);
         eventIOReceiver.registerCallback(ShaderRegisteredEvent.class, registerShaderCallback);
     }
@@ -40,6 +44,7 @@ public class UniverseClient implements Threadable {
     @Override
     public void update() {
         eventIOReceiver.update();
+        blocksRepository.update();
     }
 
     @SneakyThrows
@@ -48,6 +53,7 @@ public class UniverseClient implements Threadable {
         eventIOReceiver.unregisterCallback(OnConnectedToServer.class, onConnectedToServerCallback);
         eventIOReceiver.unregisterCallback(ShaderRegisteredEvent.class, registerShaderCallback);
         bindings.finish();
+        blocksRepository.finish();
     }
 
     public void startClient() {
@@ -79,6 +85,8 @@ public class UniverseClient implements Threadable {
 
     private void registerShader(ShaderRegisteredEvent shaderRegisteredEvent) {
         EntityQuad.SHADER = shaderRegisteredEvent.getShader();
+        BlocksRepository.SHADER = shaderRegisteredEvent.getShader();
+        blocksRepository.fullVisualUpdate();
         spawnMenu();
     }
 

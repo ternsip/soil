@@ -29,7 +29,7 @@ public class Indexer {
     }
 
     public long getVolume() {
-        return (long) sizeX * sizeY;
+        return ((long) sizeX) * sizeY;
     }
 
     public boolean isInside(int x, int y) {
