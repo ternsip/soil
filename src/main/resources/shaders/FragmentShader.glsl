@@ -46,12 +46,16 @@ int roundFloat(float value) {
     return int(round(value));
 }
 
-vec4 resolveQuadTexel(int type, float period, vec2 pos) {
+float rand(float n) {
+    return fract(sin(n) * 43758.5453123);
+}
+
+vec4 resolveQuadTexel(int type, float period, vec2 pos, int animation_start) {
     if (type == QUAD_TYPE_EMPTY) {
         discard;
     }
     TextureData textureData = textures[type];
-    float timeDelta = mod(time, period) / period;
+    float timeDelta = mod(abs(time - animation_start), period) / period;
     int count = textureData.layerEnd - textureData.layerStart + 1;
     int textureLayer = textureData.layerStart + clamp(int(timeDelta * count), 0, count - 1);
     return texture(samplers[textureData.atlasNumber], vec3(pos * vec2(textureData.maxU, textureData.maxV), textureLayer));
@@ -68,9 +72,10 @@ void main(void) {
         }
         int blockX = int(realX);
         int blockY = int(realY);
-        out_Color = resolveQuadTexel(blocks[blockY * BLOCKS_X + blockX], quad.period, vec2(realX - blockX, 1 - (realY - blockY)));
+        int blockIndex = blockY * BLOCKS_X + blockX;
+        out_Color = resolveQuadTexel(blocks[blockIndex], quad.period, vec2(realX - blockX, 1 - (realY - blockY)), int(rand(blockIndex) * quad.period));
         return;
     }
-    out_Color = resolveQuadTexel(quad.type, quad.period, texture_xy);
+    out_Color = resolveQuadTexel(quad.type, quad.period, texture_xy, 0);
 
 }
