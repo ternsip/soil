@@ -13,6 +13,7 @@ public enum TextureType {
     PLAYER_IDLE(new File("interface/button.png")),
     PLAYER_ATTACK(new File("interface/player-attack.gif")),
     HOMER(new File("interface/homer.gif")),
+    TEST(new File("interface/test.gif")),
     BACKGROUND(new File("interface/scrollbar_background.jpg"));
 
 
