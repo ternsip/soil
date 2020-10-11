@@ -14,6 +14,7 @@ public enum TextureType {
     PLAYER_ATTACK(new File("interface/player-attack.gif")),
     HOMER(new File("interface/homer.gif")),
     TEST(new File("interface/test.gif")),
+    KITTY(new File("interface/kitty.gif")),
     BACKGROUND(new File("interface/scrollbar_background.jpg"));
 
 
