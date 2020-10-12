@@ -44,18 +44,18 @@ public class Camera {
 
     private void recalculatePos(CursorPosEvent event) {
         if (Soil.THREADS.getGraphics().eventIOReceiver.isMouseDown(GLFW_MOUSE_BUTTON_2)) {
-            pos.x += event.getDx() / 100.0f;
-            pos.y -= event.getDy() / 100.0f;
+            pos.x += event.getDx() / (scale.x * 500.0f);
+            pos.y -= event.getDy() / (scale.y * 500.0f);
         }
         if (Soil.THREADS.getGraphics().eventIOReceiver.isMouseDown(GLFW_MOUSE_BUTTON_1)) {
-            pos.x -= event.getDx() / 100.0f;
-            pos.y += event.getDy() / 100.0f;
+            pos.x -= scale.x * event.getDx() / (scale.x * 500.0f);
+            pos.y += scale.y * event.getDy() / (scale.y * 500.0f);
         }
     }
 
     private void recalculateZoom(ScrollEvent event) {
-        scale.x += event.getYOffset() / 25.0f;
-        scale.y += event.getYOffset() / 25.0f;
+        scale.x += scale.x * event.getYOffset() / 25.0f;
+        scale.y += scale.y * event.getYOffset() / 25.0f;
         scale.x = Math.max(MIN_SCALE, scale.x);
         scale.y = Math.max(MIN_SCALE, scale.y);
     }
