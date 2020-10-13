@@ -39,7 +39,7 @@ public class Graphics implements Threadable {
         windowData.getFpsCounter().updateFps();
         windowData.swapBuffers();
         windowData.pollEvents();
-        audioRepository.update();
+        //audioRepository.update(); memory leaks
     }
 
     @Override

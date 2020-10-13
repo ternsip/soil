@@ -3,6 +3,7 @@ package com.ternsip.soil.graph.shader.base;
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.logic.Finishable;
 import com.ternsip.soil.common.logic.Utils;
+import com.ternsip.soil.graph.display.Camera;
 import com.ternsip.soil.graph.display.Texture;
 import com.ternsip.soil.graph.display.TextureRepository;
 import com.ternsip.soil.graph.shader.uniforms.UniformInteger;
@@ -24,7 +25,7 @@ public final class Shader implements Finishable {
 
     public static final int MAX_LAYERS = 16;
     public static final int TEXTURE_BUFFER_CELL_SIZE = 5;
-    public static final int QUAD_BUFFER_CELL_SIZE = 2;
+    public static final int QUAD_BUFFER_CELL_SIZE = 4;
     public static final int VERTEX_BUFFER_CELL_SIZE = 2;
     public static final int QUAD_BUFFER_SIZE = Mesh.MAX_QUADS * QUAD_BUFFER_CELL_SIZE;
     public static final int VERTEX_BUFFER_SIZE = Mesh.MAX_VERTICES * VERTEX_BUFFER_CELL_SIZE;
@@ -82,8 +83,9 @@ public final class Shader implements Finishable {
             BufferUpdate bufferUpdate = blocksUpdates.poll();
             blocksBuffer.writeToGpu(bufferUpdate.start, bufferUpdate.end - bufferUpdate.start + 1);
         }
-        cameraPos.load(Soil.THREADS.getGraphics().camera.getPos());
-        cameraScale.load(Soil.THREADS.getGraphics().camera.getScale());
+        Camera camera = Soil.THREADS.getGraphics().camera;
+        cameraPos.load(camera.getPos().x, camera.getPos().y);
+        cameraScale.load(camera.getScale().x, camera.getScale().y);
         for (int layerIndex = 0; layerIndex < MAX_LAYERS; ++layerIndex) {
             int quads = EntityQuad.getCountThreadSafe(layerIndex);
             if (quads <= 0) {

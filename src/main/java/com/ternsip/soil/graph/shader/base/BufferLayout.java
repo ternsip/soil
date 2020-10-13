@@ -99,6 +99,7 @@ public class BufferLayout extends Locatable implements Finishable {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
+    // TODO BIG MEMORY LEAK
     private ByteBuffer sliceData(int offset, int size) {
         ByteBuffer byteBuffer = data.slice();
         byteBuffer.order(BYTE_ORDER);

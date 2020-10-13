@@ -9,7 +9,7 @@ import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 @Getter
 @Setter
 @Slf4j
-public abstract class Uniform<T> extends Locatable {
+public abstract class Uniform extends Locatable {
 
     public void locate(int programID, String name) {
         int location = glGetUniformLocation(programID, name);
@@ -19,7 +19,5 @@ public abstract class Uniform<T> extends Locatable {
             setLocation(location);
         }
     }
-
-    protected abstract void load(T value);
 
 }

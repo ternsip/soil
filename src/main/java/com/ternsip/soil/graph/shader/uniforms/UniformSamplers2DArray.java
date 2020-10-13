@@ -2,14 +2,14 @@ package com.ternsip.soil.graph.shader.uniforms;
 
 import com.ternsip.soil.graph.shader.base.Uniform;
 
-public class UniformSamplers2DArray extends Uniform<Integer[]> {
+public class UniformSamplers2DArray extends Uniform {
 
-    private UniformSampler2DArray[] uniformSampler2DArrays;
+    private UniformSampler[] uniformSampler2DArrays;
 
     public UniformSamplers2DArray(int size) {
-        uniformSampler2DArrays = new UniformSampler2DArray[size];
+        uniformSampler2DArrays = new UniformSampler[size];
         for (int i = 0; i < size; i++) {
-            uniformSampler2DArrays[i] = new UniformSampler2DArray();
+            uniformSampler2DArrays[i] = new UniformSampler();
         }
     }
 
@@ -20,7 +20,7 @@ public class UniformSamplers2DArray extends Uniform<Integer[]> {
         }
     }
 
-    public void load(Integer[] value) {
+    public void load(int[] value) {
         for (int i = 0; i < value.length; i++) {
             uniformSampler2DArrays[i].load(value[i]);
         }

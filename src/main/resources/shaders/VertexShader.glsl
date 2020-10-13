@@ -9,6 +9,7 @@ const int[] TEXTURE_Y = { 0, 0, 1, 1 };
 
 const int QUAD_TYPE_EMPTY = 0;
 const int QUAD_TYPE_BLOCKS = 1;
+const int QUAD_TYPE_FONT = 2;
 
 struct Vertex {
     float x;
@@ -18,6 +19,8 @@ struct Vertex {
 struct Quad {
     int type;
     float period;
+    int meta_i;
+    float meta_f;
 };
 
 layout (std430, binding = 2) buffer quadBuffer {
