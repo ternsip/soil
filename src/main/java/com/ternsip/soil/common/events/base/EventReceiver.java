@@ -3,6 +3,7 @@ package com.ternsip.soil.common.events.base;
 import com.ternsip.soil.common.logic.Utils;
 import lombok.Getter;
 
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -22,7 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class EventReceiver {
 
-    private final ConcurrentHashMap<Class<?>, EventProcessor> eventProcessors = new ConcurrentHashMap<>();
+    // TODO removed sync map - THREAD SAFETY ISSUE!
+    private final HashMap<Class<?>, EventProcessor> eventProcessors = new HashMap<>();
 
     public EventReceiver() {
         for (Class<? extends Event> clazz : Utils.getAllClasses(Event.class)) {

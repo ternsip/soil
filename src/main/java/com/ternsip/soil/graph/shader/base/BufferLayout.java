@@ -10,8 +10,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
-import static org.lwjgl.opengl.ARBShaderStorageBufferObject.GL_SHADER_STORAGE_BUFFER;
 import static org.lwjgl.opengl.GL43C.*;
+import static org.lwjgl.opengl.GL44C.*;
 
 
 /*
@@ -39,9 +39,11 @@ public class BufferLayout extends Locatable implements Finishable {
             throw new IllegalArgumentException("SSBO should be always multiple of 16 (vec4 in memory)"); // TODO mb vec3 in memory? depends
         }
         this.ssbo = glGenBuffers();
-        this.data = ByteBuffer.allocateDirect(bytesSize);
-        this.data.order(BYTE_ORDER);
-        allocateBuffer();
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+        ByteBuffer allocatedBuffer = ByteBuffer.allocateDirect(bytesSize).order(BYTE_ORDER);
+        glBufferStorage(GL_SHADER_STORAGE_BUFFER, allocatedBuffer, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+        this.data = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, bytesSize, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT |  GL_MAP_FLUSH_EXPLICIT_BIT | GL_MAP_COHERENT_BIT ).order(BYTE_ORDER);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
     @Override
@@ -62,13 +64,7 @@ public class BufferLayout extends Locatable implements Finishable {
 
     void writeToGpu(int offset, int size) {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, FOUR_BYTES * offset, sliceData(offset, size));
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    }
-
-    void readFromGpu(int offset, int size) {
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, FOUR_BYTES * offset, sliceData(offset, size));
+        glFlushMappedBufferRange(GL_SHADER_STORAGE_BUFFER, FOUR_BYTES * offset, size * FOUR_BYTES);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
@@ -91,12 +87,6 @@ public class BufferLayout extends Locatable implements Finishable {
     @Override
     public void finish() {
         glDeleteBuffers(ssbo);
-    }
-
-    private void allocateBuffer() {
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, data, GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
     // TODO BIG MEMORY LEAK
