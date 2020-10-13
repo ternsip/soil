@@ -86,6 +86,9 @@ public class BufferLayout extends Locatable implements Finishable {
 
     @Override
     public void finish() {
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         glDeleteBuffers(ssbo);
     }
 
