@@ -41,7 +41,7 @@ public class BufferLayout extends Locatable implements Finishable {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
         ByteBuffer allocatedBuffer = ByteBuffer.allocateDirect(bytesSize).order(BYTE_ORDER);
         glBufferStorage(GL_SHADER_STORAGE_BUFFER, allocatedBuffer, BUFFER_FLAGS);
-        this.data = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, bytesSize, BUFFER_FLAGS | GL_MAP_FLUSH_EXPLICIT_BIT).order(BYTE_ORDER);
+        this.data = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY).order(BYTE_ORDER);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
