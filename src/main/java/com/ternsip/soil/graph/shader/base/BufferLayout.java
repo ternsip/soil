@@ -1,8 +1,6 @@
 package com.ternsip.soil.graph.shader.base;
 
 import com.ternsip.soil.common.logic.Finishable;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.BufferUtils;
 
@@ -28,6 +26,7 @@ public class BufferLayout extends Locatable implements Finishable {
     private static final int FOUR_BYTES = 4;
     private static final int VEC4_BYTES = FOUR_BYTES * 4;
     private static final ByteOrder BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
+    private static final int BUFFER_FLAGS = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
 
     private final int ssbo;
     private final ByteBuffer data;
@@ -41,8 +40,8 @@ public class BufferLayout extends Locatable implements Finishable {
         this.ssbo = glGenBuffers();
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
         ByteBuffer allocatedBuffer = ByteBuffer.allocateDirect(bytesSize).order(BYTE_ORDER);
-        glBufferStorage(GL_SHADER_STORAGE_BUFFER, allocatedBuffer, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
-        this.data = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, bytesSize, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT |  GL_MAP_FLUSH_EXPLICIT_BIT | GL_MAP_COHERENT_BIT ).order(BYTE_ORDER);
+        glBufferStorage(GL_SHADER_STORAGE_BUFFER, allocatedBuffer, BUFFER_FLAGS);
+        this.data = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, bytesSize, BUFFER_FLAGS | GL_MAP_FLUSH_EXPLICIT_BIT).order(BYTE_ORDER);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
@@ -60,12 +59,6 @@ public class BufferLayout extends Locatable implements Finishable {
             setLocation(location);
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER, getLocation(), ssbo);
         }
-    }
-
-    void writeToGpu(int offset, int size) {
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-        glFlushMappedBufferRange(GL_SHADER_STORAGE_BUFFER, FOUR_BYTES * offset, size * FOUR_BYTES);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
     public int readInt(int index) {
@@ -91,15 +84,5 @@ public class BufferLayout extends Locatable implements Finishable {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         glDeleteBuffers(ssbo);
     }
-
-    // TODO BIG MEMORY LEAK
-    private ByteBuffer sliceData(int offset, int size) {
-        ByteBuffer byteBuffer = data.slice();
-        byteBuffer.order(BYTE_ORDER);
-        byteBuffer.position(offset * FOUR_BYTES);
-        byteBuffer.limit(size * FOUR_BYTES);
-        return byteBuffer;
-    }
-
 
 }

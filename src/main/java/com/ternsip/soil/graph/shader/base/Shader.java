@@ -43,7 +43,6 @@ public final class Shader implements Finishable {
     private final UniformInteger time = new UniformInteger();
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
 
-    public final LinkedBlockingQueue<BufferUpdate> blocksUpdates = new LinkedBlockingQueue<>();
     public final BufferLayout blocksBuffer = new BufferLayout(BlocksRepository.SIZE_X * BlocksRepository.SIZE_Y);
     public final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length * TEXTURE_BUFFER_CELL_SIZE);
     public final BufferLayout quadBuffer = new BufferLayout(MAX_LAYERS * QUAD_BUFFER_SIZE);
@@ -79,10 +78,6 @@ public final class Shader implements Finishable {
     }
 
     public void render() {
-        while (!blocksUpdates.isEmpty()) {
-            BufferUpdate bufferUpdate = blocksUpdates.poll();
-            blocksBuffer.writeToGpu(bufferUpdate.start, bufferUpdate.end - bufferUpdate.start + 1);
-        }
         Camera camera = Soil.THREADS.getGraphics().camera;
         cameraPos.load(camera.getPos().x, camera.getPos().y);
         cameraScale.load(camera.getScale().x, camera.getScale().y);
@@ -93,8 +88,6 @@ public final class Shader implements Finishable {
                 continue;
             }
             this.layer.load(layerIndex);
-            quadBuffer.writeToGpu(layerIndex * QUAD_BUFFER_SIZE, layerIndex * QUAD_BUFFER_SIZE + quads * QUAD_BUFFER_CELL_SIZE);
-            vertexBuffer.writeToGpu(layerIndex * VERTEX_BUFFER_SIZE, layerIndex * VERTEX_BUFFER_SIZE + quads * Mesh.QUAD_VERTICES * VERTEX_BUFFER_CELL_SIZE);
             mesh.render(quads);
         }
     }
@@ -117,7 +110,6 @@ public final class Shader implements Finishable {
             textureBuffer.writeFloat(index + 4, texture.getMaxV());
             index += TEXTURE_BUFFER_CELL_SIZE;
         }
-        textureBuffer.writeToGpu(0, TextureType.values().length * TEXTURE_BUFFER_CELL_SIZE);
         samplers.loadDefault();
     }
 

@@ -118,7 +118,10 @@ public class WindowData {
         glfwTerminate();
     }
 
-    public void swapBuffers() {
+    public void draw() {
+        //glFinish();
+        //glDrawBuffer(GL_FRONT);
+        //https://stackoverflow.com/questions/41233696/opengl-prevent-double-buffers
         glfwSwapBuffers(getWindow());
     }
 

@@ -3,7 +3,6 @@ package com.ternsip.soil.universe;
 import com.ternsip.soil.common.logic.Finishable;
 import com.ternsip.soil.common.logic.Indexer;
 import com.ternsip.soil.common.logic.Utils;
-import com.ternsip.soil.graph.shader.base.BufferUpdate;
 import com.ternsip.soil.graph.shader.base.Shader;
 import com.ternsip.soil.universe.generators.ChunkGenerator;
 
@@ -30,35 +29,27 @@ public class BlocksRepository implements Finishable {
     public void updateBlocks(int startX, int startY, Block[][] blocks) {
         int endX = startX + blocks.length - 1;
         int endY = startX + blocks[0].length - 1;
-        for (int y = startY; y <= endY; ++y) {
-            for (int x = startX; x <= endX; ++x) {
+        for (int x = startX; x <= endX; ++x) {
+            for (int y = startY; y <= endY; ++y) {
                 this.blocks[x][y] = blocks[x][y];
             }
         }
     }
 
-    public void visualUpdate(int startX, int startY, int sizeX, int sizeY) {
-        int endX = startX + sizeX - 1;
-        int endY = startX + sizeY - 1;
-        for (int y = startY; y <= endY; ++y) {
-            for (int x = startX; x <= endX; ++x) {
-                int index = (int) INDEXER.getIndex(startX, y);
-                SHADER.blocksBuffer.writeInt(index, blocks[x][y].textureType.ordinal());
+    public void visualUpdate(int startX, int startY, int endX, int endY) {
+        for (int x = startX; x <= endX; ++x) {
+            for (int y = startY; y <= endY; ++y) {
+                SHADER.blocksBuffer.writeInt((int) INDEXER.getIndex(x, y), blocks[x][y].textureType.ordinal());
             }
-            int startIndex = (int) INDEXER.getIndex(startX, y);
-            int endIndex = (int) INDEXER.getIndex(endX, y);
-            SHADER.blocksUpdates.add(new BufferUpdate(startIndex, endIndex));
         }
     }
 
     public void fullVisualUpdate() {
-        for (int y = 0; y < SIZE_Y; ++y) {
-            for (int x = 0; x < SIZE_X; ++x) {
-                int index = (int) INDEXER.getIndex(x, y);
-                SHADER.blocksBuffer.writeInt(index, blocks[x][y].textureType.ordinal());
+        for (int x = 0; x < SIZE_X; ++x) {
+            for (int y = 0; y < SIZE_Y; ++y) {
+                SHADER.blocksBuffer.writeInt((int) INDEXER.getIndex(x, y), blocks[x][y].textureType.ordinal());
             }
         }
-        SHADER.blocksUpdates.add(new BufferUpdate(0, (int) INDEXER.getVolume() - 1));
     }
 
 

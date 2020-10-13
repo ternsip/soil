@@ -37,7 +37,7 @@ public class Graphics implements Threadable {
         eventIOReceiver.update();
         shader.render();
         windowData.getFpsCounter().updateFps();
-        windowData.swapBuffers();
+        windowData.draw();
         windowData.pollEvents();
         //audioRepository.update(); memory leaks
     }
