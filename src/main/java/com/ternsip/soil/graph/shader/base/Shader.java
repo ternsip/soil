@@ -86,13 +86,13 @@ public final class Shader implements Finishable {
         Camera camera = Soil.THREADS.getGraphics().camera;
         cameraPos.load(camera.getPos().x, camera.getPos().y);
         cameraScale.load(camera.getScale().x, camera.getScale().y);
+        this.time.load((int) (System.currentTimeMillis() % Integer.MAX_VALUE));
         for (int layerIndex = 0; layerIndex < MAX_LAYERS; ++layerIndex) {
             int quads = EntityQuad.getCountThreadSafe(layerIndex);
             if (quads <= 0) {
                 continue;
             }
             this.layer.load(layerIndex);
-            this.time.load((int) (System.currentTimeMillis() % Integer.MAX_VALUE));
             quadBuffer.writeToGpu(layerIndex * QUAD_BUFFER_SIZE, layerIndex * QUAD_BUFFER_SIZE + quads * QUAD_BUFFER_CELL_SIZE);
             vertexBuffer.writeToGpu(layerIndex * VERTEX_BUFFER_SIZE, layerIndex * VERTEX_BUFFER_SIZE + quads * Mesh.QUAD_VERTICES * VERTEX_BUFFER_CELL_SIZE);
             mesh.render(quads);
