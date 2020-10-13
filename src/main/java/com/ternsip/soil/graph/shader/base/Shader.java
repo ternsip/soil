@@ -17,7 +17,6 @@ import org.lwjgl.opengl.GL11;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.lwjgl.opengl.GL20.*;
 
@@ -25,7 +24,7 @@ public final class Shader implements Finishable {
 
     public static final int MAX_LAYERS = 16;
     public static final int TEXTURE_BUFFER_CELL_SIZE = 5;
-    public static final int QUAD_BUFFER_CELL_SIZE = 4;
+    public static final int QUAD_BUFFER_CELL_SIZE = 6;
     public static final int VERTEX_BUFFER_CELL_SIZE = 2;
     public static final int QUAD_BUFFER_SIZE = Mesh.MAX_QUADS * QUAD_BUFFER_CELL_SIZE;
     public static final int VERTEX_BUFFER_SIZE = Mesh.MAX_VERTICES * VERTEX_BUFFER_CELL_SIZE;

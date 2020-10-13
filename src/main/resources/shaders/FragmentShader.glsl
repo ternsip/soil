@@ -8,6 +8,7 @@ const int BLOCKS_Y = 3000;
 const int QUAD_TYPE_EMPTY = 0;
 const int QUAD_TYPE_BLOCKS = 1;
 const int QUAD_TYPE_FONT = 2;
+const int QUAD_FLAG_PINNED = 0x1;
 
 struct TextureData {
     int layerStart;
@@ -19,9 +20,11 @@ struct TextureData {
 
 struct Quad {
     int type;
-    float period;
-    int meta_i;
-    float meta_f;
+    int animation_start;
+    float animation_period;
+    int flags;
+    int meta1;
+    int meta2;
 };
 
 layout (std430, binding = 0) buffer blocksBuffer {
@@ -54,18 +57,18 @@ float rand(float n) {
     return fract(sin(n) * 43758.5453123);
 }
 
-vec4 resolveQuadTexel(int type, float period, int meta_i, vec2 pos, int animation_start) {
-    if (type == QUAD_TYPE_EMPTY) {
+vec4 resolveQuadTexel(Quad quad, vec2 pos) {
+    if (quad.type == QUAD_TYPE_EMPTY) {
         discard;
     }
-    TextureData textureData = textures[type];
-    float timeDelta = mod(abs(time - animation_start), period) / period;
+    TextureData textureData = textures[quad.type];
+    float timeDelta = mod(abs(time - quad.animation_start), quad.animation_period) / quad.animation_period;
     int count = textureData.layerEnd - textureData.layerStart + 1;
     int textureLayer = textureData.layerStart + clamp(int(timeDelta * count), 0, count - 1);
     vec2 maxUV = vec2(textureData.maxU, textureData.maxV);
-    if (type == QUAD_TYPE_FONT) {
-        pos.x = (pos.x + meta_i % POWER4) / POWER4;
-        pos.y = (pos.y + meta_i / POWER4) / POWER4;
+    if (quad.type == QUAD_TYPE_FONT) {
+        pos.x = (pos.x + quad.meta1 % POWER4) / POWER4;
+        pos.y = (pos.y + quad.meta1 / POWER4) / POWER4;
     }
     return texture(samplers[textureData.atlasNumber], vec3(pos * maxUV, textureLayer));
 }
@@ -82,9 +85,10 @@ void main(void) {
         int blockX = int(realX);
         int blockY = int(realY);
         int blockIndex = blockY * BLOCKS_X + blockX;
-        out_Color = resolveQuadTexel(blocks[blockIndex], quad.period, 0, vec2(realX - blockX, 1 - (realY - blockY)), int(rand(blockIndex) * quad.period));
+        Quad newQuad = Quad(blocks[blockIndex], int(rand(blockIndex) * quad.animation_period), quad.animation_period, 0, 0, 0);
+        out_Color = resolveQuadTexel(newQuad, vec2(realX - blockX, 1 - (realY - blockY)));
         return;
     }
-    out_Color = resolveQuadTexel(quad.type, quad.period, quad.meta_i, texture_xy, 0);
+    out_Color = resolveQuadTexel(quad, texture_xy);
 
 }

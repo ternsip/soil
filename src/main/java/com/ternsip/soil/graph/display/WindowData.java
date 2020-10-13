@@ -33,7 +33,6 @@ public class WindowData {
     public static final Vector4fc BACKGROUND_COLOR = new Vector4f(0f, 0f, 0f, 1f);
 
     private final ArrayList<Callback> callbacks = new ArrayList<>();
-    private final FpsCounter fpsCounter = new FpsCounter();
     private final long window;
     private Vector2i windowSize;
     private boolean cursorEnabled;

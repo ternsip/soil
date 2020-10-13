@@ -2,7 +2,7 @@ package com.ternsip.soil.general;
 
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.events.base.EventIOReceiver;
-import com.ternsip.soil.common.events.display.ShaderRegisteredEvent;
+import com.ternsip.soil.common.events.display.GraphicsReadyEvent;
 import com.ternsip.soil.graph.display.*;
 import com.ternsip.soil.graph.shader.base.Shader;
 
@@ -19,6 +19,7 @@ public class Graphics implements Threadable {
     public TextureRepository textureRepository;
     public Shader shader;
     public AudioRepository audioRepository;
+    public FpsCounter fpsCounter;
 
     @Override
     public void init() {
@@ -27,8 +28,9 @@ public class Graphics implements Threadable {
         camera = new Camera();
         textureRepository = new TextureRepository();
         shader = new Shader();
-        Soil.THREADS.getUniverseClient().eventIOReceiver.registerEvent(ShaderRegisteredEvent.class, new ShaderRegisteredEvent(shader));
+        fpsCounter = new FpsCounter();
         audioRepository = new AudioRepository();
+        Soil.THREADS.getUniverseClient().eventIOReceiver.registerEvent(GraphicsReadyEvent.class, new GraphicsReadyEvent(shader, fpsCounter));
     }
 
     @Override
@@ -36,7 +38,7 @@ public class Graphics implements Threadable {
         windowData.clear();
         eventIOReceiver.update();
         shader.render();
-        windowData.getFpsCounter().updateFps();
+        fpsCounter.updateFps();
         windowData.draw();
         windowData.pollEvents();
         //audioRepository.update(); memory leaks

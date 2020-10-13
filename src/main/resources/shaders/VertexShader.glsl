@@ -10,6 +10,7 @@ const int[] TEXTURE_Y = { 0, 0, 1, 1 };
 const int QUAD_TYPE_EMPTY = 0;
 const int QUAD_TYPE_BLOCKS = 1;
 const int QUAD_TYPE_FONT = 2;
+const int QUAD_FLAG_PINNED = 0x1;
 
 struct Vertex {
     float x;
@@ -18,9 +19,11 @@ struct Vertex {
 
 struct Quad {
     int type;
-    float period;
-    int meta_i;
-    float meta_f;
+    int animation_start;
+    float animation_period;
+    int flags;
+    int meta1;
+    int meta2;
 };
 
 layout (std430, binding = 2) buffer quadBuffer {
@@ -50,6 +53,11 @@ void main(void) {
         return;
     }
     Vertex v = vertices[layer * MAX_VERTICES + gl_VertexID];
-    gl_Position = vec4((v.x + cameraPos.x) * cameraScale.x, (v.y + cameraPos.y) * cameraScale.y, 0, 1.0);
+    if ((quad.flags & QUAD_FLAG_PINNED) > 0) {
+        gl_Position = vec4(v.x, v.y, 0, 1.0);
+    } else {
+        gl_Position = vec4((v.x + cameraPos.x) * cameraScale.x, (v.y + cameraPos.y) * cameraScale.y, 0, 1.0);
+    }
+
 
 }

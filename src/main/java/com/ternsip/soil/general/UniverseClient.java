@@ -3,12 +3,13 @@ package com.ternsip.soil.general;
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.events.base.Callback;
 import com.ternsip.soil.common.events.base.EventIOReceiver;
-import com.ternsip.soil.common.events.display.ShaderRegisteredEvent;
+import com.ternsip.soil.common.events.display.GraphicsReadyEvent;
 import com.ternsip.soil.common.events.network.OnConnectedToServer;
 import com.ternsip.soil.graph.shader.base.TextureType;
 import com.ternsip.soil.universe.BlocksRepository;
 import com.ternsip.soil.universe.EntityQuad;
 import com.ternsip.soil.universe.EntityRepository;
+import com.ternsip.soil.universe.EntityStatistics;
 import com.ternsip.soil.universe.audio.SoundRepository;
 import com.ternsip.soil.universe.bindings.Bind;
 import com.ternsip.soil.universe.bindings.Bindings;
@@ -20,7 +21,7 @@ public class UniverseClient implements Threadable {
 
     // TODO make this callbacks automatic
     private final Callback<OnConnectedToServer> onConnectedToServerCallback = this::whenConnected;
-    private final Callback<ShaderRegisteredEvent> registerShaderCallback = this::registerShader;
+    private final Callback<GraphicsReadyEvent> registerShaderCallback = this::onGraphicsReady;
     public Bindings bindings; // TODO move bindings inside settings
     public SettingsRepository settingsRepository;
     public SoundRepository soundRepository;
@@ -38,11 +39,12 @@ public class UniverseClient implements Threadable {
         blocksRepository = new BlocksRepository();
         blocksRepository.init();
         eventIOReceiver.registerCallback(OnConnectedToServer.class, onConnectedToServerCallback);
-        eventIOReceiver.registerCallback(ShaderRegisteredEvent.class, registerShaderCallback);
+        eventIOReceiver.registerCallback(GraphicsReadyEvent.class, registerShaderCallback);
     }
 
     @Override
     public void update() {
+        entityRepository.update();
         eventIOReceiver.update();
         blocksRepository.update();
     }
@@ -51,7 +53,7 @@ public class UniverseClient implements Threadable {
     @Override
     public void finish() {
         eventIOReceiver.unregisterCallback(OnConnectedToServer.class, onConnectedToServerCallback);
-        eventIOReceiver.unregisterCallback(ShaderRegisteredEvent.class, registerShaderCallback);
+        eventIOReceiver.unregisterCallback(GraphicsReadyEvent.class, registerShaderCallback);
         bindings.finish();
         blocksRepository.finish();
     }
@@ -66,16 +68,16 @@ public class UniverseClient implements Threadable {
     }
 
     private void spawnMenu() {
-        new EntityQuad(0, TextureType.BACKGROUND, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
-        new EntityQuad(1, TextureType.PLAYER_IDLE, 1000.0f, 0, 0, 0.9f, 0, 0.9f, 0.5f, 0, 0.5f, 0, 0).register();
-        new EntityQuad(1, TextureType.PLAYER_ATTACK, 5000.0f, -0.2f, 0.2f, 0, 0.2f, 0, 0, -0.2f, 0, 0, 0).register();
+        new EntityQuad(0, TextureType.BACKGROUND, false, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
+        new EntityQuad(1, TextureType.PLAYER_IDLE, false, 1000.0f, 0, 0, 0.9f, 0, 0.9f, 0.5f, 0, 0.5f, 0, 0).register();
+        new EntityQuad(1, TextureType.PLAYER_ATTACK, false, 5000.0f, -0.2f, 0.2f, 0, 0.2f, 0, 0, -0.2f, 0, 0, 0).register();
         for (int i = 0; i < 1000; ++i)
-            new EntityQuad(1, TextureType.HOMER, 1000.0f, -0.4f, 0.2f, -0.2f, 0.2f, -0.2f, 0, -0.4f, 0, 0, 0).register();
+            new EntityQuad(1, TextureType.HOMER, false, 1000.0f, -0.4f, 0.2f, -0.2f, 0.2f, -0.2f, 0, -0.4f, 0, 0, 0).register();
         //new EntityQuad(1, TextureType.FONT, 1000.0f, -0.4f, 0.2f, -0.2f, 0.2f, -0.2f, 0, -0.4f, 0, 'c', 0).register();
-        new EntityQuad(1, TextureType.TEST, 1000.0f, -0.8f, 0.2f, -0.4f, 0.2f, -0.4f, 0, -0.8f, 0, 0, 0).register();
-        new EntityQuad(1, TextureType.KITTY, 1000.0f, -0.8f, 0.4f, -0.4f, 0.4f, -0.4f, 0.2f, -0.8f, 0.2f, 0, 0).register();
-        new EntityQuad(2, TextureType.PLAYER_IDLE, 1000.0f, 0, 0, -0.9f, -0, -0.9f, -0.5f, 0, -0.5f, 0, 0).register();
-        new EntityQuad(3, TextureType.BLOCKS, 1000.0f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).register();
+        new EntityQuad(1, TextureType.TEST, false, 1000.0f, -0.8f, 0.2f, -0.4f, 0.2f, -0.4f, 0, -0.8f, 0, 0, 0).register();
+        new EntityQuad(1, TextureType.KITTY, false, 1000.0f, -0.8f, 0.4f, -0.4f, 0.4f, -0.4f, 0.2f, -0.8f, 0.2f, 0, 0).register();
+        new EntityQuad(2, TextureType.PLAYER_IDLE, false, 1000.0f, 0, 0, -0.9f, -0, -0.9f, -0.5f, 0, -0.5f, 0, 0).register();
+        new EntityQuad(3, TextureType.BLOCKS, false, 1000.0f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).register();
     }
 
     private void spawnEntities() {
@@ -86,10 +88,11 @@ public class UniverseClient implements Threadable {
         spawnEntities();
     }
 
-    private void registerShader(ShaderRegisteredEvent shaderRegisteredEvent) {
-        EntityQuad.SHADER = shaderRegisteredEvent.getShader();
-        BlocksRepository.SHADER = shaderRegisteredEvent.getShader();
+    private void onGraphicsReady(GraphicsReadyEvent event) {
+        EntityQuad.SHADER = event.getShader();
+        BlocksRepository.SHADER = event.getShader();
         blocksRepository.fullVisualUpdate();
+        new EntityStatistics(event.getFpsCounter()).register();
         spawnMenu();
     }
 
