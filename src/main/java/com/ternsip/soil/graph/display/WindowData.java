@@ -21,7 +21,6 @@ import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.GL_SAMPLE_ALPHA_TO_COVERAGE;
 import static org.lwjgl.opengl.GL43.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -36,6 +35,7 @@ public class WindowData {
     private final long window;
     private Vector2i windowSize;
     private boolean cursorEnabled;
+    private long gSync;
 
     public WindowData() {
 
@@ -117,12 +117,31 @@ public class WindowData {
         glfwTerminate();
     }
 
-    public void draw() {
+    public void swapBuffers() {
         //glFinish();
         //glDrawBuffer(GL_FRONT);
         //https://stackoverflow.com/questions/41233696/opengl-prevent-double-buffers
         glfwSwapBuffers(getWindow());
     }
+
+
+    public void lockBuffer() {
+        if (gSync > 0) {
+            glDeleteSync(gSync);
+        }
+        gSync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+    }
+
+    public void waitBuffer() {
+        if (gSync > 0) {
+            while (true) {
+                int waitReturn = glClientWaitSync(gSync, GL_SYNC_FLUSH_COMMANDS_BIT, 1);
+                if (waitReturn == GL_ALREADY_SIGNALED || waitReturn == GL_CONDITION_SATISFIED)
+                    return;
+            }
+        }
+    }
+
 
     public void pollEvents() {
         glfwPollEvents();

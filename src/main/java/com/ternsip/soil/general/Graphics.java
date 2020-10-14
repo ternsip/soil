@@ -36,10 +36,12 @@ public class Graphics implements Threadable {
     @Override
     public void update() {
         windowData.clear();
+        //windowData.waitBuffer();
         eventIOReceiver.update();
         shader.render();
         fpsCounter.updateFps();
-        windowData.draw();
+        //windowData.lockBuffer();
+        windowData.swapBuffers();
         windowData.pollEvents();
         //audioRepository.update(); memory leaks
     }
