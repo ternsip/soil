@@ -64,23 +64,21 @@ public class EntityQuad {
             throw new IllegalArgumentException("Quad is not registered yet");
         }
         BufferLayout quadBuffer = SHADER.quadBuffer;
-        BufferLayout vertexBuffer = SHADER.vertexBuffer;
-        int quadOffset = layer * Shader.QUAD_BUFFER_SIZE + index * Shader.QUAD_BUFFER_CELL_SIZE;
-        int vertexOffset = layer * Shader.VERTEX_BUFFER_SIZE + index * Mesh.QUAD_VERTICES * Shader.VERTEX_BUFFER_CELL_SIZE;
+        int quadOffset = layer * SHADER.quadBuffer.size / Shader.MAX_LAYERS + index *  SHADER.quadBuffer.structureLength;
         quadBuffer.writeInt(quadOffset, textureType.ordinal());
         quadBuffer.writeInt(quadOffset + 1, animationStart);
         quadBuffer.writeFloat(quadOffset + 2, animationPeriod);
         quadBuffer.writeInt(quadOffset + 3, (pinned ? QUAD_PINNED_FLAG : 0));
         quadBuffer.writeInt(quadOffset + 4, metadata1);
         quadBuffer.writeInt(quadOffset + 5, metadata2);
-        vertexBuffer.writeFloat(vertexOffset, x1);
-        vertexBuffer.writeFloat(vertexOffset + 1, y1);
-        vertexBuffer.writeFloat(vertexOffset + 2, x2);
-        vertexBuffer.writeFloat(vertexOffset + 3, y2);
-        vertexBuffer.writeFloat(vertexOffset + 4, x3);
-        vertexBuffer.writeFloat(vertexOffset + 5, y3);
-        vertexBuffer.writeFloat(vertexOffset + 6, x4);
-        vertexBuffer.writeFloat(vertexOffset + 7, y4);
+        quadBuffer.writeFloat(quadOffset + 6, x1);
+        quadBuffer.writeFloat(quadOffset + 7, y1);
+        quadBuffer.writeFloat(quadOffset + 8, x2);
+        quadBuffer.writeFloat(quadOffset + 9, y2);
+        quadBuffer.writeFloat(quadOffset + 10, x3);
+        quadBuffer.writeFloat(quadOffset + 11, y3);
+        quadBuffer.writeFloat(quadOffset + 12, x4);
+        quadBuffer.writeFloat(quadOffset + 13, y4);
     }
 
     public boolean register() {

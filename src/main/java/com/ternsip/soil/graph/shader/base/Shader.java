@@ -23,11 +23,6 @@ import static org.lwjgl.opengl.GL20.*;
 public final class Shader implements Finishable {
 
     public static final int MAX_LAYERS = 16;
-    public static final int TEXTURE_BUFFER_CELL_SIZE = 5;
-    public static final int QUAD_BUFFER_CELL_SIZE = 6;
-    public static final int VERTEX_BUFFER_CELL_SIZE = 2;
-    public static final int QUAD_BUFFER_SIZE = Mesh.MAX_QUADS * QUAD_BUFFER_CELL_SIZE;
-    public static final int VERTEX_BUFFER_SIZE = Mesh.MAX_VERTICES * VERTEX_BUFFER_CELL_SIZE;
 
     private static final File VERTEX_SHADER = new File("shaders/VertexShader.glsl");
     private static final File FRAGMENT_SHADER = new File("shaders/FragmentShader.glsl");
@@ -42,10 +37,9 @@ public final class Shader implements Finishable {
     private final UniformInteger time = new UniformInteger();
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
 
-    public final BufferLayout blocksBuffer = new BufferLayout(BlocksRepository.SIZE_X * BlocksRepository.SIZE_Y);
-    public final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length * TEXTURE_BUFFER_CELL_SIZE);
-    public final BufferLayout quadBuffer = new BufferLayout(MAX_LAYERS * QUAD_BUFFER_SIZE);
-    public final BufferLayout vertexBuffer = new BufferLayout(MAX_LAYERS * VERTEX_BUFFER_SIZE);
+    public final BufferLayout blocksBuffer = new BufferLayout(BlocksRepository.SIZE_X * BlocksRepository.SIZE_Y, 1);
+    public final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length,  5);
+    public final BufferLayout quadBuffer = new BufferLayout(MAX_LAYERS * Mesh.MAX_QUADS, 14);
 
     public Shader() {
         int vertexShaderID = loadShader(VERTEX_SHADER, GL_VERTEX_SHADER);
@@ -107,7 +101,7 @@ public final class Shader implements Finishable {
             textureBuffer.writeInt(index + 2, texture.getAtlasNumber());
             textureBuffer.writeFloat(index + 3, texture.getMaxU());
             textureBuffer.writeFloat(index + 4, texture.getMaxV());
-            index += TEXTURE_BUFFER_CELL_SIZE;
+            index += textureBuffer.structureLength;
         }
         samplers.loadDefault();
     }

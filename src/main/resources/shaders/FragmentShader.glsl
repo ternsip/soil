@@ -18,6 +18,11 @@ struct TextureData {
     float maxV;
 };
 
+struct Vertex {
+    float x;
+    float y;
+};
+
 struct Quad {
     int type;
     int animation_start;
@@ -25,6 +30,7 @@ struct Quad {
     int flags;
     int meta1;
     int meta2;
+    Vertex vertices[4];
 };
 
 layout (std430, binding = 0) buffer blocksBuffer {
@@ -85,7 +91,7 @@ void main(void) {
         int blockX = int(realX);
         int blockY = int(realY);
         int blockIndex = blockY * BLOCKS_X + blockX;
-        Quad newQuad = Quad(blocks[blockIndex], int(rand(blockIndex) * quad.animation_period), quad.animation_period, 0, 0, 0);
+        Quad newQuad = Quad(blocks[blockIndex], int(rand(blockIndex) * quad.animation_period), quad.animation_period, 0, 0, 0, quad.vertices);
         out_Color = resolveQuadTexel(newQuad, vec2(realX - blockX, 1 - (realY - blockY)));
         return;
     }
