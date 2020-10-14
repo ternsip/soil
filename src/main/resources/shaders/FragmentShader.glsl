@@ -18,11 +18,6 @@ struct TextureData {
     float maxV;
 };
 
-struct Vertex {
-    float x;
-    float y;
-};
-
 struct Quad {
     int type;
     int animation_start;
@@ -30,7 +25,7 @@ struct Quad {
     int flags;
     int meta1;
     int meta2;
-    Vertex vertices[4];
+    float vertices[8];
 };
 
 layout (std430, binding = 0) buffer blocksBuffer {

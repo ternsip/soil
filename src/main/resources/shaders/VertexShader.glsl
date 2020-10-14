@@ -9,11 +9,6 @@ const int QUAD_TYPE_BLOCKS = 1;
 const int QUAD_TYPE_FONT = 2;
 const int QUAD_FLAG_PINNED = 0x1;
 
-struct Vertex {
-    float x;
-    float y;
-};
-
 struct Quad {
     int type;
     int animation_start;
@@ -21,15 +16,11 @@ struct Quad {
     int flags;
     int meta1;
     int meta2;
-    Vertex vertices[4];
+    float vertices[8];
 };
 
 layout (std430, binding = 2) buffer quadBuffer {
     Quad quadData[];
-};
-
-layout (std430, binding = 3) buffer vertexBuffer {
-    Vertex vertices[];
 };
 
 uniform int layer;
@@ -46,11 +37,12 @@ void main(void) {
     quadIndex = quadIndexi;
     int indexMod = gl_VertexID % 4;
     texture_xy = vec2(TEXTURE_X[indexMod], TEXTURE_Y[indexMod]);
-    Vertex vertex = quad.vertices[indexMod];
+    float x = quad.vertices[indexMod * 2];
+    float y = quad.vertices[indexMod * 2 + 1];
     if ((quad.flags & QUAD_FLAG_PINNED) > 0) {
-        gl_Position = vec4(vertex.x, vertex.y, 0, 1.0);
+        gl_Position = vec4(x, y, 0, 1.0);
     } else {
-        gl_Position = vec4((vertex.x + cameraPos.x) * cameraScale.x, (vertex.y + cameraPos.y) * cameraScale.y, 0, 1.0);
+        gl_Position = vec4((x + cameraPos.x) * cameraScale.x, (y + cameraPos.y) * cameraScale.y, 0, 1.0);
     }
 
 }
