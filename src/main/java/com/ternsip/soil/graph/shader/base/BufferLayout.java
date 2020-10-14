@@ -39,7 +39,8 @@ public class BufferLayout extends Locatable implements Finishable {
         this.maxStructures = maxStructures;
         this.structureLength = structureLength;
         this.size = maxStructures * structureLength;
-        int bytesSize = this.size * FOUR_BYTES;
+        int padSize = size + (4 - size % 4) % 4;
+        int bytesSize = padSize * FOUR_BYTES;
         this.ssbo = glGenBuffers();
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
         ByteBuffer allocatedBuffer = ByteBuffer.allocateDirect(bytesSize).order(BYTE_ORDER);
