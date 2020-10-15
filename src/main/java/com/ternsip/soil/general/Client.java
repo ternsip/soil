@@ -12,8 +12,6 @@ import com.ternsip.soil.universe.EntityQuad;
 import com.ternsip.soil.universe.EntityRepository;
 import com.ternsip.soil.universe.EntityStatistics;
 import com.ternsip.soil.universe.audio.SoundRepository;
-import com.ternsip.soil.universe.bindings.Bind;
-import com.ternsip.soil.universe.bindings.Bindings;
 import com.ternsip.soil.universe.common.SettingsRepository;
 import com.ternsip.soil.universe.protocol.ConsoleMessageServerPacket;
 
@@ -24,9 +22,6 @@ import com.ternsip.soil.universe.protocol.ConsoleMessageServerPacket;
  */
 public class Client implements Threadable {
 
-    // TODO make this callbacks automatic
-    private final Callback<OnConnectedToServer> onConnectedToServerCallback = this::whenConnected;
-
     public WindowData windowData;
     public EventIOReceiver eventIOReceiver;
     public Camera camera;
@@ -35,7 +30,6 @@ public class Client implements Threadable {
     public AudioRepository audioRepository;
     public FpsCounter fpsCounter;
 
-    public Bindings bindings; // TODO move bindings inside settings
     public SettingsRepository settingsRepository;
     public SoundRepository soundRepository;
     public EntityRepository entityRepository;
@@ -53,12 +47,11 @@ public class Client implements Threadable {
 
         settingsRepository = new SettingsRepository();
         soundRepository = new SoundRepository();
-        bindings = new Bindings();
         entityRepository = new EntityRepository();
         blocksRepository = new BlocksRepository();
         blocksRepository.init();
-        eventIOReceiver.registerCallback(OnConnectedToServer.class, onConnectedToServerCallback);
         blocksRepository.fullVisualUpdate();
+        eventIOReceiver.register(this);
         new EntityStatistics().register();
         spawnMenu();
     }
@@ -81,12 +74,11 @@ public class Client implements Threadable {
 
     @Override
     public void finish() {
+        Soil.THREADS.client.eventIOReceiver.unregister(this);
         shader.finish();
         textureRepository.finish();
         windowData.finish();
         audioRepository.finish();
-        eventIOReceiver.unregisterCallback(OnConnectedToServer.class, onConnectedToServerCallback);
-        bindings.finish();
         blocksRepository.finish();
     }
 
@@ -118,7 +110,6 @@ public class Client implements Threadable {
     }
 
     private void spawnEntities() {
-        bindings.addBindCallback(Bind.TEST_BUTTON, () -> Soil.THREADS.getNetworkClient().send(new ConsoleMessageServerPacket("HELLO 123")));
     }
 
     private void whenConnected(OnConnectedToServer onConnectedToServer) {

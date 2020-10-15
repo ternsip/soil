@@ -26,8 +26,7 @@ public class Camera {
     private Callback<CursorPosEvent> cursorPosCallback = this::recalculatePos;
 
     public Camera() {
-        Soil.THREADS.client.eventIOReceiver.registerCallback(ScrollEvent.class, scrollCallback);
-        Soil.THREADS.client.eventIOReceiver.registerCallback(CursorPosEvent.class, cursorPosCallback);
+        Soil.THREADS.client.eventIOReceiver.register(this);
     }
 
     public void update() {
@@ -38,8 +37,7 @@ public class Camera {
     }
 
     public void finish() {
-        Soil.THREADS.client.eventIOReceiver.unregisterCallback(ScrollEvent.class, scrollCallback);
-        Soil.THREADS.client.eventIOReceiver.unregisterCallback(CursorPosEvent.class, cursorPosCallback);
+        Soil.THREADS.client.eventIOReceiver.unregister(this);
     }
 
     private void recalculatePos(CursorPosEvent event) {

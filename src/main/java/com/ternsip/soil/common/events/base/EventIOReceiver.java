@@ -13,16 +13,7 @@ public class EventIOReceiver extends EventReceiver {
     private final boolean[] mouseButtonPressed = new boolean[8];
 
     public EventIOReceiver() {
-        registerCallback(KeyEvent.class, (KeyEvent keyEvent) -> {
-            if (keyEvent.getKey() >= 0 && keyEvent.getKey() < keyPressed.length) {
-                keyPressed[keyEvent.getKey()] = keyEvent.getAction() != GLFW_RELEASE;
-            }
-        });
-        registerCallback(MouseButtonEvent.class, (MouseButtonEvent mouseButtonEvent) -> {
-            if (mouseButtonEvent.getButton() >= 0 && mouseButtonEvent.getButton() < mouseButtonPressed.length) {
-                mouseButtonPressed[mouseButtonEvent.getButton()] = mouseButtonEvent.getAction() != GLFW_RELEASE;
-            }
-        });
+        register(this);
     }
 
     public boolean isKeyDown(int key) {
@@ -31,6 +22,18 @@ public class EventIOReceiver extends EventReceiver {
 
     public boolean isMouseDown(int button) {
         return mouseButtonPressed[button];
+    }
+
+    private void onKeyEvent(KeyEvent keyEvent) {
+        if (keyEvent.getKey() >= 0 && keyEvent.getKey() < keyPressed.length) {
+            keyPressed[keyEvent.getKey()] = keyEvent.getAction() != GLFW_RELEASE;
+        }
+    }
+
+    private void onMouseButtonEvent(MouseButtonEvent mouseButtonEvent) {
+        if (mouseButtonEvent.getButton() >= 0 && mouseButtonEvent.getButton() < mouseButtonPressed.length) {
+            mouseButtonPressed[mouseButtonEvent.getButton()] = mouseButtonEvent.getAction() != GLFW_RELEASE;
+        }
     }
 
 }

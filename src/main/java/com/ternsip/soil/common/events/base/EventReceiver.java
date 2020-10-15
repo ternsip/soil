@@ -2,9 +2,13 @@ package com.ternsip.soil.common.events.base;
 
 import com.ternsip.soil.common.logic.Utils;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * That class can potentially be used in any thread to access collected events
@@ -23,34 +27,49 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class EventReceiver {
 
-    // TODO removed sync map - THREAD SAFETY ISSUE!
-    private final HashMap<Class<?>, EventProcessor> eventProcessors = new HashMap<>();
+    private final HashMap<Class, Set<Callback>> classToCallbacks = new HashMap<>();
+    private final HashMap<Object, Set<Callback>> objectToCallbacks = new HashMap<>();
+    private final LinkedBlockingQueue events = new LinkedBlockingQueue<>();
 
     public EventReceiver() {
         for (Class<? extends Event> clazz : Utils.getAllClasses(Event.class)) {
-            eventProcessors.computeIfAbsent(clazz, e -> new EventProcessor());
+            classToCallbacks.computeIfAbsent(clazz, e -> new HashSet<>());
         }
     }
 
-    public <T extends Event> void registerEvent(Class<T> clazz, T event) {
-        getEventProcessor(clazz).registerEvent(event);
-    }
-
-    public <T extends Event> void registerCallback(Class<T> clazz, Callback<T> callback) {
-        getEventProcessor(clazz).registerCallback(callback);
-    }
-
-    public <T extends Event> void unregisterCallback(Class<T> clazz, Callback<T> callback) {
-        getEventProcessor(clazz).unregisterCallback(callback);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends Event> EventProcessor<T> getEventProcessor(Class<T> eventClass) {
-        return (EventProcessor<T>) getEventProcessors().get(eventClass);
+    public <T extends Event> void registerEvent(T event) {
+        events.add(event);
     }
 
     public void update() {
-        getEventProcessors().values().forEach(EventProcessor::update);
+        while (!getEvents().isEmpty()) {
+            Object event = events.poll();
+            for (Callback callback : classToCallbacks.get(event.getClass())) {
+                callback.apply((Event) event);
+            }
+        }
+    }
+
+    @SneakyThrows
+    public void register(Object obj) {
+        for (Method method : obj.getClass().getDeclaredMethods()) {
+            if (method.getParameterCount() == 1) {
+                if (!method.getName().equalsIgnoreCase("registerEvent") && Event.class.isAssignableFrom(method.getParameterTypes()[0])) {
+                    method.setAccessible(true);
+                    Callback callback = e -> Utils.invokeSilently(method, obj, e);
+                    classToCallbacks.get(method.getParameterTypes()[0]).add(callback);
+                    objectToCallbacks.computeIfAbsent(obj, e -> new HashSet<>()).add(callback);
+                }
+            }
+        }
+    }
+
+    @SneakyThrows
+    public void unregister(Object obj) {
+        Set<Callback> callbacks = objectToCallbacks.remove(obj);
+        for (Set<Callback> callbackSet : classToCallbacks.values()) {
+            callbackSet.removeIf(callbacks::contains);
+        }
     }
 
 }

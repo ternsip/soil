@@ -206,6 +206,11 @@ public class Utils {
         return clazz.getDeclaredConstructor().newInstance();
     }
 
+    @SneakyThrows
+    public static Object invokeSilently(Method method, Object obj, Object ...args) {
+        return method.invoke(obj, args);
+    }
+
     public static boolean isSubDirectoryPresent(File file, String subDirectory) {
         for (File parentDirectory : getAllParentDirectories(file)) {
             if (parentDirectory.getName().equals(subDirectory)) {

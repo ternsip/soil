@@ -39,7 +39,7 @@ public class WindowData {
 
     public WindowData() {
 
-        Soil.THREADS.client.eventIOReceiver.registerCallback(ErrorEvent.class, this::handleError);
+        Soil.THREADS.client.eventIOReceiver.register(this);
 
         registerErrorEvent();
 
@@ -86,9 +86,7 @@ public class WindowData {
 
         enableCursor();
 
-        registerEvent(ResizeEvent.class, new ResizeEvent(getWidth(), getHeight()));
-
-        Soil.THREADS.client.eventIOReceiver.registerCallback(ResizeEvent.class, this::handleResize);
+        registerEvent(new ResizeEvent(getWidth(), getHeight()));
     }
 
     public int getWidth() {
@@ -112,6 +110,7 @@ public class WindowData {
     }
 
     public void finish() {
+        Soil.THREADS.client.eventIOReceiver.unregister(this);
         glfwDestroyWindow(getWindow());
         for (Callback callback : getCallbacks()) {
             callback.free();
@@ -156,13 +155,13 @@ public class WindowData {
     public void enableCursor() {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         setCursorEnabled(true);
-        registerEvent(CursorVisibilityEvent.class, new CursorVisibilityEvent(true));
+        registerEvent(new CursorVisibilityEvent(true));
     }
 
     public void disableCursor() {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         setCursorEnabled(false);
-        registerEvent(CursorVisibilityEvent.class, new CursorVisibilityEvent(false));
+        registerEvent(new CursorVisibilityEvent(false));
     }
 
     private Vector2i getMainDisplaySize() {
@@ -172,7 +171,7 @@ public class WindowData {
 
     private void registerCharEvent() {
         GLFWCharCallback charCallback = GLFWCharCallback.create(
-                (window, unicodePoint) -> registerEvent(CharEvent.class, new CharEvent(unicodePoint))
+                (window, unicodePoint) -> registerEvent(new CharEvent(unicodePoint))
         );
         getCallbacks().add(charCallback);
         glfwSetCharCallback(getWindow(), charCallback);
@@ -180,7 +179,7 @@ public class WindowData {
 
     private void registerErrorEvent() {
         GLFWErrorCallback errorCallback = GLFWErrorCallback.create(
-                (error, description) -> registerEvent(ErrorEvent.class, new ErrorEvent(error, description))
+                (error, description) -> registerEvent(new ErrorEvent(error, description))
         );
         getCallbacks().add(errorCallback);
         glfwSetErrorCallback(errorCallback);
@@ -207,7 +206,7 @@ public class WindowData {
 
     private void registerScrollEvent() {
         GLFWScrollCallback scrollCallback = GLFWScrollCallback.create(
-                (window, xOffset, yOffset) -> registerEvent(ScrollEvent.class, new ScrollEvent(xOffset, yOffset))
+                (window, xOffset, yOffset) -> registerEvent(new ScrollEvent(xOffset, yOffset))
         );
         getCallbacks().add(scrollCallback);
         glfwSetScrollCallback(getWindow(), scrollCallback);
@@ -226,7 +225,7 @@ public class WindowData {
                 prevY = yPos;
                 double normalX = 2f * (xPos / getWidth() - 0.5f);
                 double normalY = -2f * (yPos / getHeight() - 0.5f);
-                registerEvent(CursorPosEvent.class, new CursorPosEvent(xPos, yPos, dx, dy, normalX, normalY));
+                registerEvent(new CursorPosEvent(xPos, yPos, dx, dy, normalX, normalY));
             }
         }));
         getCallbacks().add(posCallback);
@@ -235,7 +234,7 @@ public class WindowData {
 
     private void registerKeyEvent() {
         GLFWKeyCallback keyCallback = GLFWKeyCallback.create(
-                (window, key, scanCode, action, mods) -> registerEvent(KeyEvent.class, new KeyEvent(key, scanCode, action, mods))
+                (window, key, scanCode, action, mods) -> registerEvent(new KeyEvent(key, scanCode, action, mods))
         );
         getCallbacks().add(keyCallback);
         glfwSetKeyCallback(getWindow(), keyCallback);
@@ -243,7 +242,7 @@ public class WindowData {
 
     private void registerFrameBufferSizeEvent() {
         GLFWFramebufferSizeCallback framebufferSizeCallback = GLFWFramebufferSizeCallback.create(
-                (window, width, height) -> registerEvent(ResizeEvent.class, new ResizeEvent(width, height))
+                (window, width, height) -> registerEvent(new ResizeEvent(width, height))
         );
         getCallbacks().add(framebufferSizeCallback);
         glfwSetFramebufferSizeCallback(getWindow(), framebufferSizeCallback);
@@ -251,14 +250,14 @@ public class WindowData {
 
     private void registerMouseButtonEvent() {
         GLFWMouseButtonCallback mouseButtonCallback = GLFWMouseButtonCallback.create(
-                (window, button, action, mods) -> registerEvent(MouseButtonEvent.class, new MouseButtonEvent(button, action, mods))
+                (window, button, action, mods) -> registerEvent(new MouseButtonEvent(button, action, mods))
         );
         getCallbacks().add(mouseButtonCallback);
         glfwSetMouseButtonCallback(getWindow(), mouseButtonCallback);
     }
 
-    private <T extends Event> void registerEvent(Class<T> clazz, T event) {
-        Soil.THREADS.client.eventIOReceiver.registerEvent(clazz, event);
+    private <T extends Event> void registerEvent(T event) {
+        Soil.THREADS.client.eventIOReceiver.registerEvent(event);
     }
 
     private void handleError(ErrorEvent errorEvent) {

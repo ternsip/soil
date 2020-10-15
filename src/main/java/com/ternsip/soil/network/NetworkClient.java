@@ -92,13 +92,13 @@ public class NetworkClient implements Threadable {
 
     private void establishConnection(Connection connection) {
         setConnection(connection);
-        Soil.THREADS.client.eventIOReceiver.registerEvent(OnConnectToServer.class, new OnConnectToServer(connection));
+        Soil.THREADS.client.eventIOReceiver.registerEvent(new OnConnectToServer(connection));
     }
 
     private void disconnect() {
         if (getConnection().isActive()) {
             getConnection().close();
-            Soil.THREADS.client.eventIOReceiver.registerEvent(OnDisconnectedFromServer.class, new OnDisconnectedFromServer());
+            Soil.THREADS.client.eventIOReceiver.registerEvent(new OnDisconnectedFromServer());
             log.info("Disconnected from server");
         } else {
             throw new IllegalArgumentException(String.format("Can not disconnect because connection %s is not active", getConnection()));

@@ -86,13 +86,13 @@ public class NetworkServer implements Threadable {
 
     public void addConnection(Connection connection) {
         getConnections().add(connection);
-        Soil.THREADS.getServer().networkEventReceiver.registerEvent(OnClientConnect.class, new OnClientConnect(connection));
+        Soil.THREADS.getServer().networkEventReceiver.registerEvent(new OnClientConnect(connection));
     }
 
     private void removeInactiveConnections() {
         getConnections().removeIf(connection -> {
             if (!connection.isActive()) {
-                Soil.THREADS.getServer().networkEventReceiver.registerEvent(OnClientDisconnect.class, new OnClientDisconnect(connection));
+                Soil.THREADS.getServer().networkEventReceiver.registerEvent(new OnClientDisconnect(connection));
                 return true;
             }
             return false;
@@ -122,7 +122,7 @@ public class NetworkServer implements Threadable {
     private void disconnectClient(Connection connection) {
         if (connection.isActive()) {
             connection.close();
-            Soil.THREADS.getServer().networkEventReceiver.registerEvent(OnClientDisconnect.class, new OnClientDisconnect(connection));
+            Soil.THREADS.getServer().networkEventReceiver.registerEvent(new OnClientDisconnect(connection));
             getConnections().remove(connection);
             log.info(String.format("Client %s has been disconnected", connection));
         } else {
