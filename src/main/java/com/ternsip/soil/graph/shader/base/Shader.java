@@ -34,6 +34,7 @@ public final class Shader implements Finishable {
     private final UniformVec2 cameraPos = new UniformVec2();
     private final UniformVec2 cameraScale = new UniformVec2();
     private final UniformInteger layer = new UniformInteger();
+    private final UniformInteger size = new UniformInteger();
     private final UniformInteger time = new UniformInteger();
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
 
@@ -75,12 +76,13 @@ public final class Shader implements Finishable {
         cameraPos.load(camera.getPos().x, camera.getPos().y);
         cameraScale.load(camera.getScale().x, camera.getScale().y);
         this.time.load((int) (System.currentTimeMillis() % Integer.MAX_VALUE));
-        for (int layerIndex = 0; layerIndex < MAX_LAYERS; ++layerIndex) {
+        for (int layerIndex = MAX_LAYERS - 1; layerIndex >= 0; --layerIndex) {
             int quads = EntityQuad.getCountThreadSafe(layerIndex);
             if (quads <= 0) {
                 continue;
             }
             this.layer.load(layerIndex);
+            this.size.load(quads);
             mesh.render(quads);
         }
     }

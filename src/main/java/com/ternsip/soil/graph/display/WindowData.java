@@ -72,13 +72,20 @@ public class WindowData {
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_LIGHTING);
+        glDisable(GL_TEXTURE_2D);
 
         glEnable(GL_DEBUG_OUTPUT);
         registerDebugEvent();
         //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         OpenGlSettings.antialias(true);
-        OpenGlSettings.enableDepthTesting(false);
+        //OpenGlSettings.enableDepthTesting(false);
         OpenGlSettings.goWireframe(false);
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_GREATER);
+        glAlphaFunc (GL_GREATER, 0.99f);
+        glEnable(GL_ALPHA_TEST);
 
         glClearColor(BACKGROUND_COLOR.x(), BACKGROUND_COLOR.y(), BACKGROUND_COLOR.z(), BACKGROUND_COLOR.w());
 
@@ -148,7 +155,8 @@ public class WindowData {
     }
 
     public void clear() {
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClearDepth(0.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     public void enableCursor() {

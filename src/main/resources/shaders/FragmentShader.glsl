@@ -88,8 +88,8 @@ void main(void) {
         int blockIndex = blockY * BLOCKS_X + blockX;
         Quad newQuad = Quad(blocks[blockIndex], int(rand(blockIndex) * quad.animation_period), quad.animation_period, 0, 0, 0, quad.vertices);
         out_Color = resolveQuadTexel(newQuad, vec2(realX - blockX, 1 - (realY - blockY)));
-        return;
+    } else {
+        out_Color = resolveQuadTexel(quad, texture_xy);
     }
-    out_Color = resolveQuadTexel(quad, texture_xy);
 
 }
