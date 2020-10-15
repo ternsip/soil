@@ -1,6 +1,8 @@
 #version 430 core
 
-const int MAX_QUADS = (1 << 16) / 4;
+const int MAX_LAYERS = 16;
+const int LAYER_MAX_QUADS = (1 << 16) / 4;
+const int MAX_QUADS = LAYER_MAX_QUADS * MAX_LAYERS;
 const int[] TEXTURE_X = { 0, 1, 1, 0 };
 const int[] TEXTURE_Y = { 0, 0, 1, 1 };
 
@@ -32,7 +34,7 @@ out vec2 texture_xy;
 
 void main(void) {
 
-    int quadIndexi = MAX_QUADS * layer + gl_VertexID / 4;
+    int quadIndexi = LAYER_MAX_QUADS * layer + gl_VertexID / 4;
     Quad quad = quadData[quadIndexi];
     quadIndex = quadIndexi;
     int indexMod = gl_VertexID % 4;

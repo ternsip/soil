@@ -72,6 +72,8 @@ public class WindowData {
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_LIGHTING);
+        glDisable(GL_TEXTURE_2D);
 
         glEnable(GL_DEBUG_OUTPUT);
         registerDebugEvent();
