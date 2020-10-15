@@ -84,7 +84,6 @@ public class AudioRepository {
         });
 
         // Orient listener in 3d space
-        Vector3fc pos = soundRepository.getListenerPosition();
         Vector3fc orientFront = soundRepository.getOrientationFront();
         Vector3fc orientUp = soundRepository.getOrientationUp();
         ORIENTATION_BUFFER.clear();
@@ -95,7 +94,7 @@ public class AudioRepository {
         ORIENTATION_BUFFER.put(orientUp.y());
         ORIENTATION_BUFFER.put(orientUp.z());
         ORIENTATION_BUFFER.rewind();
-        alListener3f(AL_POSITION, pos.x(), pos.y(), pos.z());
+        alListener3f(AL_POSITION, soundRepository.x, soundRepository.y, 0);
         alListenerfv(AL_ORIENTATION, ORIENTATION_BUFFER);
 
     }
@@ -154,7 +153,11 @@ public class AudioRepository {
             alSourcei(sourcePointer, AL_BUFFER, bufferPointer);
             alSourcef(sourcePointer, AL_GAIN, sound.getMagnitude());
             alSourcef(sourcePointer, AL_PITCH, sound.getPitch());
-            alSource3f(sourcePointer, AL_POSITION, sound.getPosition().x(), sound.getPosition().y(), sound.getPosition().z());
+            if (sound.local) {
+                alSource3f(sourcePointer, AL_POSITION, sound.x, sound.y, 0);
+            } else {
+                alSource3f(sourcePointer, AL_POSITION, Soil.THREADS.client.soundRepository.x, Soil.THREADS.client.soundRepository.y, 0);
+            }
         }
 
         public void finish() {

@@ -30,10 +30,9 @@ public class Camera {
     }
 
     public void update() {
-        // TODO finish audio
-        //getUniverseClient().getSoundRepository().setListenerPosition(eye);
-        //getUniverseClient().getSoundRepository().setListenerOrientationFront(getLookDirection());
-        //getUniverseClient().getSoundRepository().setListenerOrientationUp(getUpDirection());
+        Soil.THREADS.client.soundRepository.setListenerPosition(pos.x, pos.y);
+        //Soil.THREADS.client.soundRepository.setListenerOrientationFront(getLookDirection());
+        //Soil.THREADS.client.soundRepository.setListenerOrientationUp(getUpDirection());
     }
 
     public void finish() {

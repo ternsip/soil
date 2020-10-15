@@ -15,24 +15,21 @@ import java.io.File;
 @Getter
 public class Sound {
 
-    private final File file;
-    private final Vector3fc position;
-    private final float magnitude;
-    private final float pitch;
-    private final int playTimes;
-    private final boolean local;
+    public final File file;
+    public float x, y;
+    public final float magnitude;
+    public final float pitch;
+    public final int playTimes;
+    public final boolean local;
 
     public Sound(File file) {
         this.file = file;
-        this.position = new Vector3f(0);
+        this.x = 0;
+        this.y = 0;
         this.magnitude = 1;
         this.pitch = 1;
         this.playTimes = 1;
         this.local = true;
-    }
-
-    public Vector3fc getPosition() {
-        return isLocal() ? Soil.THREADS.client.soundRepository.getListenerPosition() : position;
     }
 
     public void register() {

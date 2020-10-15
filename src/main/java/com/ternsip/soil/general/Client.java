@@ -11,9 +11,12 @@ import com.ternsip.soil.universe.BlocksRepository;
 import com.ternsip.soil.universe.EntityQuad;
 import com.ternsip.soil.universe.EntityRepository;
 import com.ternsip.soil.universe.EntityStatistics;
+import com.ternsip.soil.universe.audio.Sound;
 import com.ternsip.soil.universe.audio.SoundRepository;
 import com.ternsip.soil.universe.common.SettingsRepository;
 import com.ternsip.soil.universe.protocol.ConsoleMessageServerPacket;
+
+import java.io.File;
 
 /**
  * Provides full control over user Input/Output channels
@@ -69,7 +72,7 @@ public class Client implements Threadable {
         //windowData.lockBuffer();
         windowData.swapBuffers();
         windowData.pollEvents();
-        //audioRepository.update(); memory leaks
+        audioRepository.update();
     }
 
     @Override

@@ -15,12 +15,13 @@ public class SoundRepository {
 
     private final Set<Sound> sounds = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    private final Vector3f listenerPosition = new Vector3f(0);
+    public float x, y;
     private final Vector3f orientationFront = new Vector3f(0);
     private final Vector3f orientationUp = new Vector3f(0);
 
-    public void setListenerPosition(Vector3fc pos) {
-        getListenerPosition().set(pos);
+    public void setListenerPosition(float x, float y) {
+        this.x = x;
+        this.y = y;
     }
 
     public void setListenerOrientationFront(Vector3fc orient) {
