@@ -23,7 +23,7 @@ public class Bindings {
         for (Bind bind : Bind.values()) {
             keyStateToBind.put(bind.getDefaultKeyState(), bind);
         }
-        Soil.THREADS.getUniverseClient().eventIOReceiver.registerCallback(KeyEvent.class, keyCallback);
+        Soil.THREADS.client.eventIOReceiver.registerCallback(KeyEvent.class, keyCallback);
     }
 
     public void load() {
@@ -43,7 +43,7 @@ public class Bindings {
     }
 
     public void finish() {
-        Soil.THREADS.getUniverseClient().eventIOReceiver.unregisterCallback(KeyEvent.class, keyCallback);
+        Soil.THREADS.client.eventIOReceiver.unregisterCallback(KeyEvent.class, keyCallback);
     }
 
     private void handleKeyEvent(KeyEvent event) {

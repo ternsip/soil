@@ -52,7 +52,7 @@ public class AudioRepository {
 
     public void update() {
 
-        SoundRepository soundRepository = Soil.THREADS.getUniverseClient().soundRepository;
+        SoundRepository soundRepository = Soil.THREADS.client.soundRepository;
         Set<Sound> soundsSet = soundRepository.getSounds();
 
         soundsSet.removeIf(sound -> {

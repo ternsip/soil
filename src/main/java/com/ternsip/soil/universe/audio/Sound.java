@@ -32,15 +32,15 @@ public class Sound {
     }
 
     public Vector3fc getPosition() {
-        return isLocal() ? Soil.THREADS.getUniverseClient().soundRepository.getListenerPosition() : position;
+        return isLocal() ? Soil.THREADS.client.soundRepository.getListenerPosition() : position;
     }
 
     public void register() {
-        Soil.THREADS.getUniverseClient().soundRepository.register(this);
+        Soil.THREADS.client.soundRepository.register(this);
     }
 
     public void unregister() {
-        Soil.THREADS.getUniverseClient().soundRepository.unregister(this);
+        Soil.THREADS.client.soundRepository.unregister(this);
     }
 
 }

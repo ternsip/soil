@@ -13,11 +13,11 @@ public class Entity {
     }
 
     public void register() {
-        Soil.THREADS.getUniverseClient().entityRepository.register(this);
+        Soil.THREADS.client.entityRepository.register(this);
     }
 
     public void unregister() {
-        Soil.THREADS.getUniverseClient().entityRepository.unregister(uuid);
+        Soil.THREADS.client.entityRepository.unregister(uuid);
     }
 
 

@@ -71,7 +71,7 @@ public final class Shader implements Finishable {
     }
 
     public void render() {
-        Camera camera = Soil.THREADS.getGraphics().camera;
+        Camera camera = Soil.THREADS.client.camera;
         cameraPos.load(camera.getPos().x, camera.getPos().y);
         cameraScale.load(camera.getScale().x, camera.getScale().y);
         this.time.load((int) (System.currentTimeMillis() % Integer.MAX_VALUE));
@@ -93,7 +93,7 @@ public final class Shader implements Finishable {
 
     private void loadDefaultData() {
         int index = 0;
-        TextureRepository textureRepository = Soil.THREADS.getGraphics().textureRepository;
+        TextureRepository textureRepository = Soil.THREADS.client.textureRepository;
         for (TextureType textureType : TextureType.values()) {
             Texture texture = textureRepository.getTexture(textureType.file);
             textureBuffer.writeInt(index, texture.getLayerStart());

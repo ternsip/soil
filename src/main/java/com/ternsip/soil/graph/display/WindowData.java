@@ -39,7 +39,7 @@ public class WindowData {
 
     public WindowData() {
 
-        Soil.THREADS.getGraphics().eventIOReceiver.registerCallback(ErrorEvent.class, this::handleError);
+        Soil.THREADS.client.eventIOReceiver.registerCallback(ErrorEvent.class, this::handleError);
 
         registerErrorEvent();
 
@@ -88,7 +88,7 @@ public class WindowData {
 
         registerEvent(ResizeEvent.class, new ResizeEvent(getWidth(), getHeight()));
 
-        Soil.THREADS.getGraphics().eventIOReceiver.registerCallback(ResizeEvent.class, this::handleResize);
+        Soil.THREADS.client.eventIOReceiver.registerCallback(ResizeEvent.class, this::handleResize);
     }
 
     public int getWidth() {
@@ -258,8 +258,7 @@ public class WindowData {
     }
 
     private <T extends Event> void registerEvent(Class<T> clazz, T event) {
-        Soil.THREADS.getGraphics().eventIOReceiver.registerEvent(clazz, event);
-        Soil.THREADS.getUniverseClient().eventIOReceiver.registerEvent(clazz, event);
+        Soil.THREADS.client.eventIOReceiver.registerEvent(clazz, event);
     }
 
     private void handleError(ErrorEvent errorEvent) {

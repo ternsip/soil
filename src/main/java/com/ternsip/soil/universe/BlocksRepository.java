@@ -1,5 +1,6 @@
 package com.ternsip.soil.universe;
 
+import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.logic.Finishable;
 import com.ternsip.soil.common.logic.Indexer;
 import com.ternsip.soil.common.logic.Utils;
@@ -15,7 +16,6 @@ public class BlocksRepository implements Finishable {
     private static final List<ChunkGenerator> CHUNK_GENERATORS = constructChunkGenerators();
     public static final int SIZE_X = 4000;
     public static final int SIZE_Y = 3000;
-    public static Shader SHADER;
 
     public static final Indexer INDEXER = new Indexer(SIZE_X, SIZE_Y);
     public final Block[][] blocks = new Block[SIZE_X][SIZE_Y];
@@ -37,17 +37,19 @@ public class BlocksRepository implements Finishable {
     }
 
     public void visualUpdate(int startX, int startY, int endX, int endY) {
+        Shader shader = Soil.THREADS.client.shader;
         for (int x = startX; x <= endX; ++x) {
             for (int y = startY; y <= endY; ++y) {
-                SHADER.blocksBuffer.writeInt((int) INDEXER.getIndex(x, y), blocks[x][y].textureType.ordinal());
+                shader.blocksBuffer.writeInt((int) INDEXER.getIndex(x, y), blocks[x][y].textureType.ordinal());
             }
         }
     }
 
     public void fullVisualUpdate() {
+        Shader shader = Soil.THREADS.client.shader;
         for (int x = 0; x < SIZE_X; ++x) {
             for (int y = 0; y < SIZE_Y; ++y) {
-                SHADER.blocksBuffer.writeInt((int) INDEXER.getIndex(x, y), blocks[x][y].textureType.ordinal());
+                shader.blocksBuffer.writeInt((int) INDEXER.getIndex(x, y), blocks[x][y].textureType.ordinal());
             }
         }
     }

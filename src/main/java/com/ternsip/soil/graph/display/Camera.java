@@ -26,8 +26,8 @@ public class Camera {
     private Callback<CursorPosEvent> cursorPosCallback = this::recalculatePos;
 
     public Camera() {
-        Soil.THREADS.getGraphics().eventIOReceiver.registerCallback(ScrollEvent.class, scrollCallback);
-        Soil.THREADS.getGraphics().eventIOReceiver.registerCallback(CursorPosEvent.class, cursorPosCallback);
+        Soil.THREADS.client.eventIOReceiver.registerCallback(ScrollEvent.class, scrollCallback);
+        Soil.THREADS.client.eventIOReceiver.registerCallback(CursorPosEvent.class, cursorPosCallback);
     }
 
     public void update() {
@@ -38,16 +38,16 @@ public class Camera {
     }
 
     public void finish() {
-        Soil.THREADS.getGraphics().eventIOReceiver.unregisterCallback(ScrollEvent.class, scrollCallback);
-        Soil.THREADS.getGraphics().eventIOReceiver.unregisterCallback(CursorPosEvent.class, cursorPosCallback);
+        Soil.THREADS.client.eventIOReceiver.unregisterCallback(ScrollEvent.class, scrollCallback);
+        Soil.THREADS.client.eventIOReceiver.unregisterCallback(CursorPosEvent.class, cursorPosCallback);
     }
 
     private void recalculatePos(CursorPosEvent event) {
-        if (Soil.THREADS.getGraphics().eventIOReceiver.isMouseDown(GLFW_MOUSE_BUTTON_2)) {
+        if (Soil.THREADS.client.eventIOReceiver.isMouseDown(GLFW_MOUSE_BUTTON_2)) {
             pos.x += event.getDx() / (scale.x * 500.0f);
             pos.y -= event.getDy() / (scale.y * 500.0f);
         }
-        if (Soil.THREADS.getGraphics().eventIOReceiver.isMouseDown(GLFW_MOUSE_BUTTON_1)) {
+        if (Soil.THREADS.client.eventIOReceiver.isMouseDown(GLFW_MOUSE_BUTTON_1)) {
             pos.x -= scale.x * event.getDx() / (scale.x * 500.0f);
             pos.y += scale.y * event.getDy() / (scale.y * 500.0f);
         }

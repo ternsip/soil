@@ -1,5 +1,6 @@
 package com.ternsip.soil.universe;
 
+import com.ternsip.soil.Soil;
 import com.ternsip.soil.graph.shader.base.BufferLayout;
 import com.ternsip.soil.graph.shader.base.Mesh;
 import com.ternsip.soil.graph.shader.base.Shader;
@@ -15,7 +16,6 @@ public class EntityQuad {
     public static final LayerQuads LAYER_QUADS = new LayerQuads();
     public static final int UNASSIGNED = -1;
     public static final int QUAD_PINNED_FLAG = 0x1;
-    public static Shader SHADER;
 
     public final int layer;
     public int index = UNASSIGNED;
@@ -63,8 +63,9 @@ public class EntityQuad {
         if (index == EntityQuad.UNASSIGNED) {
             throw new IllegalArgumentException("Quad is not registered yet");
         }
-        BufferLayout quadBuffer = SHADER.quadBuffer;
-        int quadOffset = layer * SHADER.quadBuffer.size / Shader.MAX_LAYERS + index *  SHADER.quadBuffer.structureLength;
+        Shader shader = Soil.THREADS.client.shader;
+        BufferLayout quadBuffer = shader.quadBuffer;
+        int quadOffset = layer * shader.quadBuffer.size / Shader.MAX_LAYERS + index *  shader.quadBuffer.structureLength;
         quadBuffer.writeInt(quadOffset, textureType.ordinal());
         quadBuffer.writeInt(quadOffset + 1, animationStart);
         quadBuffer.writeFloat(quadOffset + 2, animationPeriod);
