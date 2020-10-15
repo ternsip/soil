@@ -59,25 +59,9 @@ float rand(float n) {
 }
 
 vec4 resolveQuadTexel(Quad quad, vec2 pos) {
-    if (quad.type == QUAD_TYPE_EMPTY) {
-        discard;
-    }
-    TextureData textureData = textures[quad.type];
-    float timeDelta = mod(abs(time - quad.animation_start), quad.animation_period) / quad.animation_period;
-    int count = textureData.layerEnd - textureData.layerStart + 1;
-    int textureLayer = textureData.layerStart + clamp(int(timeDelta * count), 0, count - 1);
-    vec2 maxUV = vec2(textureData.maxU, textureData.maxV);
-    if (quad.type == QUAD_TYPE_FONT) {
-        pos.x = (pos.x + quad.meta1 % POWER4) / POWER4;
-        pos.y = (pos.y + quad.meta1 / POWER4) / POWER4;
-    }
-    return texture(samplers[textureData.atlasNumber], vec3(pos * maxUV, textureLayer));
-}
-
-void main(void) {
-
-    Quad quad = quadData[roundFloat(quadIndex)];
-    if (quad.type == QUAD_TYPE_BLOCKS) {
+    int type = quad.type;
+    int animation_start = quad.animation_start;
+    if (type == QUAD_TYPE_BLOCKS) {
         float realX = (texture_xy.x * 2 - 1) / cameraScale.x - cameraPos.x;
         float realY = (texture_xy.y * 2 - 1) / cameraScale.y - cameraPos.y;
         if (realX < 0 || realY < 0 || realX >= BLOCKS_X || realY >= BLOCKS_Y) {
@@ -86,10 +70,28 @@ void main(void) {
         int blockX = int(realX);
         int blockY = int(realY);
         int blockIndex = blockY * BLOCKS_X + blockX;
-        Quad newQuad = Quad(blocks[blockIndex], int(rand(blockIndex) * quad.animation_period), quad.animation_period, 0, 0, 0, quad.vertices);
-        out_Color = resolveQuadTexel(newQuad, vec2(realX - blockX, 1 - (realY - blockY)));
-        return;
+        type = blocks[blockIndex];
+        animation_start = int(rand(blockIndex) * quad.animation_period);
+        pos.x = realX - blockX;
+        pos.y = 1 - (realY - blockY);
     }
-    out_Color = resolveQuadTexel(quad, texture_xy);
+    if (type == QUAD_TYPE_EMPTY) {
+        discard;
+    }
+    TextureData textureData = textures[type];
+    float timeDelta = mod(abs(time - animation_start), quad.animation_period) / quad.animation_period;
+    int count = textureData.layerEnd - textureData.layerStart + 1;
+    int textureLayer = textureData.layerStart + clamp(int(timeDelta * count), 0, count - 1);
+    vec2 maxUV = vec2(textureData.maxU, textureData.maxV);
+    if (type == QUAD_TYPE_FONT) {
+        pos.x = (pos.x + quad.meta1 % POWER4) / POWER4;
+        pos.y = (pos.y + quad.meta1 / POWER4) / POWER4;
+    }
+    return texture(samplers[textureData.atlasNumber], vec3(pos * maxUV, textureLayer));
+}
+
+void main(void) {
+
+    out_Color = resolveQuadTexel(quadData[roundFloat(quadIndex)], texture_xy);
 
 }
