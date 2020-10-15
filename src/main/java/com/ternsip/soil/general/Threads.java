@@ -12,7 +12,7 @@ public class Threads {
 
     private final Thread mainThread = Thread.currentThread();
     private final Scanner scanner = new Scanner(System.in);
-    private final ThreadWrapper<UniverseServer> universeServerThreadWrapper = new ThreadWrapper<>(UniverseServer::new, 1000L / 128);
+    private final ThreadWrapper<Server> universeServerThreadWrapper = new ThreadWrapper<>(Server::new, 1000L / 128);
     private final ThreadWrapper<NetworkClient> networkClientThreadWrapper = new ThreadWrapper<>(NetworkClient::new);
     private final ThreadWrapper<NetworkServer> networkServerThreadWrapper = new ThreadWrapper<>(NetworkServer::new);
     private final ThreadWrapper<NetworkServerAcceptor> networkServerAcceptorThread = new ThreadWrapper<>(NetworkServerAcceptor::new);
@@ -58,7 +58,7 @@ public class Threads {
         return mainThread;
     }
 
-    public UniverseServer getUniverseServer() {
+    public Server getServer() {
         return universeServerThreadWrapper.getObjective();
     }
 

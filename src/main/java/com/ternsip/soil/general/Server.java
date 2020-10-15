@@ -5,7 +5,7 @@ import com.ternsip.soil.common.events.base.EventReceiver;
 import com.ternsip.soil.universe.common.SettingsRepository;
 import lombok.SneakyThrows;
 
-public class UniverseServer implements Threadable {
+public class Server implements Threadable {
 
     public SettingsRepository settingsRepository;
     public EventReceiver networkEventReceiver;
@@ -32,7 +32,7 @@ public class UniverseServer implements Threadable {
     }
 
     public void stop() {
-        Soil.THREADS.getUniverseServer().stop();
+        Soil.THREADS.getServer().stop();
     }
 
     private void spawnEntities() {

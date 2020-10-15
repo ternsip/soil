@@ -96,7 +96,7 @@ public class Client implements Threadable {
 
     public void stop() {
         // TODO Use main loop deactivator
-        Soil.THREADS.getUniverseServer().stop();
+        Soil.THREADS.getServer().stop();
         Soil.THREADS.getNetworkClient().stop();
     }
 
