@@ -11,6 +11,7 @@ public enum TextureType {
     BLOCKS(new File("interface/blocks.jpg")),
     FONT(new File("fonts/default.png")),
     BLOCK_WATER(new File("interface/button.png")),
+    BLOCK_LAVA(new File("interface/lava.png")),
     BLOCK_DIRT(new File("interface/dirt.png")),
     BLOCK_LAWN(new File("interface/lawn.png")),
     PLAYER_IDLE(new File("interface/button.png")),
