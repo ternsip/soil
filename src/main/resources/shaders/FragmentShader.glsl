@@ -109,7 +109,7 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
         int blockIndex = blockY * BLOCKS_X + blockX;
         Block block = blocks[blockIndex];
         if (type == QUAD_TYPE_SHADOW) {
-            return vec4(0, 0, 0, 1 - block.emit);
+            return vec4(0, 0, 0, 1 - max(block.emit, block.sky));
         }
         type = block.type;
         animation_start = int(rand(blockIndex) * quad.animation_period);

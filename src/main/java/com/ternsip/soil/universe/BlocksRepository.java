@@ -46,6 +46,11 @@ public class BlocksRepository implements Finishable {
         int endX = startX + sizeX - 1;
         int endY = startX + sizeY - 1;
         for (int x = startX; x <= endX; ++x) {
+            int height = SIZE_Y - 1;
+            while (height > 0 && !blocks[x][height].obstacle) {
+                height--;
+            }
+            lightMassKernel.height[x] = height;
             for (int y = startY; y <= endY; ++y) {
                 int index = (int) INDEXER.getIndex(x, y);
                 lightMassKernel.setLightMeta(index, blocks[x][y].lightOpacity, blocks[x][y].emitLight);

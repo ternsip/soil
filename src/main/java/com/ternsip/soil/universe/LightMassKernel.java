@@ -64,7 +64,7 @@ public class LightMassKernel extends Kernel {
             light[realIndex] = (opacity << 8) + selfEmit;
             return;
         }
-        int bestSkyLight = (startY + y) >= height[x] ? MAX_LIGHT : 0;
+        int bestSkyLight = y >= height[x] ? MAX_LIGHT : 0;
         int bestEmitLight = selfEmit;
         for (int k = 0; k < 4; ++k) {
             int nx = x + offsetX[k];
