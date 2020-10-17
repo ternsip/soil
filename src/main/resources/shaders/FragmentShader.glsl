@@ -10,6 +10,8 @@ const int QUAD_TYPE_BLOCKS = 1;
 const int QUAD_TYPE_FONT = 2;
 const int QUAD_TYPE_WATER = 3;
 const int QUAD_TYPE_LAVA = 4;
+const int QUAD_TYPE_SHADOW = 5;
+
 const int QUAD_FLAG_PINNED = 0x1;
 
 struct Block {
@@ -97,7 +99,8 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
     int animation_start = quad.animation_start;
     float realX = (texture_xy.x * 2 - 1) / cameraScale.x - cameraPos.x;
     float realY = (texture_xy.y * 2 - 1) / cameraScale.y - cameraPos.y;
-    if (type == QUAD_TYPE_BLOCKS) {
+    float shadowMask = 0;
+    if (type == QUAD_TYPE_BLOCKS || type == QUAD_TYPE_SHADOW) {
         if (realX < 0 || realY < 0 || realX >= BLOCKS_X || realY >= BLOCKS_Y) {
             discard;
         }
@@ -105,6 +108,9 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
         int blockY = int(realY);
         int blockIndex = blockY * BLOCKS_X + blockX;
         Block block = blocks[blockIndex];
+        if (type == QUAD_TYPE_SHADOW) {
+            return vec4(0, 0, 0, 1 - block.emit);
+        }
         type = block.type;
         animation_start = int(rand(blockIndex) * quad.animation_period);
         pos.x = realX - blockX;

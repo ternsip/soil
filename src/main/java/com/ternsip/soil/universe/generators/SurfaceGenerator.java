@@ -12,7 +12,7 @@ import static com.ternsip.soil.universe.BlocksRepository.SIZE_Y;
 @Getter
 public class SurfaceGenerator implements ChunkGenerator {
 
-    private final int height = 9;
+    private final int height = 15;
 
     @Override
     public int getPriority() {
@@ -31,7 +31,7 @@ public class SurfaceGenerator implements ChunkGenerator {
                 if (y == height + 1) {
                     blocksRepository.blocks[x][y] = Block.GRASS;
                 }
-                if (y < 4 && random.nextDouble() > 0) {
+                if (y < 8 && random.nextDouble() > 0.98) {
                     blocksRepository.blocks[x][y] = Block.LAVA;
                 }
             }

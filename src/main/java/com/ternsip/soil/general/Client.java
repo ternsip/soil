@@ -1,7 +1,6 @@
 package com.ternsip.soil.general;
 
 import com.ternsip.soil.Soil;
-import com.ternsip.soil.common.events.base.Callback;
 import com.ternsip.soil.common.events.base.EventIOReceiver;
 import com.ternsip.soil.common.events.network.OnConnectedToServer;
 import com.ternsip.soil.graph.display.*;
@@ -11,12 +10,8 @@ import com.ternsip.soil.universe.BlocksRepository;
 import com.ternsip.soil.universe.EntityQuad;
 import com.ternsip.soil.universe.EntityRepository;
 import com.ternsip.soil.universe.EntityStatistics;
-import com.ternsip.soil.universe.audio.Sound;
 import com.ternsip.soil.universe.audio.SoundRepository;
 import com.ternsip.soil.universe.common.SettingsRepository;
-import com.ternsip.soil.universe.protocol.ConsoleMessageServerPacket;
-
-import java.io.File;
 
 /**
  * Provides full control over user Input/Output channels
@@ -110,6 +105,7 @@ public class Client implements Threadable {
         new EntityQuad(1, TextureType.KITTY, false, 1000.0f, -0.8f, 0.4f, -0.4f, 0.4f, -0.4f, 0.2f, -0.8f, 0.2f, 0, 0).register();
         new EntityQuad(2, TextureType.PLAYER_IDLE, false, 1000.0f, 0, 0, -0.9f, -0, -0.9f, -0.5f, 0, -0.5f, 0, 0).register();
         new EntityQuad(3, TextureType.BLOCKS, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
+        new EntityQuad(4, TextureType.SHADOW, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
     }
 
     private void spawnEntities() {
