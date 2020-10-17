@@ -64,6 +64,7 @@ float mod289(float x){ return x - floor(x * (1.0 / 289.0)) * 289.0; }
 vec4 mod289(vec4 x){ return x - floor(x * (1.0 / 289.0)) * 289.0; }
 vec4 perm(vec4 x){ return mod289(((x * 34.0) + 1.0) * x); }
 
+// https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
 float noise(vec3 p){
     vec3 a = floor(p);
     vec3 d = p - a;
@@ -108,7 +109,7 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
     if (type == QUAD_TYPE_LAVA) {
         vec3 orange = vec3(1., .45, 0.);
         vec3 yellow = vec3(1., 1., 0.);
-        // TODO make lava better
+        // TODO make lava better https://www.shadertoy.com/view/llsBR4 https://www.shadertoy.com/view/lslXRS https://thebookofshaders.com/edit.php#11/lava-lamp.frag http://www.science-and-fiction.org/rendering/noise.html
         float noiseValue = noise(vec3(realX, realY, loopTime(10000) * 10));
         return vec4(mix(yellow, orange, vec3(smoothstep(0., 1., noiseValue))), 0.9f);
     }

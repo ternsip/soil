@@ -31,7 +31,7 @@ public class SurfaceGenerator implements ChunkGenerator {
                 if (y == height + 1) {
                     blocksRepository.blocks[x][y] = Block.GRASS;
                 }
-                if (y < 4 && random.nextDouble() > 0.1) {
+                if (y < 4 && random.nextDouble() > 0.9) {
                     blocksRepository.blocks[x][y] = Block.LAVA;
                 }
             }
