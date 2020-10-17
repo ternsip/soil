@@ -64,8 +64,8 @@ public class BlocksRepository implements Finishable {
                 int index = (int) INDEXER.getIndex(x, y);
                 int offset = index * shader.blocksBuffer.structureLength;
                 shader.blocksBuffer.writeInt(offset, blocks[x][y].textureType.ordinal());
-                shader.blocksBuffer.writeFloat(offset + 1, lightMassKernel.getLightSky(index));
-                shader.blocksBuffer.writeFloat(offset + 2, lightMassKernel.getLightEmit(index));
+                shader.blocksBuffer.writeFloat(offset + 1, lightMassKernel.getLightSky(index) / (float)MAX_LIGHT);
+                shader.blocksBuffer.writeFloat(offset + 2, lightMassKernel.getLightEmit(index)  / (float)MAX_LIGHT);
             }
         }
     }

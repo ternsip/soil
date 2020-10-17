@@ -7,6 +7,9 @@ import static com.ternsip.soil.universe.BlocksRepository.*;
 
 public class LightMassKernel extends Kernel {
 
+    private final int[] offsetX = {-1, 1, 0, 0};
+    private final int[] offsetY = {0, 0, 1, -1};
+
     final int[] light = new int[SIZE_X * SIZE_Y];
     final int[] lightMeta = new int[SIZE_X * SIZE_Y];
     final int[] height = new int[SIZE_X];
@@ -24,16 +27,12 @@ public class LightMassKernel extends Kernel {
         lightMeta[index] = (opacity << 8) + selfEmit;
     }
 
-    public float getLightSky(int index) {
-        int lightX = (light[index] >> 24) & 0xFF;
-        int lightY = (light[index] >> 16) & 0xFF;
-        return (lightX * lightX + lightY * lightY) * 0.5f / (MAX_LIGHT * MAX_LIGHT);
+    public int getLightSky(int index) {
+        return Math.min((light[index] >> 24) & 0xFF, (light[index] >> 16) & 0xFF);
     }
 
-    public float getLightEmit(int index) {
-        int lightX = (light[index] >> 8) & 0xFF;
-        int lightY = light[index] & 0xFF;
-        return (lightX * lightX + lightY * lightY) * 0.5f / (MAX_LIGHT * MAX_LIGHT);
+    public int getLightEmit(int index) {
+        return Math.min((light[index] >> 8) & 0xFF, light[index] & 0xFF);
     }
 
     public void update(int startX, int startY, int sizeX, int sizeY) {
@@ -70,23 +69,27 @@ public class LightMassKernel extends Kernel {
         int bestSkyLightY = (startY + y) >= height[x] ? MAX_LIGHT : 0;
         int bestEmitLightX = selfEmit;
         int bestEmitLightY = selfEmit;
-        for (int delta = -1; delta <= 1; delta += 2) {
-            int nx = x + delta;
-            if (nx < 0 || nx >= SIZE_X) {
+        for (int k = 0; k < 4; ++k) {
+            int nx = x + offsetX[k];
+            int ny = y + offsetY[k];
+            if (nx < 0 || nx >= SIZE_X || ny < 0 || ny >= SIZE_Y) {
                 continue;
             }
-            int nLightValue = light[y * SIZE_X + nx];
-            bestSkyLightX = max(bestSkyLightX, ((nLightValue >> 24) & 0xFF) - opacity);
-            bestEmitLightX = max(bestEmitLightX, ((nLightValue >> 8) & 0xFF) - opacity);
-        }
-        for (int delta = -1; delta <= 1; delta += 2) {
-            int ny = y + delta;
-            if (ny < 0 || ny >= SIZE_Y) {
-                continue;
+            int opacityX = (offsetX[k] == 0 ? 0 : opacity);
+            int opacityY = (offsetY[k] == 0 ? 0 : opacity);
+            int nLightValue = light[ny * SIZE_X + nx];
+            int newSkyX = ((nLightValue >> 24) & 0xFF) - opacityX;
+            int newSkyY = ((nLightValue >> 16) & 0xFF) - opacityY;
+            int newEmitX = ((nLightValue >> 8) & 0xFF) - opacityX;
+            int newEmitY = (nLightValue & 0xFF) - opacityY;
+            if (min(newSkyX, newSkyY) > min(bestSkyLightX, bestSkyLightY)) {
+                bestSkyLightX = newSkyX;
+                bestSkyLightY = newSkyY;
             }
-            int nLightValue = light[ny * SIZE_X + x];
-            bestSkyLightY = max(bestSkyLightY, ((nLightValue >> 16) & 0xFF) - opacity);
-            bestEmitLightY = max(bestEmitLightY, (nLightValue & 0xFF) - opacity);
+            if (min(newEmitX, newEmitY) > min(bestEmitLightX, bestEmitLightY)) {
+                bestEmitLightX = newEmitX;
+                bestEmitLightY = newEmitY;
+            }
         }
         light[realIndex] = (bestSkyLightX << 24) + (bestSkyLightY << 16) + (bestEmitLightX << 8) + bestEmitLightY;
     }
