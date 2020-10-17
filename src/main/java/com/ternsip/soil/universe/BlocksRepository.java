@@ -1,5 +1,6 @@
 package com.ternsip.soil.universe;
 
+import com.aparapi.Range;
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.logic.Finishable;
 import com.ternsip.soil.common.logic.Indexer;
@@ -16,9 +17,11 @@ public class BlocksRepository implements Finishable {
     private static final List<ChunkGenerator> CHUNK_GENERATORS = constructChunkGenerators();
     public static final int SIZE_X = 4000;
     public static final int SIZE_Y = 3000;
+    public static final int MAX_LIGHT = 16;
 
     public static final Indexer INDEXER = new Indexer(SIZE_X, SIZE_Y);
     public final Block[][] blocks = new Block[SIZE_X][SIZE_Y];
+    public final LightMassKernel lightMassKernel = new LightMassKernel();
 
     public void init() {
         for (ChunkGenerator chunkGenerator : CHUNK_GENERATORS) {
@@ -27,31 +30,49 @@ public class BlocksRepository implements Finishable {
     }
 
     public void updateBlocks(int startX, int startY, Block[][] blocks) {
-        int endX = startX + blocks.length - 1;
-        int endY = startX + blocks[0].length - 1;
+        int sizeX = blocks.length;
+        int sizeY = blocks[0].length;
+        int endX = startX + sizeX - 1;
+        int endY = startX + sizeY - 1;
         for (int x = startX; x <= endX; ++x) {
             for (int y = startY; y <= endY; ++y) {
                 this.blocks[x][y] = blocks[x][y];
             }
         }
+        updateLight(startX, startY, sizeX, sizeY);
     }
 
-    public void visualUpdate(int startX, int startY, int endX, int endY) {
-        Shader shader = Soil.THREADS.client.shader;
+    public void updateLight(int startX, int startY, int sizeX, int sizeY) {
+        int endX = startX + sizeX - 1;
+        int endY = startX + sizeY - 1;
         for (int x = startX; x <= endX; ++x) {
             for (int y = startY; y <= endY; ++y) {
-                shader.blocksBuffer.writeInt((int) INDEXER.getIndex(x, y), blocks[x][y].textureType.ordinal());
+                int index = (int) INDEXER.getIndex(x, y);
+                lightMassKernel.setLightMeta(index, blocks[x][y].lightOpacity, blocks[x][y].emitLight);
+            }
+        }
+        lightMassKernel.update(startX, startY, sizeX, sizeY);
+    }
+
+
+    public void visualUpdate(int startX, int startY, int sizeX, int sizeY) {
+        Shader shader = Soil.THREADS.client.shader;
+        int endX = startX + sizeX - 1;
+        int endY = startX + sizeY - 1;
+        for (int x = startX; x <= endX; ++x) {
+            for (int y = startY; y <= endY; ++y) {
+                int index = (int) INDEXER.getIndex(x, y);
+                int offset = index * shader.blocksBuffer.structureLength;
+                shader.blocksBuffer.writeInt(offset, blocks[x][y].textureType.ordinal());
+                shader.blocksBuffer.writeFloat(offset + 1, lightMassKernel.getLightSky(index));
+                shader.blocksBuffer.writeFloat(offset + 2, lightMassKernel.getLightEmit(index));
             }
         }
     }
 
     public void fullVisualUpdate() {
-        Shader shader = Soil.THREADS.client.shader;
-        for (int x = 0; x < SIZE_X; ++x) {
-            for (int y = 0; y < SIZE_Y; ++y) {
-                shader.blocksBuffer.writeInt((int) INDEXER.getIndex(x, y), blocks[x][y].textureType.ordinal());
-            }
-        }
+        updateLight(0, 0, SIZE_X, SIZE_Y);
+        visualUpdate(0, 0, SIZE_X, SIZE_Y);
     }
 
 
@@ -60,7 +81,7 @@ public class BlocksRepository implements Finishable {
     }
 
     public void finish() {
-
+        lightMassKernel.dispose();
     }
 
     private static List<ChunkGenerator> constructChunkGenerators() {

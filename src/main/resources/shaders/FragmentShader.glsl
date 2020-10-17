@@ -12,6 +12,12 @@ const int QUAD_TYPE_WATER = 3;
 const int QUAD_TYPE_LAVA = 4;
 const int QUAD_FLAG_PINNED = 0x1;
 
+struct Block {
+    int type;
+    float sky;
+    float emit;
+};
+
 struct TextureData {
     int layerStart;
     int layerEnd;
@@ -31,7 +37,7 @@ struct Quad {
 };
 
 layout (std430, binding = 0) buffer blocksBuffer {
-    int blocks[];
+    Block blocks[];
 };
 
 layout (std430, binding = 1) buffer textureBuffer {
@@ -98,7 +104,8 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
         int blockX = int(realX);
         int blockY = int(realY);
         int blockIndex = blockY * BLOCKS_X + blockX;
-        type = blocks[blockIndex];
+        Block block = blocks[blockIndex];
+        type = block.type;
         animation_start = int(rand(blockIndex) * quad.animation_period);
         pos.x = realX - blockX;
         pos.y = 1 - (realY - blockY);
