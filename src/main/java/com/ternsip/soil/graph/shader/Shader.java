@@ -6,8 +6,8 @@ import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.graph.display.Camera;
 import com.ternsip.soil.graph.display.Texture;
 import com.ternsip.soil.graph.display.TextureRepository;
-import com.ternsip.soil.universe.BlocksRepository;
-import com.ternsip.soil.universe.EntityQuad;
+import com.ternsip.soil.game.blocks.BlocksRepository;
+import com.ternsip.soil.game.entities.EntityQuad;
 import lombok.SneakyThrows;
 import org.lwjgl.opengl.GL11;
 

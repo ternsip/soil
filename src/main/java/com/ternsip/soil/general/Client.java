@@ -7,10 +7,10 @@ import com.ternsip.soil.events.OnConnectedToServer;
 import com.ternsip.soil.graph.display.*;
 import com.ternsip.soil.graph.shader.Shader;
 import com.ternsip.soil.graph.shader.TextureType;
-import com.ternsip.soil.universe.BlocksRepository;
-import com.ternsip.soil.universe.EntityQuad;
-import com.ternsip.soil.universe.EntityRepository;
-import com.ternsip.soil.universe.EntityStatistics;
+import com.ternsip.soil.game.blocks.BlocksRepository;
+import com.ternsip.soil.game.entities.EntityQuad;
+import com.ternsip.soil.game.entities.EntityRepository;
+import com.ternsip.soil.game.entities.EntityStatistics;
 import com.ternsip.soil.graph.display.SoundRepository;
 import com.ternsip.soil.graph.display.SettingsRepository;
 

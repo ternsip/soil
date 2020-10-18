@@ -1,4 +1,4 @@
-package com.ternsip.soil.universe;
+package com.ternsip.soil.game.entities;
 
 import com.ternsip.soil.Soil;
 

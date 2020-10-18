@@ -1,4 +1,4 @@
-package com.ternsip.soil.universe;
+package com.ternsip.soil.game.blocks;
 
 import com.ternsip.soil.graph.shader.TextureType;
 import lombok.RequiredArgsConstructor;

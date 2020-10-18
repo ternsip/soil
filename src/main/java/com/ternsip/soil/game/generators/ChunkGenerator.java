@@ -1,6 +1,6 @@
-package com.ternsip.soil.universe.generators;
+package com.ternsip.soil.game.generators;
 
-import com.ternsip.soil.universe.BlocksRepository;
+import com.ternsip.soil.game.blocks.BlocksRepository;
 
 public interface ChunkGenerator {
 

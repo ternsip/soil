@@ -1,13 +1,13 @@
-package com.ternsip.soil.universe.generators;
+package com.ternsip.soil.game.generators;
 
-import com.ternsip.soil.universe.Block;
-import com.ternsip.soil.universe.BlocksRepository;
+import com.ternsip.soil.game.blocks.Block;
+import com.ternsip.soil.game.blocks.BlocksRepository;
 import lombok.Getter;
 
 import java.util.Random;
 
-import static com.ternsip.soil.universe.BlocksRepository.SIZE_X;
-import static com.ternsip.soil.universe.BlocksRepository.SIZE_Y;
+import static com.ternsip.soil.game.blocks.BlocksRepository.SIZE_X;
+import static com.ternsip.soil.game.blocks.BlocksRepository.SIZE_Y;
 
 @Getter
 public class SurfaceGenerator implements ChunkGenerator {

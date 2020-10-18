@@ -1,4 +1,4 @@
-package com.ternsip.soil.universe.packets;
+package com.ternsip.soil.game.packets;
 
 import com.ternsip.soil.network.Connection;
 import com.ternsip.soil.network.ServerPacket;

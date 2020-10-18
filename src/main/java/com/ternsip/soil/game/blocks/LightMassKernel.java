@@ -1,9 +1,9 @@
-package com.ternsip.soil.universe;
+package com.ternsip.soil.game.blocks;
 
 import com.aparapi.Kernel;
 import com.aparapi.Range;
 
-import static com.ternsip.soil.universe.BlocksRepository.*;
+import static com.ternsip.soil.game.blocks.BlocksRepository.*;
 
 public class LightMassKernel extends Kernel {
 
