@@ -1,9 +1,7 @@
 package com.ternsip.soil.graph.display;
 
 import com.ternsip.soil.Soil;
-import com.ternsip.soil.common.logic.Utils;
-import com.ternsip.soil.universe.audio.Sound;
-import com.ternsip.soil.universe.audio.SoundRepository;
+import com.ternsip.soil.common.Utils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;

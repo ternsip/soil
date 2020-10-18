@@ -1,17 +1,18 @@
 package com.ternsip.soil.general;
 
 import com.ternsip.soil.Soil;
-import com.ternsip.soil.common.events.base.EventIOReceiver;
-import com.ternsip.soil.common.events.network.OnConnectedToServer;
+import com.ternsip.soil.common.Threadable;
+import com.ternsip.soil.events.EventIOReceiver;
+import com.ternsip.soil.events.OnConnectedToServer;
 import com.ternsip.soil.graph.display.*;
-import com.ternsip.soil.graph.shader.base.Shader;
-import com.ternsip.soil.graph.shader.base.TextureType;
+import com.ternsip.soil.graph.shader.Shader;
+import com.ternsip.soil.graph.shader.TextureType;
 import com.ternsip.soil.universe.BlocksRepository;
 import com.ternsip.soil.universe.EntityQuad;
 import com.ternsip.soil.universe.EntityRepository;
 import com.ternsip.soil.universe.EntityStatistics;
-import com.ternsip.soil.universe.audio.SoundRepository;
-import com.ternsip.soil.universe.common.SettingsRepository;
+import com.ternsip.soil.graph.display.SoundRepository;
+import com.ternsip.soil.graph.display.SettingsRepository;
 
 /**
  * Provides full control over user Input/Output channels

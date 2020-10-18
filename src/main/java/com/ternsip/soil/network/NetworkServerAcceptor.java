@@ -1,7 +1,7 @@
 package com.ternsip.soil.network;
 
 import com.ternsip.soil.Soil;
-import com.ternsip.soil.general.Threadable;
+import com.ternsip.soil.common.Threadable;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

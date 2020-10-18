@@ -1,8 +1,9 @@
 package com.ternsip.soil.general;
 
 import com.ternsip.soil.Soil;
-import com.ternsip.soil.common.events.base.EventReceiver;
-import com.ternsip.soil.universe.common.SettingsRepository;
+import com.ternsip.soil.common.Threadable;
+import com.ternsip.soil.events.EventReceiver;
+import com.ternsip.soil.graph.display.SettingsRepository;
 import lombok.SneakyThrows;
 
 public class Server implements Threadable {

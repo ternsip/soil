@@ -1,10 +1,10 @@
 package com.ternsip.soil.universe;
 
 import com.ternsip.soil.Soil;
-import com.ternsip.soil.graph.shader.base.BufferLayout;
-import com.ternsip.soil.graph.shader.base.Mesh;
-import com.ternsip.soil.graph.shader.base.Shader;
-import com.ternsip.soil.graph.shader.base.TextureType;
+import com.ternsip.soil.graph.shader.BufferLayout;
+import com.ternsip.soil.graph.shader.Mesh;
+import com.ternsip.soil.graph.shader.Shader;
+import com.ternsip.soil.graph.shader.TextureType;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;

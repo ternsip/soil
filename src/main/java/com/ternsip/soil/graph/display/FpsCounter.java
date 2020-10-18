@@ -1,6 +1,6 @@
 package com.ternsip.soil.graph.display;
 
-import com.ternsip.soil.common.logic.Timer;
+import com.ternsip.soil.common.Timer;
 
 public class FpsCounter {
 

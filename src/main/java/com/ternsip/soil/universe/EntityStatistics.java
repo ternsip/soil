@@ -1,8 +1,7 @@
 package com.ternsip.soil.universe;
 
 import com.ternsip.soil.Soil;
-import com.ternsip.soil.common.logic.Updatable;
-import com.ternsip.soil.graph.display.FpsCounter;
+import com.ternsip.soil.common.Updatable;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

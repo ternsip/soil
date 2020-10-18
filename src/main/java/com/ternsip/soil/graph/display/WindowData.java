@@ -1,10 +1,7 @@
 package com.ternsip.soil.graph.display;
 
 import com.ternsip.soil.Soil;
-import com.ternsip.soil.common.events.base.CharEvent;
-import com.ternsip.soil.common.events.base.ErrorEvent;
-import com.ternsip.soil.common.events.base.Event;
-import com.ternsip.soil.common.events.display.*;
+import com.ternsip.soil.events.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +45,7 @@ public class WindowData {
         }
         Vector2i mainDisplaySize = getMainDisplaySize();
         this.windowSize = new Vector2i((int) (mainDisplaySize.x() * 0.8), (int) (mainDisplaySize.y() * 0.8));
-        this.window = glfwCreateWindow(windowSize.x(), windowSize.y(), "Glade", NULL, NULL);
+        this.window = glfwCreateWindow(windowSize.x(), windowSize.y(), "Soil", NULL, NULL);
         if (window == NULL) {
             glfwTerminate();
             throw new RuntimeException("Failed to create the GLFW window");

@@ -3,7 +3,7 @@ package com.ternsip.soil.graph.display;
 import com.sun.imageio.plugins.gif.GIFImageMetadata;
 import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
-import com.ternsip.soil.common.logic.Utils;
+import com.ternsip.soil.common.Utils;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

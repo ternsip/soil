@@ -1,5 +1,6 @@
 package com.ternsip.soil.general;
 
+import com.ternsip.soil.common.ThreadWrapper;
 import com.ternsip.soil.network.NetworkClient;
 import com.ternsip.soil.network.NetworkServer;
 import com.ternsip.soil.network.NetworkServerAcceptor;

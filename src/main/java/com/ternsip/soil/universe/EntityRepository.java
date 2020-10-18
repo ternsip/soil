@@ -1,13 +1,10 @@
 package com.ternsip.soil.universe;
 
-import com.ternsip.soil.common.logic.Updatable;
-import com.ternsip.soil.graph.shader.base.Shader;
+import com.ternsip.soil.common.Updatable;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Setter
 public class EntityRepository {

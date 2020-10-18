@@ -1,6 +1,6 @@
 package com.ternsip.soil.network;
 
-import com.ternsip.soil.common.logic.Utils;
+import com.ternsip.soil.common.Utils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

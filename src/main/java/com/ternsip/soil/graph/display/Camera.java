@@ -1,9 +1,9 @@
 package com.ternsip.soil.graph.display;
 
 import com.ternsip.soil.Soil;
-import com.ternsip.soil.common.events.base.Callback;
-import com.ternsip.soil.common.events.display.CursorPosEvent;
-import com.ternsip.soil.common.events.display.ScrollEvent;
+import com.ternsip.soil.events.Callback;
+import com.ternsip.soil.events.CursorPosEvent;
+import com.ternsip.soil.events.ScrollEvent;
 import lombok.Getter;
 import lombok.Setter;
 import org.joml.*;

@@ -1,6 +1,6 @@
 package com.ternsip.soil.universe;
 
-import com.ternsip.soil.graph.shader.base.TextureType;
+import com.ternsip.soil.graph.shader.TextureType;
 
 public class EntityText extends Entity {
 
