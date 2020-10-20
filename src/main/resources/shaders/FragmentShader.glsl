@@ -1,6 +1,9 @@
 #version 430 core
 
+const float INF = 1e6;
+const float EPS = 1e-6;
 const int MAX_SAMPLERS = 16;
+const int MAX_LIGHT = 8;
 const int POWER4 = 16;
 const int BLOCKS_X = 4000;
 const int BLOCKS_Y = 3000;
@@ -108,13 +111,46 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
         int blockY = int(realY);
         int blockIndex = blockY * BLOCKS_X + blockX;
         Block block = blocks[blockIndex];
+        pos.x = realX - blockX;
+        pos.y = 1 - (realY - blockY);
         if (type == QUAD_TYPE_SHADOW) {
-            return vec4(0, 0, 0, 1 - max(block.emit, block.sky));
+            float light = max(block.emit, block.sky);
+            if (blockX < BLOCKS_X - 1) {
+                Block nextBlock = blocks[blockIndex + 1];
+                light = max(light, max(nextBlock.emit, nextBlock.sky) * pos.x);
+            }
+            if (blockY < BLOCKS_Y - 1) {
+                Block nextBlock = blocks[blockIndex + BLOCKS_X];
+                light = max(light, max(nextBlock.emit, nextBlock.sky) * (1 - pos.y));
+            }
+            if (blockX > 0) {
+                Block nextBlock = blocks[blockIndex - 1];
+                light = max(light, max(nextBlock.emit, nextBlock.sky) * (1 - pos.x));
+            }
+            if (blockY > 0) {
+                Block nextBlock = blocks[blockIndex - BLOCKS_X];
+                light = max(light, max(nextBlock.emit, nextBlock.sky) * pos.y);
+            }
+            if (blockX < BLOCKS_X - 1 && blockY < BLOCKS_Y - 1) {
+                Block nextBlock = blocks[blockIndex + BLOCKS_X + 1];
+                light = max(light, max(nextBlock.emit, nextBlock.sky) * max(0, 1 - length(vec2(1 - pos.x, pos.y))));
+            }
+            if (blockX < BLOCKS_X - 1 && blockY > 0) {
+                Block nextBlock = blocks[blockIndex - BLOCKS_X + 1];
+                light = max(light, max(nextBlock.emit, nextBlock.sky) * max(0, 1 - length(vec2(1 - pos.x, 1 - pos.y))));
+            }
+            if (blockX > 0 && blockY < BLOCKS_Y - 1) {
+                Block nextBlock = blocks[blockIndex + BLOCKS_X - 1];
+                light = max(light, max(nextBlock.emit, nextBlock.sky) * max(0, 1 - length(vec2(pos.x, pos.y))));
+            }
+            if (blockX > 0 && blockY > 0) {
+                Block nextBlock = blocks[blockIndex - BLOCKS_X - 1];
+                light = max(light, max(nextBlock.emit, nextBlock.sky) * max(0, 1 - length(vec2(pos.x, 1 - pos.y))));
+            }
+            return vec4(0, 0, 0, 1 - light);
         }
         type = block.type;
         animation_start = int(rand(blockIndex) * quad.animation_period);
-        pos.x = realX - blockX;
-        pos.y = 1 - (realY - blockY);
     }
     if (type == QUAD_TYPE_EMPTY) {
         discard;

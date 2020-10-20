@@ -39,6 +39,7 @@ public class BlocksRepository implements Finishable {
             }
         }
         updateLight(startX, startY, sizeX, sizeY);
+        visualUpdate(startX, startY, sizeX, sizeY);
     }
 
     public void updateLight(int startX, int startY, int sizeX, int sizeY) {
@@ -49,15 +50,14 @@ public class BlocksRepository implements Finishable {
             while (height > 0 && !blocks[x][height].obstacle) {
                 height--;
             }
-            lightMassKernel.height[x] = height;
+            lightMassKernel.height[x] = height + 1;
             for (int y = startY; y <= endY; ++y) {
                 int index = (int) INDEXER.getIndex(x, y);
-                lightMassKernel.setLightMeta(index, blocks[x][y].lightOpacity, blocks[x][y].emitLight);
+                lightMassKernel.setLightMeta(index, Math.max(blocks[x][y].opacity, 0), Math.max(-blocks[x][y].opacity, 0));
             }
         }
         lightMassKernel.update(startX, startY, sizeX, sizeY);
     }
-
 
     public void visualUpdate(int startX, int startY, int sizeX, int sizeY) {
         Shader shader = Soil.THREADS.client.shader;
