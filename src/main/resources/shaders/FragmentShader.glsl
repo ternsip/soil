@@ -73,6 +73,15 @@ float rand(float n) {
     return fract(sin(n) * 43758.5453123);
 }
 
+int randInt(int seed) {
+    // Xorshift*32
+    // Based on George Marsaglia's work: http://www.jstatsoft.org/v08/i14/paper
+    seed ^= seed << 13;
+    seed ^= seed >> 17;
+    seed ^= seed << 5;
+    return seed;
+}
+
 float mod289(float x){ return x - floor(x * (1.0 / 289.0)) * 289.0; }
 vec4 mod289(vec4 x){ return x - floor(x * (1.0 / 289.0)) * 289.0; }
 vec4 perm(vec4 x){ return mod289(((x * 34.0) + 1.0) * x); }
@@ -95,8 +104,8 @@ float noise(vec3 p){
     return o4.y * d.y + o4.x * (1.0 - d.y);
 }
 
-float loopTime(int length) {
-    return (abs(time % (2 * length) - length)) / float(length);
+float loopValue(int value, int length) {
+    return (abs(value % (2 * length) - length)) / float(length);
 }
 
 vec4 resolveQuadTexel(Quad quad, vec2 pos) {
@@ -119,17 +128,19 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
             for (int dx = -L_RADIUS, nx = blockX - L_RADIUS; dx <= L_RADIUS; ++dx, ++nx) {
                 for (int dy = -L_RADIUS, ny = blockY - L_RADIUS; dy <= L_RADIUS; ++dy, ++ny) {
                     if (nx < 0 || ny < 0 || nx >= BLOCKS_X || ny >= BLOCKS_Y) continue;
-                    Block nextBlock = blocks[ny * BLOCKS_X + nx];
+                    int nextBlockIndex = ny * BLOCKS_X + nx;
+                    Block nextBlock = blocks[nextBlockIndex];
                     vec2 anchor = vec2(dx, dy);
                     if (dx == 0) anchor.x = blockFragment.x;
                     if (dy == 0) anchor.y = blockFragment.y;
                     if (dx < 0) anchor.x += 1;
                     if (dy < 0) anchor.y += 1;
                     float dist = max(0, (L_RADIUS - distance(blockFragment, anchor)) / L_RADIUS);
-                    light = max(light, max(nextBlock.emit, nextBlock.sky) * dist);
+                    float strobe = 0.7 + 0.6 * loopValue(time + randInt(nextBlockIndex), 2000);
+                    light = max(light, max(nextBlock.emit, nextBlock.sky) * dist * strobe);
                 }
             }
-            return vec4(0, 0, 0, 1 - light);
+            return vec4(0, 0, 0, 1 - clamp(light, 0, 1));
         }
         type = block.type;
         animation_start = int(rand(blockIndex) * quad.animation_period);
@@ -143,7 +154,7 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
         vec3 orange = vec3(1., .45, 0.);
         vec3 yellow = vec3(1., 1., 0.);
         // TODO make lava better https://www.shadertoy.com/view/llsBR4 https://www.shadertoy.com/view/lslXRS https://thebookofshaders.com/edit.php#11/lava-lamp.frag http://www.science-and-fiction.org/rendering/noise.html
-        float noiseValue = noise(vec3(realX, realY, loopTime(10000) * 10));
+        float noiseValue = noise(vec3(realX, realY, loopValue(time, 10000) * 10));
         return vec4(mix(yellow, orange, vec3(smoothstep(0., 1., noiseValue))), 0.9f);
     }
     TextureData textureData = textures[type];
