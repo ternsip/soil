@@ -111,46 +111,27 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
         int blockY = int(realY);
         int blockIndex = blockY * BLOCKS_X + blockX;
         Block block = blocks[blockIndex];
-        pos.x = realX - blockX;
-        pos.y = 1 - (realY - blockY);
+        vec2 blockFragment = vec2(realX - blockX, realY - blockY);
         if (type == QUAD_TYPE_SHADOW) {
-            float light = max(block.emit, block.sky);
-            if (blockX < BLOCKS_X - 1) {
-                Block nextBlock = blocks[blockIndex + 1];
-                light = max(light, max(nextBlock.emit, nextBlock.sky) * pos.x);
-            }
-            if (blockY < BLOCKS_Y - 1) {
-                Block nextBlock = blocks[blockIndex + BLOCKS_X];
-                light = max(light, max(nextBlock.emit, nextBlock.sky) * (1 - pos.y));
-            }
-            if (blockX > 0) {
-                Block nextBlock = blocks[blockIndex - 1];
-                light = max(light, max(nextBlock.emit, nextBlock.sky) * (1 - pos.x));
-            }
-            if (blockY > 0) {
-                Block nextBlock = blocks[blockIndex - BLOCKS_X];
-                light = max(light, max(nextBlock.emit, nextBlock.sky) * pos.y);
-            }
-            if (blockX < BLOCKS_X - 1 && blockY < BLOCKS_Y - 1) {
-                Block nextBlock = blocks[blockIndex + BLOCKS_X + 1];
-                light = max(light, max(nextBlock.emit, nextBlock.sky) * max(0, 1 - length(vec2(1 - pos.x, pos.y))));
-            }
-            if (blockX < BLOCKS_X - 1 && blockY > 0) {
-                Block nextBlock = blocks[blockIndex - BLOCKS_X + 1];
-                light = max(light, max(nextBlock.emit, nextBlock.sky) * max(0, 1 - length(vec2(1 - pos.x, 1 - pos.y))));
-            }
-            if (blockX > 0 && blockY < BLOCKS_Y - 1) {
-                Block nextBlock = blocks[blockIndex + BLOCKS_X - 1];
-                light = max(light, max(nextBlock.emit, nextBlock.sky) * max(0, 1 - length(vec2(pos.x, pos.y))));
-            }
-            if (blockX > 0 && blockY > 0) {
-                Block nextBlock = blocks[blockIndex - BLOCKS_X - 1];
-                light = max(light, max(nextBlock.emit, nextBlock.sky) * max(0, 1 - length(vec2(pos.x, 1 - pos.y))));
+            float light = 0;
+            int radius = 3;
+            for (int dx = -radius, nx = blockX - radius; dx <= radius; ++dx, ++nx) {
+                for (int dy = -radius, ny = blockY - radius; dy <= radius; ++dy, ++ny) {
+                    if (nx < 0 || ny < 0 || nx >= BLOCKS_X || ny >= BLOCKS_Y) continue;
+                    Block nextBlock = blocks[ny * BLOCKS_X + nx];
+                    vec2 anchor = vec2(dx == 0 ? blockFragment.x : dx, dy == 0 ? blockFragment.y : dy);
+                    if (dx < 0) anchor.x += 1;
+                    if (dy < 0) anchor.y += 1;
+                    float dist = max(0, (radius - distance(blockFragment, anchor)) / radius);
+                    light = max(light, max(nextBlock.emit, nextBlock.sky) * dist);
+                }
             }
             return vec4(0, 0, 0, 1 - light);
         }
         type = block.type;
         animation_start = int(rand(blockIndex) * quad.animation_period);
+        pos.x = blockFragment.x;
+        pos.y = 1 - blockFragment.y;
     }
     if (type == QUAD_TYPE_EMPTY) {
         discard;
