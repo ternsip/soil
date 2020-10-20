@@ -9,9 +9,9 @@ import static com.ternsip.soil.game.blocks.BlocksRepository.MAX_LIGHT;
 public enum Block {
 
     AIR(false, 1, TextureType.EMPTY),
-    DIRT(true, MAX_LIGHT, TextureType.BLOCK_DIRT),
+    DIRT(true, 3, TextureType.BLOCK_DIRT),
     STONE(true, MAX_LIGHT, TextureType.BLOCK_DIRT),
-    LAWN(true, MAX_LIGHT, TextureType.BLOCK_LAWN),
+    LAWN(true, 3, TextureType.BLOCK_LAWN),
     GRASS(false, MAX_LIGHT, TextureType.GRASS),
     WOOD(true, MAX_LIGHT, TextureType.BLOCK_DIRT),
     WATER(false, 2, TextureType.BLOCK_DIRT),
