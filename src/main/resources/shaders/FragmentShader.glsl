@@ -3,6 +3,7 @@
 const float INF = 1e6;
 const float EPS = 1e-6;
 const int MAX_SAMPLERS = 16;
+const int BACKLIGHT_RADIUS = 3;
 const int MAX_LIGHT = 8;
 const int POWER4 = 16;
 const int BLOCKS_X = 4000;
@@ -114,15 +115,16 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
         vec2 blockFragment = vec2(realX - blockX, realY - blockY);
         if (type == QUAD_TYPE_SHADOW) {
             float light = 0;
-            int radius = 3;
-            for (int dx = -radius, nx = blockX - radius; dx <= radius; ++dx, ++nx) {
-                for (int dy = -radius, ny = blockY - radius; dy <= radius; ++dy, ++ny) {
+            for (int dx = -BACKLIGHT_RADIUS, nx = blockX - BACKLIGHT_RADIUS; dx <= BACKLIGHT_RADIUS; ++dx, ++nx) {
+                for (int dy = -BACKLIGHT_RADIUS, ny = blockY - BACKLIGHT_RADIUS; dy <= BACKLIGHT_RADIUS; ++dy, ++ny) {
                     if (nx < 0 || ny < 0 || nx >= BLOCKS_X || ny >= BLOCKS_Y) continue;
                     Block nextBlock = blocks[ny * BLOCKS_X + nx];
-                    vec2 anchor = vec2(dx == 0 ? blockFragment.x : dx, dy == 0 ? blockFragment.y : dy);
+                    vec2 anchor = vec2(dx, dy);
+                    if (dx == 0) anchor.x = blockFragment.x;
+                    if (dy == 0) anchor.y = blockFragment.y;
                     if (dx < 0) anchor.x += 1;
                     if (dy < 0) anchor.y += 1;
-                    float dist = max(0, (radius - distance(blockFragment, anchor)) / radius);
+                    float dist = max(0, (BACKLIGHT_RADIUS - distance(blockFragment, anchor)) / BACKLIGHT_RADIUS);
                     light = max(light, max(nextBlock.emit, nextBlock.sky) * dist);
                 }
             }
