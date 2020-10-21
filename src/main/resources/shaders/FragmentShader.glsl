@@ -125,6 +125,9 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
         vec2 blockFragment = vec2(realX - blockX, realY - blockY);
         if (type == QUAD_TYPE_SHADOW) {
             float light = 0;
+            if (cameraScale.x < 0.01 || cameraScale.y < 0.01) {
+                return vec4(0, 0, 0, 0);
+            }
             for (int dx = -L_RADIUS, nx = blockX - L_RADIUS; dx <= L_RADIUS; ++dx, ++nx) {
                 for (int dy = -L_RADIUS, ny = blockY - L_RADIUS; dy <= L_RADIUS; ++dy, ++ny) {
                     if (nx < 0 || ny < 0 || nx >= BLOCKS_X || ny >= BLOCKS_Y) continue;
