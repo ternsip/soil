@@ -136,8 +136,8 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
                     if (dx < 0) anchor.x += 1;
                     if (dy < 0) anchor.y += 1;
                     float dist = max(0, (L_RADIUS - distance(blockFragment, anchor)) / L_RADIUS);
-                    float strobe = 0.7 + 0.6 * loopValue(time + randInt(nextBlockIndex), 2000);
-                    light = max(light, max(nextBlock.emit, nextBlock.sky) * dist * strobe);
+                    float strobe = 0.4 + 1.2 * loopValue(time + randInt(nextBlockIndex), 2000);
+                    light += max(nextBlock.emit, nextBlock.sky) * dist * dist * dist * strobe;
                 }
             }
             return vec4(0, 0, 0, 1 - clamp(light, 0, 1));
