@@ -30,6 +30,7 @@ public final class Shader implements Finishable {
 
     private final UniformVec2 cameraPos = new UniformVec2();
     private final UniformVec2 cameraScale = new UniformVec2();
+    private final UniformVec2 aspect = new UniformVec2();
     private final UniformInteger layer = new UniformInteger();
     private final UniformInteger time = new UniformInteger();
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
@@ -69,11 +70,12 @@ public final class Shader implements Finishable {
 
     public void render() {
         Camera camera = Soil.THREADS.client.camera;
-        cameraPos.load(camera.getPos().x, camera.getPos().y);
-        cameraScale.load(camera.getScale().x, camera.getScale().y);
+        cameraPos.load(camera.pos.x, camera.pos.y);
+        cameraScale.load(camera.scale.x, camera.scale.y);
+        aspect.load(camera.aspectX, camera.aspectY);
         this.time.load((int) (System.currentTimeMillis() % Integer.MAX_VALUE));
         for (int layerIndex = 0; layerIndex < MAX_LAYERS; ++layerIndex) {
-            int quads = EntityQuad.getCountThreadSafe(layerIndex);
+            int quads = EntityQuad.getCount(layerIndex);
             if (quads <= 0) {
                 continue;
             }

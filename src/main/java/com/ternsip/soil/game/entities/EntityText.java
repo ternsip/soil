@@ -1,5 +1,7 @@
 package com.ternsip.soil.game.entities;
 
+import com.ternsip.soil.Soil;
+import com.ternsip.soil.graph.display.Camera;
 import com.ternsip.soil.graph.shader.TextureType;
 
 public class EntityText extends Entity {
@@ -74,16 +76,17 @@ public class EntityText extends Entity {
     }
 
     private void applyText() {
-        float offsetX = centered ? (1 - text.length()) * 0.5f * textCompression : 0.5f;
-        float offsetY = centered ? 0 : -0.5f;
+        float scaleX = this.scaleX * textCompression;
+        float offsetX = centered ? (1 - text.length()) * 0.5f : 1;
+        float offsetY = centered ? 0 : -1;
         for (int i = 0; i < text.length(); ++i) {
-            quads[i].x1 = posX + (offsetX - 1 + i * textCompression) * scaleX;
+            quads[i].x1 = posX + (offsetX - 1 + i) * scaleX;
             quads[i].y1 = posY + (offsetY + 1) * scaleY;
-            quads[i].x2 = posX + (offsetX + 1 + i * textCompression) * scaleX;
+            quads[i].x2 = posX + (offsetX + 1 + i) * scaleX;
             quads[i].y2 = posY + (offsetY + 1) * scaleY;
-            quads[i].x3 = posX + (offsetX + 1 + i * textCompression) * scaleX;
+            quads[i].x3 = posX + (offsetX + 1 + i) * scaleX;
             quads[i].y3 = posY + (offsetY - 1) * scaleY;
-            quads[i].x4 = posX + (offsetX - 1 + i * textCompression) * scaleX;
+            quads[i].x4 = posX + (offsetX - 1 + i) * scaleX;
             quads[i].y4 = posY + (offsetY - 1) * scaleY;
             quads[i].metadata1 = text.charAt(i);
             if (quads[i].isRegistered()) {

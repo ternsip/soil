@@ -1,6 +1,7 @@
 package com.ternsip.soil.game.entities;
 
 import com.ternsip.soil.Soil;
+import com.ternsip.soil.graph.display.Camera;
 import com.ternsip.soil.graph.shader.BufferLayout;
 import com.ternsip.soil.graph.shader.Mesh;
 import com.ternsip.soil.graph.shader.Shader;
@@ -91,7 +92,6 @@ public class EntityQuad {
         entityQuads.add(this);
         this.index = entityQuads.size() - 1;
         this.writeToBufferLayout();
-        quads.count.set(entityQuads.size());
         return true;
     }
 
@@ -113,12 +113,11 @@ public class EntityQuad {
             lastQuad.writeToBufferLayout();
         }
         entityQuads.remove(lastIndex);
-        quads.count.set(entityQuads.size());
         index = UNASSIGNED;
     }
 
-    public static int getCountThreadSafe(int layer) {
-        return LAYER_QUADS.quads[layer].count.get();
+    public static int getCount(int layer) {
+        return LAYER_QUADS.quads[layer].entityQuads.size();
     }
 
     private static final class LayerQuads {
@@ -136,7 +135,6 @@ public class EntityQuad {
     private static final class Quads {
 
         private final ArrayList<EntityQuad> entityQuads = new ArrayList<>();
-        private final AtomicInteger count = new AtomicInteger(0);
 
     }
 

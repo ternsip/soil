@@ -62,6 +62,7 @@ out vec4 out_Color;
 
 uniform vec2 cameraPos;
 uniform vec2 cameraScale;
+uniform vec2 aspect;
 uniform int time;
 uniform sampler2DArray[MAX_SAMPLERS] samplers;
 
@@ -111,8 +112,8 @@ float loopValue(int value, int length) {
 vec4 resolveQuadTexel(Quad quad, vec2 pos) {
     int type = quad.type;
     int animation_start = quad.animation_start;
-    float realX = (texture_xy.x * 2 - 1) / cameraScale.x - cameraPos.x;
-    float realY = (texture_xy.y * 2 - 1) / cameraScale.y - cameraPos.y;
+    float realX = (texture_xy.x * 2 - 1) / (cameraScale.x * aspect.x) - cameraPos.x;
+    float realY = (texture_xy.y * 2 - 1) / (cameraScale.y * aspect.y) - cameraPos.y;
     float shadowMask = 0;
     if (type == QUAD_TYPE_BLOCKS || type == QUAD_TYPE_SHADOW) {
         if (realX < 0 || realY < 0 || realX >= BLOCKS_X || realY >= BLOCKS_Y) {
