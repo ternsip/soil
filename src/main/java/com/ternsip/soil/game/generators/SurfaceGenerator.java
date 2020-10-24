@@ -12,7 +12,7 @@ import static com.ternsip.soil.game.blocks.BlocksRepository.SIZE_Y;
 @Getter
 public class SurfaceGenerator implements ChunkGenerator {
 
-    private final int height = 15;
+    private final int height = 35;
 
     @Override
     public int getPriority() {

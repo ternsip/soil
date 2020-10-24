@@ -2,7 +2,9 @@
 
 #define PI 3.1415926538
 #define PI_2 6.28318530717
+#define SQRT2 1.4142135623730
 
+const float LIGHT_ACCURACY = 3;
 const float INF = 1e6;
 const float EPS = 1e-6;
 const int MAX_SAMPLERS = 16;
@@ -11,8 +13,8 @@ const int POWER4 = 16;
 const int BLOCKS_X = 4000;
 const int BLOCKS_Y = 3000;
 const int TOTAL_BLOCKS = BLOCKS_X * BLOCKS_Y;
-const int[] ANCHOR_DELTA_X = { -1, -1, -1, 0, 0, 1, 1, 1 };
-const int[] ANCHOR_DELTA_Y = { -1, 0, 1, -1, 1, -1, 0, 1 };
+const float[] ANCHOR_DELTA_X = { -1, -1, -1, 0, 0, 1, 1, 1 };
+const float[] ANCHOR_DELTA_Y = { -1, 0, 1, -1, 1, -1, 0, 1 };
 const int[] ANCHOR_DELTA_INDEX = { -BLOCKS_X-1, -1, BLOCKS_X-1, -BLOCKS_X, BLOCKS_X, -BLOCKS_X+1, 1, BLOCKS_X+1 };
 
 const int QUAD_TYPE_EMPTY = 0;
@@ -139,17 +141,23 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
                 return vec4(0, 0, 0, 0);
             }
             float light = max(block.emit, block.sky);
+            float receiveMaxLight[8];
+            float receiveLight[8];
             for (int k = 0; k < 8; ++k) {
                 int nextBlockIndex = blockIndex + ANCHOR_DELTA_INDEX[k];
                 if (nextBlockIndex < 0 || nextBlockIndex >= TOTAL_BLOCKS) continue;
                 Block nextBlock = blocks[nextBlockIndex];
                 vec2 anchor = vec2(ANCHOR_DELTA_X[k] + 0.5, ANCHOR_DELTA_Y[k] + 0.5);
-                float dist = 1.5 - min(1.5, distance(blockFragment, anchor));
+                float dist = (SQRT2 - min(SQRT2, distance(blockFragment, anchor))) / SQRT2;
                 float angle = atan(anchor.y - blockFragment.y, anchor.x - blockFragment.x);
                 float strobe = 1 + 2 * noise(vec3(loopValue(time + randInt(nextBlockIndex), 100000) * 100, 2 + sin(angle) * 2, 2 + cos(angle) * 2));
-                float targetBlockLight = max(nextBlock.emit, nextBlock.sky);
-                float targetLight = targetBlockLight * pow(dist, strobe);
-                light = max(light, max(targetLight, min(targetBlockLight, light + targetLight)));
+                receiveMaxLight[k] = max(nextBlock.emit, nextBlock.sky);
+                receiveLight[k] = receiveMaxLight[k] * pow(dist, strobe);
+            }
+            for (int iteration = 0; iteration < LIGHT_ACCURACY; ++iteration) {
+                for (int k = 0; k < 8; ++k) {
+                    light = max(light, max(receiveLight[k], min(receiveMaxLight[k], light + receiveLight[k])));
+                }
             }
             return vec4(0, 0, 0, 1 - light);
         }
