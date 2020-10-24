@@ -11,6 +11,9 @@ const int POWER4 = 16;
 const int BLOCKS_X = 4000;
 const int BLOCKS_Y = 3000;
 const int TOTAL_BLOCKS = BLOCKS_X * BLOCKS_Y;
+const int[] ANCHOR_DELTA_X = { -1, -1, -1, 0, 0, 1, 1, 1 };
+const int[] ANCHOR_DELTA_Y = { -1, 0, 1, -1, 1, -1, 0, 1 };
+const int[] ANCHOR_DELTA_INDEX = { -BLOCKS_X-1, -1, BLOCKS_X-1, -BLOCKS_X, BLOCKS_X, -BLOCKS_X+1, 1, BLOCKS_X+1 };
 
 const int QUAD_TYPE_EMPTY = 0;
 const int QUAD_TYPE_BLOCKS = 1;
@@ -122,7 +125,6 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
     int animation_start = quad.animation_start;
     float realX = (texture_xy.x * 2 - 1) / (cameraScale.x * aspect.x) - cameraPos.x;
     float realY = (texture_xy.y * 2 - 1) / (cameraScale.y * aspect.y) - cameraPos.y;
-    float shadowMask = 0;
     if (type == QUAD_TYPE_BLOCKS || type == QUAD_TYPE_SHADOW) {
         if (realX < 0 || realY < 0 || realX >= BLOCKS_X || realY >= BLOCKS_Y) {
             discard;
@@ -137,23 +139,17 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
                 return vec4(0, 0, 0, 0);
             }
             float light = max(block.emit, block.sky);
-            for (int dx = -1, nx = blockX - 1; dx <= 1; ++dx, ++nx) {
-                for (int dy = -1, ny = blockY - 1; dy <= 1; ++dy, ++ny) {
-                    if (nx < 0 || ny < 0 || nx >= BLOCKS_X || ny >= BLOCKS_Y) continue;
-                    int nextBlockIndex = ny * BLOCKS_X + nx;
-                    Block nextBlock = blocks[nextBlockIndex];
-                    vec2 anchor = vec2(dx, dy);
-                    if (dx == 0) anchor.x = blockFragment.x;
-                    if (dy == 0) anchor.y = blockFragment.y;
-                    if (dx < 0) anchor.x += 1;
-                    if (dy < 0) anchor.y += 1;
-                    float dist = 1 - min(1, distance(blockFragment, anchor));
-                    float angle = atan(dy + 0.5 - blockFragment.y, dx + 0.5 - blockFragment.x);
-                    float strobe = 1 + 2 * noise(vec3(loopValue(time + randInt(nextBlockIndex), 100000) * 100, 2 + sin(angle) * 2, 2 + cos(angle) * 2));
-                    float targetBlockLight = max(nextBlock.emit, nextBlock.sky);
-                    float targetLight = targetBlockLight * pow(dist, strobe);
-                    light = max(light, max(targetLight, min(targetBlockLight, light + targetLight)));
-                }
+            for (int k = 0; k < 8; ++k) {
+                int nextBlockIndex = blockIndex + ANCHOR_DELTA_INDEX[k];
+                if (nextBlockIndex < 0 || nextBlockIndex >= TOTAL_BLOCKS) continue;
+                Block nextBlock = blocks[nextBlockIndex];
+                vec2 anchor = vec2(ANCHOR_DELTA_X[k] + 0.5, ANCHOR_DELTA_Y[k] + 0.5);
+                float dist = 1.5 - min(1.5, distance(blockFragment, anchor));
+                float angle = atan(anchor.y - blockFragment.y, anchor.x - blockFragment.x);
+                float strobe = 1 + 2 * noise(vec3(loopValue(time + randInt(nextBlockIndex), 100000) * 100, 2 + sin(angle) * 2, 2 + cos(angle) * 2));
+                float targetBlockLight = max(nextBlock.emit, nextBlock.sky);
+                float targetLight = targetBlockLight * pow(dist, strobe);
+                light = max(light, max(targetLight, min(targetBlockLight, light + targetLight)));
             }
             return vec4(0, 0, 0, 1 - light);
         }
