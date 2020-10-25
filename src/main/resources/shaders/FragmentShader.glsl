@@ -205,7 +205,7 @@ vec4 resolveQuadTexel() {
             if (blockX + ANCHOR_DELTA_X[k] < 0 || blockY + ANCHOR_DELTA_Y[k] < 0 || blockX + ANCHOR_DELTA_X[k] >= BLOCKS_X || blockY + ANCHOR_DELTA_Y[k] >= BLOCKS_Y) continue;
             Block nextBlock = blocks[nextBlockIndex];
             TextureData nextTextureData = textures[nextBlock.type];
-            if (nextTextureData.textureStyle != TEXTURE_STYLE_4_ADJACENT8_VARIATION) continue;
+            if (nextTextureData.textureStyle != TEXTURE_STYLE_4_ADJACENT8_VARIATION || nextBlock.type == block.type) continue;
             int variation = abs(randInt(nextBlockIndex)) % 4;
             int dx = 1 + (variation % 2) * 3 - ANCHOR_DELTA_X[k];
             int dy = 1 + (variation / 2) * 3 + ANCHOR_DELTA_Y[k];
