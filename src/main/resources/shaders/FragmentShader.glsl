@@ -170,7 +170,7 @@ vec4 resolveQuadTexel() {
             float receiveLight[8];
             for (int k = 0; k < 8; ++k) {
                 int nextBlockIndex = blockIndex + ANCHOR_DELTA_INDEX[k];
-                if (nextBlockIndex < 0 || nextBlockIndex >= TOTAL_BLOCKS) continue;
+                if (blockX + ANCHOR_DELTA_X[k] < 0 || blockY + ANCHOR_DELTA_Y[k] < 0 || blockX + ANCHOR_DELTA_X[k] >= BLOCKS_X || blockY + ANCHOR_DELTA_Y[k] >= BLOCKS_Y) continue;
                 Block nextBlock = blocks[nextBlockIndex];
                 vec2 anchor = vec2(ANCHOR_DELTA_X[k] + 0.5, ANCHOR_DELTA_Y[k] + 0.5);
                 float dist = (SQRT2 - min(SQRT2, distance(blockFragment, anchor))) / SQRT2;
@@ -202,7 +202,7 @@ vec4 resolveQuadTexel() {
         }
         for (int k = 0; k < 8; ++k) {
             int nextBlockIndex = blockIndex + ANCHOR_DELTA_INDEX[k];
-            if (nextBlockIndex < 0 || nextBlockIndex >= TOTAL_BLOCKS) continue;
+            if (blockX + ANCHOR_DELTA_X[k] < 0 || blockY + ANCHOR_DELTA_Y[k] < 0 || blockX + ANCHOR_DELTA_X[k] >= BLOCKS_X || blockY + ANCHOR_DELTA_Y[k] >= BLOCKS_Y) continue;
             Block nextBlock = blocks[nextBlockIndex];
             TextureData nextTextureData = textures[nextBlock.type];
             if (nextTextureData.textureStyle != TEXTURE_STYLE_4_ADJACENT8_VARIATION) continue;
