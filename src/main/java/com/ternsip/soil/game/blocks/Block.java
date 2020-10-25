@@ -16,7 +16,7 @@ public enum Block {
     WOOD(true, MAX_LIGHT, TextureType.BLOCK_DIRT),
     WATER(false, 2, TextureType.BLOCK_DIRT),
     LAVA(false, -10, TextureType.BLOCK_LAVA),
-    SAND(true, MAX_LIGHT, TextureType.BLOCK_DIRT);
+    SAND(true, 3, TextureType.BLOCK_SAND);
 
     public final boolean obstacle;
     public final int opacity;

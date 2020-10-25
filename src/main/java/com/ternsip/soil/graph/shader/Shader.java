@@ -33,10 +33,11 @@ public final class Shader implements Finishable {
     private final UniformVec2 aspect = new UniformVec2();
     private final UniformInteger layer = new UniformInteger();
     private final UniformInteger time = new UniformInteger();
+    private final UniformBoolean debugging = new UniformBoolean();
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
 
     public final BufferLayout blocksBuffer = new BufferLayout(BlocksRepository.SIZE_X * BlocksRepository.SIZE_Y, 3);
-    public final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length,  5);
+    public final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length,  6);
     public final BufferLayout quadBuffer = new BufferLayout(MAX_LAYERS * Mesh.MAX_QUADS, 14);
 
     public Shader() {
@@ -73,6 +74,8 @@ public final class Shader implements Finishable {
         cameraPos.load(camera.pos.x, camera.pos.y);
         cameraScale.load(camera.scale.x, camera.scale.y);
         aspect.load(camera.aspectX, camera.aspectY);
+        debugging.load(camera.scale.x < 0.01 || camera.scale.y < 0.01);
+        //debugging.load(true);
         this.time.load((int) (System.currentTimeMillis() % Integer.MAX_VALUE));
         for (int layerIndex = 0; layerIndex < MAX_LAYERS; ++layerIndex) {
             int quads = EntityQuad.getCount(layerIndex);
@@ -95,11 +98,12 @@ public final class Shader implements Finishable {
         TextureRepository textureRepository = Soil.THREADS.client.textureRepository;
         for (TextureType textureType : TextureType.values()) {
             Texture texture = textureRepository.getTexture(textureType.file);
-            textureBuffer.writeInt(index, texture.getLayerStart());
-            textureBuffer.writeInt(index + 1, texture.getLayerEnd());
-            textureBuffer.writeInt(index + 2, texture.getAtlasNumber());
-            textureBuffer.writeFloat(index + 3, texture.getMaxU());
-            textureBuffer.writeFloat(index + 4, texture.getMaxV());
+            textureBuffer.writeInt(index, texture.layerStart);
+            textureBuffer.writeInt(index + 1, texture.layerEnd);
+            textureBuffer.writeInt(index + 2, texture.atlasNumber);
+            textureBuffer.writeFloat(index + 3, texture.maxU);
+            textureBuffer.writeFloat(index + 4, texture.maxV);
+            textureBuffer.writeInt(index + 5, textureType.textureStyle.ordinal());
             index += textureBuffer.structureLength;
         }
         samplers.loadDefault();

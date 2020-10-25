@@ -4,7 +4,7 @@
 #define PI_2 6.28318530717
 #define SQRT2 1.4142135623730
 
-const float LIGHT_ACCURACY = 3;
+const float LIGHT_ACCURACY = 5;
 const float INF = 1e6;
 const float EPS = 1e-6;
 const int MAX_SAMPLERS = 16;
@@ -13,16 +13,19 @@ const int POWER4 = 16;
 const int BLOCKS_X = 4000;
 const int BLOCKS_Y = 3000;
 const int TOTAL_BLOCKS = BLOCKS_X * BLOCKS_Y;
-const float[] ANCHOR_DELTA_X = { -1, -1, -1, 0, 0, 1, 1, 1 };
-const float[] ANCHOR_DELTA_Y = { -1, 0, 1, -1, 1, -1, 0, 1 };
+const int[] ANCHOR_DELTA_X = { -1, -1, -1, 0, 0, 1, 1, 1 };
+const int[] ANCHOR_DELTA_Y = { -1, 0, 1, -1, 1, -1, 0, 1 };
 const int[] ANCHOR_DELTA_INDEX = { -BLOCKS_X-1, -1, BLOCKS_X-1, -BLOCKS_X, BLOCKS_X, -BLOCKS_X+1, 1, BLOCKS_X+1 };
 
-const int QUAD_TYPE_EMPTY = 0;
-const int QUAD_TYPE_BLOCKS = 1;
-const int QUAD_TYPE_FONT = 2;
-const int QUAD_TYPE_WATER = 3;
-const int QUAD_TYPE_LAVA = 4;
-const int QUAD_TYPE_SHADOW = 5;
+const int TEXTURE_STYLE_EMPTY = 0;
+const int TEXTURE_STYLE_NORMAL = 1;
+const int TEXTURE_STYLE_SHADOW = 2;
+const int TEXTURE_STYLE_BLOCKS = 3;
+const int TEXTURE_STYLE_FONT256 = 4;
+const int TEXTURE_STYLE_WATER = 5;
+const int TEXTURE_STYLE_LAVA = 6;
+const int TEXTURE_STYLE_4_SIMPLE_VARIATION = 7;
+const int TEXTURE_STYLE_4_ADJACENT8_VARIATION = 8;
 
 const int QUAD_FLAG_PINNED = 0x1;
 
@@ -38,6 +41,7 @@ struct TextureData {
     int atlasNumber;
     float maxU;
     float maxV;
+    int textureStyle;
 };
 
 struct Quad {
@@ -71,6 +75,7 @@ uniform vec2 cameraPos;
 uniform vec2 cameraScale;
 uniform vec2 aspect;
 uniform int time;
+uniform bool debugging;
 uniform sampler2DArray[MAX_SAMPLERS] samplers;
 
 int roundFloat(float value) {
@@ -122,13 +127,36 @@ float loopValue(int value, int length) {
     return (abs(value % (2 * length) - length)) / float(length);
 }
 
-vec4 resolveQuadTexel(Quad quad, vec2 pos) {
-    int type = quad.type;
+vec4 mix4(vec4 src, vec4 dst) {
+    return src * (1 - dst.a) + vec4(dst.rgb * dst.a, dst.a);
+}
+
+vec2 translateSquarePos(vec2 pos, int scale, int dx, int dy) {
+    return vec2((pos.x + dx) / scale, (pos.y + dy) / scale);
+}
+
+vec2 translateSquareIndex(vec2 pos, int scale, int index) {
+    return vec2((pos.x + index % scale) / scale, (pos.y + index / scale) / scale);
+}
+
+vec4 resolveTexture(TextureData textureData, int animation_start, float animation_period, vec2 pos) {
+    float timeDelta = mod(abs(time - animation_start), animation_period) / animation_period;
+    int count = textureData.layerEnd - textureData.layerStart + 1;
+    int textureLayer = textureData.layerStart + clamp(int(timeDelta * count), 0, count - 1);
+    vec2 maxUV = vec2(textureData.maxU, textureData.maxV);
+    return texture(samplers[textureData.atlasNumber], vec3(pos * maxUV, textureLayer));
+}
+
+vec4 resolveQuadTexel() {
+    Quad quad = quadData[roundFloat(quadIndex)];
+    vec2 pos = texture_xy;
+    TextureData textureData = textures[quad.type];
     int animation_start = quad.animation_start;
     float realX = (texture_xy.x * 2 - 1) / (cameraScale.x * aspect.x) - cameraPos.x;
     float realY = (texture_xy.y * 2 - 1) / (cameraScale.y * aspect.y) - cameraPos.y;
-    if (type == QUAD_TYPE_BLOCKS || type == QUAD_TYPE_SHADOW) {
-        if (realX < 0 || realY < 0 || realX >= BLOCKS_X || realY >= BLOCKS_Y) {
+    vec4 overlapTexel = vec4(0);
+    if (textureData.textureStyle == TEXTURE_STYLE_BLOCKS || textureData.textureStyle == TEXTURE_STYLE_SHADOW) {
+        if (realX < 0 || realY < 0 || realX >= BLOCKS_X || realY >= BLOCKS_Y || (debugging && textureData.textureStyle == TEXTURE_STYLE_SHADOW)) {
             discard;
         }
         int blockX = int(realX);
@@ -136,10 +164,7 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
         int blockIndex = blockY * BLOCKS_X + blockX;
         Block block = blocks[blockIndex];
         vec2 blockFragment = vec2(realX - blockX, realY - blockY);
-        if (type == QUAD_TYPE_SHADOW) {
-            if (cameraScale.x < 0.01 || cameraScale.y < 0.01) {
-                return vec4(0, 0, 0, 0);
-            }
+        if (textureData.textureStyle == TEXTURE_STYLE_SHADOW) {
             float light = max(block.emit, block.sky);
             float receiveMaxLight[8];
             float receiveLight[8];
@@ -161,35 +186,48 @@ vec4 resolveQuadTexel(Quad quad, vec2 pos) {
             }
             return vec4(0, 0, 0, 1 - light);
         }
-        type = block.type;
-        animation_start = int(rand(blockIndex) * quad.animation_period);
+        textureData = textures[block.type];
+        animation_start = randInt(blockIndex);
         pos.x = blockFragment.x;
         pos.y = 1 - blockFragment.y;
+        if (textureData.textureStyle == TEXTURE_STYLE_4_SIMPLE_VARIATION) {
+            int variation = abs(randInt(blockIndex)) % 4;
+            pos = translateSquareIndex(pos, 2, variation);
+        }
+        if (textureData.textureStyle == TEXTURE_STYLE_4_ADJACENT8_VARIATION) {
+            int variation = abs(randInt(blockIndex)) % 4;
+            int dx = 1 + (variation % 2) * 3;
+            int dy = 1 + (variation / 2) * 3;
+            pos = translateSquarePos(pos, 6, dx, dy);
+        }
+        for (int k = 0; k < 8; ++k) {
+            int nextBlockIndex = blockIndex + ANCHOR_DELTA_INDEX[k];
+            if (nextBlockIndex < 0 || nextBlockIndex >= TOTAL_BLOCKS) continue;
+            Block nextBlock = blocks[nextBlockIndex];
+            TextureData nextTextureData = textures[nextBlock.type];
+            if (nextTextureData.textureStyle != TEXTURE_STYLE_4_ADJACENT8_VARIATION) continue;
+            int variation = abs(randInt(nextBlockIndex)) % 4;
+            int dx = 1 + (variation % 2) * 3 - ANCHOR_DELTA_X[k];
+            int dy = 1 + (variation / 2) * 3 + ANCHOR_DELTA_Y[k];
+            overlapTexel = mix4(overlapTexel, resolveTexture(nextTextureData, randInt(nextBlockIndex), quad.animation_period, translateSquarePos(pos, 6, dx, dy)));
+        }
     }
-    if (type == QUAD_TYPE_EMPTY) {
-        discard;
+    if (textureData.textureStyle == TEXTURE_STYLE_EMPTY) {
+        return overlapTexel;
     }
-    if (type == QUAD_TYPE_LAVA) {
+    if (textureData.textureStyle == TEXTURE_STYLE_LAVA) {
         vec3 orange = vec3(1., .45, 0.);
         vec3 yellow = vec3(1., 1., 0.);
         // TODO make lava better https://www.shadertoy.com/view/llsBR4 https://www.shadertoy.com/view/lslXRS https://thebookofshaders.com/edit.php#11/lava-lamp.frag http://www.science-and-fiction.org/rendering/noise.html
         float noiseValue = noise(vec3(realX, realY, loopValue(time, 10000) * 10));
-        return vec4(mix(yellow, orange, vec3(smoothstep(0., 1., noiseValue))), 0.9f);
+        return mix4(vec4(mix(yellow, orange, vec3(smoothstep(0., 1., noiseValue))), 0.9f), overlapTexel);
     }
-    TextureData textureData = textures[type];
-    float timeDelta = mod(abs(time - animation_start), quad.animation_period) / quad.animation_period;
-    int count = textureData.layerEnd - textureData.layerStart + 1;
-    int textureLayer = textureData.layerStart + clamp(int(timeDelta * count), 0, count - 1);
-    vec2 maxUV = vec2(textureData.maxU, textureData.maxV);
-    if (type == QUAD_TYPE_FONT) {
-        pos.x = (pos.x + quad.meta1 % POWER4) / POWER4;
-        pos.y = (pos.y + quad.meta1 / POWER4) / POWER4;
+    if (textureData.textureStyle == TEXTURE_STYLE_FONT256) {
+        pos = translateSquareIndex(pos, POWER4, quad.meta1);
     }
-    return texture(samplers[textureData.atlasNumber], vec3(pos * maxUV, textureLayer));
+    return mix4(resolveTexture(textureData, animation_start, quad.animation_period, pos), overlapTexel);
 }
 
 void main(void) {
-
-    out_Color = resolveQuadTexel(quadData[roundFloat(quadIndex)], texture_xy);
-
+    out_Color = resolveQuadTexel();
 }

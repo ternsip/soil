@@ -4,13 +4,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Getter
 public class Texture {
 
-    private final int atlasNumber;
-    private final int layerStart;
-    private final int layerEnd;
-    private final float maxU;
-    private final float maxV;
+    public final int atlasNumber;
+    public final int layerStart;
+    public final int layerEnd;
+    public final float maxU;
+    public final float maxV;
 
 }

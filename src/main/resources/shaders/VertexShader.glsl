@@ -6,9 +6,6 @@ const int MAX_QUADS = LAYER_MAX_QUADS * MAX_LAYERS;
 const int[] TEXTURE_X = { 0, 1, 1, 0 };
 const int[] TEXTURE_Y = { 0, 0, 1, 1 };
 
-const int QUAD_TYPE_EMPTY = 0;
-const int QUAD_TYPE_BLOCKS = 1;
-const int QUAD_TYPE_FONT = 2;
 const int QUAD_FLAG_PINNED = 0x1;
 
 struct Quad {
