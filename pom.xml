@@ -42,10 +42,59 @@
 
     <profiles>
         <profile>
-            <id>windows-profile</id>
+            <id>windows-x86-profile</id>
             <activation>
                 <os>
                     <family>Windows</family>
+                    <arch>x86</arch>
+                </os>
+            </activation>
+            <properties>
+                <platform>natives-windows-x86</platform>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows-x64-profile</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>x64</arch>
+                </os>
+            </activation>
+            <properties>
+                <platform>natives-windows</platform>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows-x86_64-profile</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>x86_64</arch>
+                </os>
+            </activation>
+            <properties>
+                <platform>natives-windows</platform>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows-amd64-profile</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
+            <properties>
+                <platform>natives-windows</platform>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows-intel64-profile</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>Intel 64</arch>
                 </os>
             </activation>
             <properties>
@@ -139,11 +188,10 @@
             <version>2.0.0</version>
         </dependency>
         <dependency>
-            <groupId>org.l33tlabs.twl</groupId>
-            <artifactId>pngdecoder</artifactId>
-            <version>1.0</version>
+            <groupId>org.joml</groupId>
+            <artifactId>joml</artifactId>
+            <version>${joml.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
@@ -180,11 +228,6 @@
             <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl-nanovg</artifactId>
             <version>${lwjgl.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.joml</groupId>
-            <artifactId>joml</artifactId>
-            <version>${joml.version}</version>
         </dependency>
 
         <!-- Natives for graphical libraries -->
@@ -265,20 +308,6 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.googlecode.mavennatives</groupId>
-                <artifactId>maven-nativedependencies-plugin</artifactId>
-                <version>0.0.7</version>
-                <executions>
-                    <execution>
-                        <id>unpacknatives</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
