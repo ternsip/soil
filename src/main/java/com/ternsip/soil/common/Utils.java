@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.assimp.AIScene;
-import org.lwjgl.assimp.Assimp;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
@@ -28,8 +26,6 @@ import java.util.stream.Collectors;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterOutputStream;
 
-import static org.lwjgl.assimp.Assimp.aiGetErrorString;
-
 /**
  * Set of util methods that are not part of any object
  * Should contain only static methods
@@ -37,6 +33,9 @@ import static org.lwjgl.assimp.Assimp.aiGetErrorString;
  */
 @Slf4j
 public class Utils {
+
+    public static final String SOURCES_ROOT = "com.ternsip.soil";
+    public static final String RESOURCES_ROOT = "soil";
 
     @SneakyThrows
     public static synchronized FileInputStream loadResourceAsFileStream(File file) {
@@ -55,24 +54,11 @@ public class Utils {
 
     @SneakyThrows
     public static synchronized InputStream loadResourceAsStream(File file) {
-        InputStream in = Utils.class.getClassLoader().getResourceAsStream(file.getPath());
+        InputStream in = Utils.class.getClassLoader().getResourceAsStream("\\" + file.getPath());
         if (in == null) {
             throw new FileNotFoundException("Can't find file: " + file.getPath());
         }
         return in;
-    }
-
-    @SneakyThrows
-    public static synchronized AIScene loadResourceAsAssimp(File file, int flags) {
-        byte[] _data = IOUtils.toByteArray(Utils.loadResourceAsStream(file));
-        ByteBuffer data = BufferUtils.createByteBuffer(_data.length);
-        data.put(_data);
-        data.flip();
-        AIScene scene = Assimp.aiImportFileFromMemory(data, flags, "");
-        if (scene == null) {
-            throw new IllegalStateException(aiGetErrorString());
-        }
-        return scene;
     }
 
     public static byte[] bufferToArray(ByteBuffer buf) {
@@ -157,12 +143,12 @@ public class Utils {
     }
 
     public static synchronized <T> Set<Class<? extends T>> getAllClasses(Class<T> clazz) {
-        Reflections reflections = new Reflections("", new SubTypesScanner());
+        Reflections reflections = new Reflections(SOURCES_ROOT, new SubTypesScanner());
         return reflections.getSubTypesOf(clazz);
     }
 
     public static synchronized List<File> getResourceListing(String[] extensions) {
-        Reflections reflections = new Reflections("", new ResourcesScanner());
+        Reflections reflections = new Reflections(RESOURCES_ROOT, new ResourcesScanner());
         String pattern = "(.*\\." + String.join(")|(.*\\.", extensions) + ")";
         return reflections
                 .getResources(Pattern.compile(pattern))

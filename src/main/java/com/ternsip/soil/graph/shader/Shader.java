@@ -21,8 +21,8 @@ public final class Shader implements Finishable {
 
     public static final int MAX_LAYERS = 16;
 
-    private static final File VERTEX_SHADER = new File("shaders/VertexShader.glsl");
-    private static final File FRAGMENT_SHADER = new File("shaders/FragmentShader.glsl");
+    private static final File VERTEX_SHADER = new File("soil/shaders/VertexShader.glsl");
+    private static final File FRAGMENT_SHADER = new File("soil/shaders/FragmentShader.glsl");
 
     private final int programID;
 
