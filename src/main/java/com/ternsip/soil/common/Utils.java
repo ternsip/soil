@@ -14,7 +14,6 @@ import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -38,13 +37,9 @@ public class Utils {
     public static final String RESOURCES_ROOT = "soil";
 
     @SneakyThrows
-    public static synchronized FileInputStream loadResourceAsFileStream(File file) {
-        URL resource = Utils.class.getClassLoader().getResource(file.getPath());
-        if (resource == null) {
-            throw new IllegalArgumentException("Can't find file: " + file.getPath());
-        }
-        File rFile = new File(resource.toURI());
-        return new FileInputStream(rFile);
+    public static String getPath(File file) {
+        // TODO think on such replacement (that was made to let uber-jar work properly)
+        return file.getPath().replace("\\", "/");
     }
 
     @SneakyThrows
@@ -54,9 +49,9 @@ public class Utils {
 
     @SneakyThrows
     public static synchronized InputStream loadResourceAsStream(File file) {
-        InputStream in = Utils.class.getClassLoader().getResourceAsStream("\\" + file.getPath());
+        InputStream in = Utils.class.getClassLoader().getResourceAsStream(getPath(file));
         if (in == null) {
-            throw new FileNotFoundException("Can't find file: " + file.getPath());
+            throw new FileNotFoundException("Can't find file: " + getPath(file));
         }
         return in;
     }
