@@ -152,8 +152,8 @@ vec4 resolveQuadTexel() {
     vec2 pos = texture_xy;
     TextureData textureData = textures[quad.type];
     int animation_start = quad.animation_start;
-    float realX = (texture_xy.x * 2 - 1) / (cameraScale.x * aspect.x) - cameraPos.x;
-    float realY = (texture_xy.y * 2 - 1) / (cameraScale.y * aspect.y) - cameraPos.y;
+    float realX = (texture_xy.x * 2 - 1) / (cameraScale.x * aspect.x) + cameraPos.x;
+    float realY = (texture_xy.y * 2 - 1) / (cameraScale.y * aspect.y) + cameraPos.y;
     vec4 overlapTexel = vec4(0);
     if (textureData.textureStyle == TEXTURE_STYLE_BLOCKS || textureData.textureStyle == TEXTURE_STYLE_SHADOW) {
         if (realX < 0 || realY < 0 || realX >= BLOCKS_X || realY >= BLOCKS_Y || (debugging && textureData.textureStyle == TEXTURE_STYLE_SHADOW)) {

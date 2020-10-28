@@ -29,7 +29,7 @@ public class EntityQuad {
     public int metadata2;
 
     public EntityQuad(int layer, TextureType textureType, boolean pinned) {
-        this(layer, textureType, pinned, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        this(layer, textureType, pinned, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     public EntityQuad(

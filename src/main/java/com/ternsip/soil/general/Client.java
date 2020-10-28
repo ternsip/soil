@@ -4,6 +4,7 @@ import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Threadable;
 import com.ternsip.soil.events.EventIOReceiver;
 import com.ternsip.soil.events.OnConnectedToServer;
+import com.ternsip.soil.game.entities.EntityPlayer;
 import com.ternsip.soil.graph.display.*;
 import com.ternsip.soil.graph.shader.Shader;
 import com.ternsip.soil.graph.shader.TextureType;
@@ -56,16 +57,16 @@ public class Client implements Threadable {
     }
 
     @Override
+    // TODO think about sync order
     public void update() {
         windowData.clear();
-        //windowData.waitBuffer();
-        eventIOReceiver.update();
-        shader.render();
+        windowData.waitBuffer();
         fpsCounter.updateFps();
-        entityRepository.update();
         eventIOReceiver.update();
         blocksRepository.update();
-        //windowData.lockBuffer();
+        entityRepository.update();
+        shader.render();
+        windowData.lockBuffer();
         windowData.swapBuffers();
         windowData.pollEvents();
         audioRepository.update();
@@ -107,6 +108,7 @@ public class Client implements Threadable {
         new EntityQuad(2, TextureType.PLAYER_IDLE, false, 1000.0f, 0, 0, -0.9f, -0, -0.9f, -0.5f, 0, -0.5f, 0, 0).register();
         new EntityQuad(3, TextureType.BLOCKS, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
         new EntityQuad(4, TextureType.SHADOW, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
+        new EntityPlayer(2).register();
     }
 
     private void spawnEntities() {

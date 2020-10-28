@@ -14,7 +14,7 @@ public class Camera {
     public static final float MIN_SCALE = 0.000001f; // TODO rework
 
     public Vector2f pos = new Vector2f(0);
-    public Vector2f scale = new Vector2f(1);
+    public Vector2f scale = new Vector2f(0.03f);
     public int width = 1;
     public int height = 1;
     public float aspectX = 1;
@@ -34,8 +34,8 @@ public class Camera {
 
     private void recalculatePos(CursorPosEvent event) {
         if (Soil.THREADS.client.eventIOReceiver.isMouseDown(GLFW_MOUSE_BUTTON_2) || Soil.THREADS.client.eventIOReceiver.isMouseDown(GLFW_MOUSE_BUTTON_1)) {
-            pos.x += event.getDx() / (scale.x * 500.0f);
-            pos.y -= event.getDy() / (scale.y * 500.0f);
+            pos.x -= event.getDx() / (scale.x * 500.0f);
+            pos.y += event.getDy() / (scale.y * 500.0f);
         }
     }
 

@@ -40,8 +40,8 @@ void main(void) {
     float x = quad.vertices[indexMod * 2];
     float y = quad.vertices[indexMod * 2 + 1];
     if ((quad.flags & QUAD_FLAG_PINNED) == 0) {
-        gl_Position.x = (x + cameraPos.x) * cameraScale.x * aspect.x;
-        gl_Position.y = (y + cameraPos.y) * cameraScale.y * aspect.y;
+        gl_Position.x = (x - cameraPos.x) * cameraScale.x * aspect.x;
+        gl_Position.y = (y - cameraPos.y) * cameraScale.y * aspect.y;
     } else {
         gl_Position = vec4(x, y, 0, 1.0);
     }
