@@ -18,7 +18,7 @@ public enum TextureType {
     BLOCK_DIRT(new File("soil/interface/dirt.png"), TEXTURE_STYLE_NORMAL),
     BLOCK_SAND(new File("soil/interface/sand_4_adjacent8.png"), TEXTURE_STYLE_4_ADJACENT8_VARIATION),
     BLOCK_LAWN(new File("soil/interface/lawn.png"), TEXTURE_STYLE_NORMAL),
-    PLAYER_IDLE(new File("soil/interface/button.png"), TEXTURE_STYLE_NORMAL),
+    PLAYER_IDLE(new File("soil/interface/player_idle.gif"), TEXTURE_STYLE_NORMAL),
     PLAYER_ATTACK(new File("soil/interface/player-attack.gif"), TEXTURE_STYLE_NORMAL),
     HOMER(new File("soil/interface/homer.gif"), TEXTURE_STYLE_NORMAL),
     TEST(new File("soil/interface/test.gif"), TEXTURE_STYLE_NORMAL),

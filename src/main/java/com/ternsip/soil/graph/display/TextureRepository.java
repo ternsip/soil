@@ -1,6 +1,6 @@
 package com.ternsip.soil.graph.display;
 
-import com.sun.imageio.plugins.gif.GIFImageMetadata;
+import com.madgag.gif.fmsware.GifDecoder;
 import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
 import com.ternsip.soil.common.Utils;
@@ -152,6 +152,7 @@ public class TextureRepository {
         private final int width;
         private final int height;
         private final byte[][] frameData;
+        private final int[] frameDelay;
 
         @SneakyThrows
         Image(File file) {
@@ -164,41 +165,22 @@ public class TextureRepository {
                     throw new IllegalArgumentException(String.format("File %s has 0 animation frames", file.getName()));
                 }
                 this.frameData = new byte[frameCount][];
-                this.width = imageReader.getWidth(0);
-                this.height = imageReader.getHeight(0);
-                BufferedImage prevFrame = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                BufferedImage canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                Graphics graphics = canvas.getGraphics();
-                for (int i = 0; i < frameCount; i++) {
-                    BufferedImage frame = imageReader.read(i);
-                    GIFImageMetadata meta = (GIFImageMetadata) imageReader.getImageMetadata(i);
-                    if (meta.disposalMethod == 1) {
-                        // Do Not Dispose (Leave As Is), meaning leave canvas from previous frame
-                        graphics.drawImage(frame, meta.imageLeftPosition, meta.imageTopPosition, null);
-                    } else if (meta.disposalMethod == 2) {
-                        // Restore to background, meaning clear canvas to background color
-                        fillBufferImage(canvas, 0);
-                        graphics.drawImage(frame, meta.imageLeftPosition, meta.imageTopPosition, null);
-                    } else if (meta.disposalMethod == 3) {
-                        // Restore to previous, meaning clear canvas to frame before last
-                        fillBufferImage(canvas, 0);
-                        graphics.drawImage(prevFrame, 0, 0, null);
-                        graphics.drawImage(frame, meta.imageLeftPosition, meta.imageTopPosition, null);
-                    } else {
-                        // Unspecified disposal method, full replace
-                        fillBufferImage(canvas, 0);
-                        graphics.drawImage(frame, meta.imageLeftPosition, meta.imageTopPosition, null);
-                    }
-                    prevFrame = frame;
-                    frameData[i] = bufferedImageToBitmapRGBA(canvas);
+                this.frameDelay = new int[frameCount];
+                GifDecoder d = new GifDecoder();
+                d.read(Utils.loadResourceAsStream(file));
+                this.width = d.getFrameSize().width;
+                this.height = d.getFrameSize().height;
+                for (int i = 0; i < d.getFrameCount(); i++) {
+                    frameDelay[i] = d.getDelay(i);
+                    frameData[i] = bufferedImageToBitmapRGBA(d.getFrame(i));
                 }
-                graphics.dispose();
             } else {
                 ByteBuffer imageData = Utils.loadResourceToByteBuffer(file);
                 IntBuffer w = BufferUtils.createIntBuffer(1);
                 IntBuffer h = BufferUtils.createIntBuffer(1);
                 IntBuffer avChannels = BufferUtils.createIntBuffer(1);
                 this.frameData = new byte[][]{Utils.bufferToArray(stbi_load_from_memory(imageData, w, h, avChannels, COMPONENT_RGBA))};
+                this.frameDelay = new int[]{0};
                 this.width = w.get();
                 this.height = h.get();
             }
@@ -219,14 +201,6 @@ public class TextureRepository {
                 }
             }
             return dataRGBA;
-        }
-
-        private static void fillBufferImage(BufferedImage bufferedImage, int argb) {
-            for (int x = 0; x < bufferedImage.getWidth(); x++) {
-                for (int y = 0; y < bufferedImage.getHeight(); y++) {
-                    bufferedImage.setRGB(x, y, argb);
-                }
-            }
         }
 
     }
