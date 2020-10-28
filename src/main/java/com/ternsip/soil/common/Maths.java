@@ -6,8 +6,10 @@ import java.lang.Math;
 
 public class Maths {
 
-    public static final float EPS = 1e-5f;
+    public static final float EPS_F = 1e-5f;
     public static final double EPS_D = 1e-10f;
+    public static final float INF_F = Float.MAX_VALUE;
+    public static final double INF_D = Double.MAX_VALUE;
 
     public static final Vector3fc UP_DIRECTION = new Vector3f(0, 1, 0);
     public static final Vector3fc DOWN_DIRECTION = new Vector3f(0, -1, 0);
@@ -45,7 +47,7 @@ public class Maths {
         );
     }
 
-    public static float frac(float v) {
+    public static float fract(float v) {
         return (float) (v - Math.floor(v));
     }
 
@@ -58,7 +60,7 @@ public class Maths {
     }
 
     public static boolean isFloatsEqual(float a, float b) {
-        return Math.abs(a - b) < EPS;
+        return Math.abs(a - b) < EPS_F;
     }
 
     public static int log(int x, int base) {
@@ -66,7 +68,7 @@ public class Maths {
     }
 
     public static Vector3fc normalizeOrEmpty(Vector3fc v) {
-        return v.lengthSquared() <= EPS ? v : v.normalize(new Vector3f());
+        return v.lengthSquared() <= EPS_F ? v : v.normalize(new Vector3f());
     }
 
     public static Matrix4f createTransformationMatrix(Vector3fc translation, Vector3f rot, float scale) {
