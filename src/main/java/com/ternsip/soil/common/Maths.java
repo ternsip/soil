@@ -167,4 +167,12 @@ public class Maths {
         return (b + a % b) % b;
     }
 
+    public static float minByAbs(float a, float b) {
+        return (Math.abs(a) < Math.abs(b)) ? a : b;
+    }
+
+    public static float maxByAbs(float a, float b) {
+        return (Math.abs(a) > Math.abs(b)) ? a : b;
+    }
+
 }

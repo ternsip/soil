@@ -2,6 +2,7 @@ package com.ternsip.soil.general;
 
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Threadable;
+import com.ternsip.soil.common.Timer;
 import com.ternsip.soil.events.EventIOReceiver;
 import com.ternsip.soil.events.OnConnectedToServer;
 import com.ternsip.soil.game.entities.EntityPlayer;
@@ -13,7 +14,7 @@ import com.ternsip.soil.game.entities.EntityQuad;
 import com.ternsip.soil.game.entities.EntityRepository;
 import com.ternsip.soil.game.entities.EntityStatistics;
 import com.ternsip.soil.graph.display.SoundRepository;
-import com.ternsip.soil.graph.display.SettingsRepository;
+import com.ternsip.soil.graph.display.Settings;
 
 /**
  * Provides full control over user Input/Output channels
@@ -29,11 +30,11 @@ public class Client implements Threadable {
     public Shader shader;
     public AudioRepository audioRepository;
     public FpsCounter fpsCounter;
-
-    public SettingsRepository settingsRepository;
+    public Settings settings;
     public SoundRepository soundRepository;
     public EntityRepository entityRepository;
     public BlocksRepository blocksRepository;
+    public Timer physicsClock;
 
     @Override
     public void init() {
@@ -44,14 +45,14 @@ public class Client implements Threadable {
         shader = new Shader();
         fpsCounter = new FpsCounter();
         audioRepository = new AudioRepository();
-
-        settingsRepository = new SettingsRepository();
+        settings = new Settings();
         soundRepository = new SoundRepository();
         entityRepository = new EntityRepository();
         blocksRepository = new BlocksRepository();
         blocksRepository.init();
         blocksRepository.fullVisualUpdate();
         eventIOReceiver.register(this);
+        physicsClock = new Timer(1000 / settings.physicalTicksPerSecond);
         new EntityStatistics().register();
         spawnMenu();
     }
@@ -63,8 +64,11 @@ public class Client implements Threadable {
         windowData.waitBuffer();
         fpsCounter.updateFps();
         eventIOReceiver.update();
-        blocksRepository.update();
-        entityRepository.update();
+        if (physicsClock.isOver()) {
+            physicsClock.drop();
+            blocksRepository.update();
+            entityRepository.update();
+        }
         shader.render();
         windowData.lockBuffer();
         windowData.swapBuffers();
@@ -108,7 +112,7 @@ public class Client implements Threadable {
         new EntityQuad(2, TextureType.PLAYER_IDLE, false, 1000.0f, 0, 0, -0.9f, -0, -0.9f, -0.5f, 0, -0.5f, 0, 0).register();
         new EntityQuad(3, TextureType.BLOCKS, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
         new EntityQuad(4, TextureType.SHADOW, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
-        new EntityPlayer(2).register();
+        new EntityPlayer(5).register();
     }
 
     private void spawnEntities() {

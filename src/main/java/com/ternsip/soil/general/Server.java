@@ -3,17 +3,17 @@ package com.ternsip.soil.general;
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Threadable;
 import com.ternsip.soil.events.EventReceiver;
-import com.ternsip.soil.graph.display.SettingsRepository;
+import com.ternsip.soil.graph.display.Settings;
 import lombok.SneakyThrows;
 
 public class Server implements Threadable {
 
-    public SettingsRepository settingsRepository;
+    public Settings settings;
     public EventReceiver networkEventReceiver;
 
     @Override
     public void init() {
-        settingsRepository = new SettingsRepository();
+        settings = new Settings();
         networkEventReceiver = new EventReceiver();
         spawnEntities();
     }

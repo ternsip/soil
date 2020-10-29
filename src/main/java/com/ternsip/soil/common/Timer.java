@@ -6,6 +6,8 @@ import lombok.SneakyThrows;
 
 /**
  * Timer class to control time
+ * Milliseconds timer
+ * TODO create nanotimer
  *
  * @author Ternsip
  */

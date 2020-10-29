@@ -60,22 +60,39 @@ public class BlocksRepository implements Finishable {
         }
         int cx = (int)Math.floor(x1);
         int cy = (int)Math.floor(y1);
-        if (INDEXER.isInside(cx, cy) && blocks[cx][cy].obstacle) {
+        if (isObstacle(cx, cy)) {
             return Math.min(1, Math.min(tMaxX, tMaxY));
         }
         while (tMaxX <= 1 || tMaxY <= 1) {
             if (tMaxX < tMaxY) {
-                tMaxX = tMaxX + tDeltaX;
                 cx += signX;
+                if (isObstacle(cx, cy)) {
+                    return Math.min(1, Math.min(tMaxX, tMaxY));
+                }
+                tMaxX = tMaxX + tDeltaX;
             } else {
-                tMaxY = tMaxY + tDeltaY;
                 cy += signY;
-            }
-            if (INDEXER.isInside(cx, cy) && blocks[cx][cy].obstacle) {
-                return Math.min(1, Math.min(tMaxX, tMaxY));
+                if (isObstacle(cx, cy)) {
+                    return Math.min(1, Math.min(tMaxX, tMaxY));
+                }
+                tMaxY = tMaxY + tDeltaY;
             }
         }
         return 1;
+    }
+
+    public boolean setBlockSafe(int x, int y, Block block) {
+        if (INDEXER.isInside(x, y)) {
+            blocks[x][y] = block;
+            updateLight(x, y, 1, 1);
+            visualUpdate(x, y, 1, 1);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isObstacle(int x, int y) {
+        return INDEXER.isInside(x, y) && blocks[x][y].obstacle;
     }
 
     public void updateBlocks(int startX, int startY, Block[][] blocks) {
