@@ -25,6 +25,7 @@ public class EntityPlayer extends Entity implements Updatable {
     private boolean touchingRight = false;
     private boolean touchingBottom = false;
     private boolean touchingTop = false;
+    private boolean watchingLeft = true;
 
     public EntityPlayer(int layer) {
         this.layer = layer;
@@ -58,9 +59,11 @@ public class EntityPlayer extends Entity implements Updatable {
             processMovement(0, -0.1f);
         }
         if (Soil.THREADS.client.eventIOReceiver.isKeyDown(GLFW_KEY_D)) {
+            watchingLeft = false;
             processMovement(0.1f, 0);
         }
         if (Soil.THREADS.client.eventIOReceiver.isKeyDown(GLFW_KEY_A)) {
+            watchingLeft = true;
             processMovement(-0.1f, 0);
         }
         if (!touchingBottom) {
@@ -115,10 +118,11 @@ public class EntityPlayer extends Entity implements Updatable {
         if (touchingTop) {
             fallingSpeed = Math.max(fallingSpeed, 0);
         }
-        body.x1 = x - width * 0.5f;
-        body.x2 = x + width * 0.5f;
-        body.x3 = x + width * 0.5f;
-        body.x4 = x - width * 0.5f;
+        float watching = watchingLeft ? 1 : -1;
+        body.x1 = x - width * 0.5f * watching;
+        body.x2 = x + width * 0.5f * watching;
+        body.x3 = x + width * 0.5f * watching;
+        body.x4 = x - width * 0.5f * watching;
         body.y1 = y + height;
         body.y2 = y + height;
         body.y3 = y;
