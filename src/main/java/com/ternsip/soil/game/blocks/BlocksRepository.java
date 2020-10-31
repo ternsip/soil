@@ -21,7 +21,6 @@ public class BlocksRepository implements Finishable {
 
     public static final Indexer INDEXER = new Indexer(SIZE_X, SIZE_Y);
     public final Block[][] blocks = new Block[SIZE_X][SIZE_Y];
-    public final LightMassKernel lightMassKernel = new LightMassKernel();
 
     public void init() {
         for (ChunkGenerator chunkGenerator : CHUNK_GENERATORS) {
@@ -84,7 +83,6 @@ public class BlocksRepository implements Finishable {
     public boolean setBlockSafe(int x, int y, Block block) {
         if (INDEXER.isInside(x, y)) {
             blocks[x][y] = block;
-            updateLight(x, y, 1, 1);
             visualUpdate(x, y, 1, 1);
             return true;
         }
@@ -105,25 +103,7 @@ public class BlocksRepository implements Finishable {
                 this.blocks[x][y] = blocks[x][y];
             }
         }
-        updateLight(startX, startY, sizeX, sizeY);
         visualUpdate(startX, startY, sizeX, sizeY);
-    }
-
-    public void updateLight(int startX, int startY, int sizeX, int sizeY) {
-        int endX = startX + sizeX - 1;
-        int endY = startX + sizeY - 1;
-        for (int x = startX; x <= endX; ++x) {
-            int height = SIZE_Y - 1;
-            while (height > 0 && !blocks[x][height].obstacle) {
-                height--;
-            }
-            lightMassKernel.height[x] = height + 1;
-            for (int y = startY; y <= endY; ++y) {
-                int index = (int) INDEXER.getIndex(x, y);
-                lightMassKernel.setLightMeta(index, Math.max(blocks[x][y].opacity, 0), Math.max(-blocks[x][y].opacity, 0));
-            }
-        }
-        lightMassKernel.update(startX, startY, sizeX, sizeY);
     }
 
     public void visualUpdate(int startX, int startY, int sizeX, int sizeY) {
@@ -131,18 +111,22 @@ public class BlocksRepository implements Finishable {
         int endX = startX + sizeX - 1;
         int endY = startX + sizeY - 1;
         for (int x = startX; x <= endX; ++x) {
+            int height = SIZE_Y - 1;
+            while (height > 0 && !blocks[x][height].obstacle) {
+                height--;
+            }
+            shader.heightsBuffer.writeInt(x, height + 1);
             for (int y = startY; y <= endY; ++y) {
                 int index = (int) INDEXER.getIndex(x, y);
                 int offset = index * shader.blocksBuffer.structureLength;
                 shader.blocksBuffer.writeInt(offset, blocks[x][y].textureType.ordinal());
-                shader.blocksBuffer.writeFloat(offset + 1, lightMassKernel.getLightSky(index) / (float)MAX_LIGHT);
-                shader.blocksBuffer.writeFloat(offset + 2, lightMassKernel.getLightEmit(index)  / (float)MAX_LIGHT);
+                shader.blocksBuffer.writeInt(offset + 3, Math.max(0, blocks[x][y].opacity));
+                shader.blocksBuffer.writeInt(offset + 4, Math.max(0, -blocks[x][y].opacity));
             }
         }
     }
 
     public void fullVisualUpdate() {
-        updateLight(0, 0, SIZE_X, SIZE_Y);
         visualUpdate(0, 0, SIZE_X, SIZE_Y);
     }
 
@@ -152,7 +136,6 @@ public class BlocksRepository implements Finishable {
     }
 
     public void finish() {
-        lightMassKernel.dispose();
     }
 
     private static List<ChunkGenerator> constructChunkGenerators() {

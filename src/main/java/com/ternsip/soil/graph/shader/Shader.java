@@ -36,7 +36,8 @@ public final class Shader implements Finishable {
     private final UniformBoolean debugging = new UniformBoolean();
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
 
-    public final BufferLayout blocksBuffer = new BufferLayout(BlocksRepository.SIZE_X * BlocksRepository.SIZE_Y, 3);
+    public final BufferLayout blocksBuffer = new BufferLayout(BlocksRepository.SIZE_X * BlocksRepository.SIZE_Y, 5);
+    public final BufferLayout heightsBuffer = new BufferLayout(BlocksRepository.SIZE_X, 1);
     public final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length,  6);
     public final BufferLayout quadBuffer = new BufferLayout(MAX_LAYERS * Mesh.MAX_QUADS, 14);
 

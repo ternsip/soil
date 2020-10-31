@@ -7,12 +7,16 @@
 const float LIGHT_ACCURACY = 5;
 const float INF = 1e6;
 const float EPS = 1e-6;
+const int MAX_LIGHT = 16;
+const float MAX_LIGHT_F = MAX_LIGHT;
 const int MAX_SAMPLERS = 16;
-const int MAX_LIGHT = 8;
 const int POWER4 = 16;
 const int BLOCKS_X = 4000;
 const int BLOCKS_Y = 3000;
 const int TOTAL_BLOCKS = BLOCKS_X * BLOCKS_Y;
+const int[] SIMPLE_DELTA_X = { -1, 1, 0, 0 };
+const int[] SIMPLE_DELTA_Y = { 0, 0, -1, 1 };
+const int[] SIMPLE_DELTA_INDEX = { -1, 1, -BLOCKS_X, BLOCKS_X };
 const int[] ANCHOR_DELTA_X = { -1, -1, -1, 0, 0, 1, 1, 1 };
 const int[] ANCHOR_DELTA_Y = { -1, 0, 1, -1, 1, -1, 0, 1 };
 const int[] ANCHOR_DELTA_INDEX = { -BLOCKS_X-1, -1, BLOCKS_X-1, -BLOCKS_X, BLOCKS_X, -BLOCKS_X+1, 1, BLOCKS_X+1 };
@@ -31,8 +35,10 @@ const int QUAD_FLAG_PINNED = 0x1;
 
 struct Block {
     int type;
-    float sky;
-    float emit;
+    int sky;
+    int emit;
+    int opacity;
+    int glow;
 };
 
 struct TextureData {
@@ -56,6 +62,10 @@ struct Quad {
 
 layout (std430, binding = 0) buffer blocksBuffer {
     Block blocks[];
+};
+
+layout (std430, binding = 3) buffer heightsBuffer {
+    int heights[];
 };
 
 layout (std430, binding = 1) buffer textureBuffer {
@@ -165,7 +175,17 @@ vec4 resolveQuadTexel() {
         Block block = blocks[blockIndex];
         vec2 blockFragment = vec2(realX - blockX, realY - blockY);
         if (textureData.textureStyle == TEXTURE_STYLE_SHADOW) {
-            float light = max(block.emit, block.sky);
+            block.emit = block.glow; // TODO compress sky, emit, opacity, glow into one integer
+            block.sky = (heights[blockX] <= blockY) ? MAX_LIGHT : 0;
+            for (int k = 0; k < 4; ++k) {
+                if (blockX + SIMPLE_DELTA_X[k] < 0 || blockY + SIMPLE_DELTA_Y[k] < 0 || blockX + SIMPLE_DELTA_X[k] >= BLOCKS_X || blockY + SIMPLE_DELTA_Y[k] >= BLOCKS_Y) continue;
+                Block nextBlock = blocks[blockIndex + SIMPLE_DELTA_INDEX[k]];
+                block.emit = max(block.emit, nextBlock.emit - block.opacity);
+                block.sky = max(block.sky, nextBlock.sky - block.opacity);
+            }
+            blocks[blockIndex].sky = block.sky;
+            blocks[blockIndex].emit = block.emit;
+            float light = max(block.emit / MAX_LIGHT_F, block.sky / MAX_LIGHT_F);
             float receiveMaxLight[8];
             float receiveLight[8];
             for (int k = 0; k < 8; ++k) {
@@ -176,7 +196,7 @@ vec4 resolveQuadTexel() {
                 float dist = (SQRT2 - min(SQRT2, distance(blockFragment, anchor))) / SQRT2;
                 float angle = atan(anchor.y - blockFragment.y, anchor.x - blockFragment.x);
                 float strobe = 1 + 2 * noise(vec3(loopValue(time + randInt(nextBlockIndex), 100000) * 100, 2 + sin(angle) * 2, 2 + cos(angle) * 2));
-                receiveMaxLight[k] = max(nextBlock.emit, nextBlock.sky);
+                receiveMaxLight[k] = max(nextBlock.emit / MAX_LIGHT_F, nextBlock.sky / MAX_LIGHT_F);
                 receiveLight[k] = receiveMaxLight[k] * pow(dist, strobe);
             }
             for (int iteration = 0; iteration < LIGHT_ACCURACY; ++iteration) {

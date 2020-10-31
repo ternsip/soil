@@ -97,7 +97,7 @@ public class Client implements Threadable {
     }
 
     private void spawnMenu() {
-        new EntityQuad(0, TextureType.BACKGROUND, false, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
+        new EntityQuad(0, TextureType.BACKGROUND, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
         new EntityQuad(1, TextureType.PLAYER_IDLE, false, 1000.0f, 0, 0, 0.9f, 0, 0.9f, 0.5f, 0, 0.5f, 0, 0).register();
         new EntityQuad(1, TextureType.PLAYER_ATTACK, false, 5000.0f, -0.2f, 0.2f, 0, 0.2f, 0, 0, -0.2f, 0, 0, 0).register();
         //TODO
