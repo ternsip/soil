@@ -5,8 +5,8 @@ import com.ternsip.soil.common.Finishable;
 import com.ternsip.soil.common.Indexer;
 import com.ternsip.soil.common.Maths;
 import com.ternsip.soil.common.Utils;
-import com.ternsip.soil.graph.shader.Shader;
 import com.ternsip.soil.game.generators.ChunkGenerator;
+import com.ternsip.soil.graph.shader.Shader;
 
 import java.util.Comparator;
 import java.util.List;
@@ -57,8 +57,8 @@ public class BlocksRepository implements Finishable {
         } else {
             tDeltaY = Maths.INF_F;
         }
-        int cx = (int)Math.floor(x1);
-        int cy = (int)Math.floor(y1);
+        int cx = (int) Math.floor(x1);
+        int cy = (int) Math.floor(y1);
         if (isObstacle(cx, cy)) {
             return Math.min(1, Math.min(tMaxX, tMaxY));
         }
@@ -112,7 +112,11 @@ public class BlocksRepository implements Finishable {
         int endY = startX + sizeY - 1;
         for (int x = startX; x <= endX; ++x) {
             int height = SIZE_Y - 1;
-            while (height > 0 && !blocks[x][height].obstacle) {
+            while (
+                    height > 0 && !blocks[x][height].obstacle &&
+                    x > 0 && !blocks[x - 1][height].obstacle &&
+                    x < (SIZE_X - 1) && !blocks[x + 1][height].obstacle
+            ) {
                 height--;
             }
             shader.heightsBuffer.writeInt(x, height + 1);

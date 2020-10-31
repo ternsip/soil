@@ -7,6 +7,7 @@ import com.ternsip.soil.events.KeyEvent;
 import com.ternsip.soil.events.MouseButtonEvent;
 import com.ternsip.soil.game.blocks.Block;
 import com.ternsip.soil.game.common.PhysicalPoint;
+import com.ternsip.soil.graph.display.Camera;
 import com.ternsip.soil.graph.shader.TextureType;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -156,6 +157,14 @@ public class EntityPlayer extends Entity implements Updatable {
     }
 
     private void handleMouseButtonEvent(MouseButtonEvent event) {
-
+        if (event.getButton() == GLFW_MOUSE_BUTTON_1 && event.getAction() == GLFW_PRESS) {
+            Camera camera = Soil.THREADS.client.camera;
+            double realX = (camera.mousePosX) / (camera.scale.x * camera.aspectX) + camera.pos.x;
+            double realY = (camera.mousePosY) / (camera.scale.y * camera.aspectY) + camera.pos.y;
+            int blockX = (int) Math.floor(realX);
+            int blockY = (int) Math.floor(realY);
+            Soil.THREADS.client.blocksRepository.setBlockSafe(blockX, blockY, Block.AIR);
+            processMovement(0, 0);
+        }
     }
 }

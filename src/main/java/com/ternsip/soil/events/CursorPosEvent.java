@@ -4,14 +4,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Getter
 public class CursorPosEvent implements Event {
 
-    private final double x;
-    private final double y;
-    private final double dx;
-    private final double dy;
-    private final double normalX;
-    private final double normalY;
+    public final double x;
+    public final double y;
+    public final double dx;
+    public final double dy;
+    public final double normalX;
+    public final double normalY;
 
 }
