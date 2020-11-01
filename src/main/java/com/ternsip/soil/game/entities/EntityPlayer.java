@@ -20,8 +20,8 @@ public class EntityPlayer extends Entity implements Updatable {
     private float x = 50;
     private float y = 47;
     private float fallingSpeed = 0;
-    private float width = 1.5f;
-    private float height = 2;
+    private float width = 0.9f;
+    private float height = 1.9f;
     private boolean touchingLeft = false;
     private boolean touchingRight = false;
     private boolean touchingBottom = false;
