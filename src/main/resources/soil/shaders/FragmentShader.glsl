@@ -201,7 +201,7 @@ vec4 resolveQuadTexel() {
             }
             for (int iteration = 0; iteration < LIGHT_ACCURACY; ++iteration) {
                 for (int k = 0; k < 8; ++k) {
-                    light = max(light, max(receiveLight[k], min(receiveMaxLight[k], light + receiveLight[k])));
+                    light = max(light, min(receiveMaxLight[k], light + receiveLight[k]));
                 }
             }
             return vec4(0, 0, 0, 1 - light);
