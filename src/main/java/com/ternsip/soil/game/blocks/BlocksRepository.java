@@ -109,7 +109,7 @@ public class BlocksRepository implements Finishable {
     public void visualUpdate(int startX, int startY, int sizeX, int sizeY) {
         Shader shader = Soil.THREADS.client.shader;
         int endX = startX + sizeX - 1;
-        int endY = startX + sizeY - 1;
+        int endY = startY + sizeY - 1;
         for (int x = startX; x <= endX; ++x) {
             int height = SIZE_Y - 1;
             while (
