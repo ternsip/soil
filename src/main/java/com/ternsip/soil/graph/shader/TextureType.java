@@ -24,6 +24,7 @@ public enum TextureType {
     TEST(new File("soil/interface/test.gif"), TEXTURE_STYLE_NORMAL),
     GRASS(new File("soil/interface/grass.gif"), TEXTURE_STYLE_NORMAL),
     KITTY(new File("soil/interface/kitty.gif"), TEXTURE_STYLE_NORMAL),
+    CB(new File("soil/interface/checkbox_background.png"), TEXTURE_STYLE_NORMAL),
     BACKGROUND(new File("soil/interface/scrollbar_background.jpg"), TEXTURE_STYLE_NORMAL);
 
     public final File file;

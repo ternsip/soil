@@ -129,8 +129,8 @@ public class EntityPlayer extends Entity implements Updatable {
         body.y3 = y;
         body.y4 = y;
         body.writeToBufferLayout();
-        Soil.THREADS.client.camera.pos.x = x;
-        Soil.THREADS.client.camera.pos.y = y;
+        //Soil.THREADS.client.camera.pos.x = x;
+        //Soil.THREADS.client.camera.pos.y = y;
     }
 
     private void teleport(int newX, int newY) {

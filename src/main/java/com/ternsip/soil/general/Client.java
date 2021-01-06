@@ -3,18 +3,20 @@ package com.ternsip.soil.general;
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Threadable;
 import com.ternsip.soil.common.Timer;
+import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.events.EventIOReceiver;
 import com.ternsip.soil.events.OnConnectedToServer;
-import com.ternsip.soil.game.entities.EntityPlayer;
-import com.ternsip.soil.graph.display.*;
-import com.ternsip.soil.graph.shader.Shader;
-import com.ternsip.soil.graph.shader.TextureType;
 import com.ternsip.soil.game.blocks.BlocksRepository;
+import com.ternsip.soil.game.entities.EntityPlayer;
 import com.ternsip.soil.game.entities.EntityQuad;
 import com.ternsip.soil.game.entities.EntityRepository;
 import com.ternsip.soil.game.entities.EntityStatistics;
-import com.ternsip.soil.graph.display.SoundRepository;
-import com.ternsip.soil.graph.display.Settings;
+import com.ternsip.soil.graph.display.*;
+import com.ternsip.soil.graph.shader.Shader;
+import com.ternsip.soil.graph.shader.TextureType;
+
+import java.nio.ByteBuffer;
+import java.util.Random;
 
 /**
  * Provides full control over user Input/Output channels
@@ -35,6 +37,8 @@ public class Client implements Threadable {
     public EntityRepository entityRepository;
     public BlocksRepository blocksRepository;
     public Timer physicsClock;
+    // TODO REMOVE
+    ByteBuffer cleanData = Utils.arrayToBuffer(new byte[40 * 40 * 4]);
 
     @Override
     public void init() {
@@ -54,6 +58,12 @@ public class Client implements Threadable {
         eventIOReceiver.register(this);
         physicsClock = new Timer(1000 / settings.physicalTicksPerSecond);
         new EntityStatistics().register();
+        // TODO REMOVE
+        byte[] b = new byte[40 * 40 * 4];
+        new Random().nextBytes(b);
+        cleanData = Utils.arrayToBuffer(b);
+        cleanData.rewind();
+        // --
         spawnMenu();
     }
 
@@ -68,6 +78,14 @@ public class Client implements Threadable {
             physicsClock.drop();
             blocksRepository.update();
             entityRepository.update();
+            // TODO REMOVE
+            Random r = new Random();
+            for (int i = 0; i < cleanData.limit(); ++i) {
+                cleanData.put(i, (byte) r.nextInt());
+            }
+            for (int i = 0; i < 100; ++i)
+                textureRepository.updateTexture(textureRepository.getTexture(TextureType.BACKGROUND), cleanData, Math.abs(r.nextInt()) % 900, Math.abs(r.nextInt()) % 900, 40, 40, 0);
+            // --
         }
         shader.render();
         windowData.lockBuffer();
@@ -100,6 +118,7 @@ public class Client implements Threadable {
         new EntityQuad(0, TextureType.BACKGROUND, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
         new EntityQuad(1, TextureType.PLAYER_IDLE, false, 1000.0f, 0, 0, 0.9f, 0, 0.9f, 0.5f, 0, 0.5f, 0, 0).register();
         new EntityQuad(1, TextureType.PLAYER_ATTACK, false, 5000.0f, -0.2f, 0.2f, 0, 0.2f, 0, 0, -0.2f, 0, 0, 0).register();
+        new EntityQuad(1, TextureType.PLAYER_ATTACK, false, 5000.0f, -0.1f, 0.2f, 0, 0.2f, 0, 0, -0.2f, 0, 0, 0).register();
         //TODO
         //If you have a 800x600 screen, and a 2D quad over the whole screen, that 2D quad will have 480000 fragment shader calls, although it has only 4 vertexes.
         //Now, moving further, let's assume you have 10 such quads, on on top of another.
@@ -112,6 +131,7 @@ public class Client implements Threadable {
         new EntityQuad(2, TextureType.PLAYER_IDLE, false, 1000.0f, 0, 0, -0.9f, -0, -0.9f, -0.5f, 0, -0.5f, 0, 0).register();
         new EntityQuad(3, TextureType.BLOCKS, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
         new EntityQuad(4, TextureType.SHADOW, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
+        new EntityQuad(5, TextureType.CB, false, 1000.0f, -0.5f, -1, 0.5f, -1, 1, 1, -1, 1, 0, 0).register();
         new EntityPlayer(1).register();
     }
 

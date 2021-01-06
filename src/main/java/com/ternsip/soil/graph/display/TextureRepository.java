@@ -4,6 +4,7 @@ import com.madgag.gif.fmsware.GifDecoder;
 import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
 import com.ternsip.soil.common.Utils;
+import com.ternsip.soil.graph.shader.TextureType;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import java.nio.IntBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.lwjgl.glfw.GLFW.glfwSetWindowIcon;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.glTexSubImage3D;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -69,7 +71,7 @@ public class TextureRepository {
 
             ArrayList<Image> suitableImages = images
                     .stream()
-                    .filter(image -> !usedImages.contains(image) && image.getWidth() <= atlasResolution && image.getHeight() <= atlasResolution)
+                    .filter(image -> !usedImages.contains(image) && image.width <= atlasResolution && image.height <= atlasResolution)
                     .collect(Collectors.toCollection(ArrayList::new));
 
             usedImages.addAll(suitableImages);
@@ -86,11 +88,11 @@ public class TextureRepository {
                     cleanData.rewind();
                     // set the whole texture to transparent (so min/mag filters don't find bad data off the edge of the actual image data)
                     glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, atlasResolution, atlasResolution, 1, GL_RGBA, GL_UNSIGNED_BYTE, cleanData);
-                    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, image.getWidth(), image.getHeight(), 1, GL_RGBA, GL_UNSIGNED_BYTE, Utils.arrayToBuffer(image.frameData[frame]));
+                    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, image.width, image.height, 1, GL_RGBA, GL_UNSIGNED_BYTE, Utils.arrayToBuffer(image.frameData[frame]));
                     layer++;
                 }
-                Texture texture = new Texture(atlasNumber, layerStart, layer - 1, image.getWidth() / (float) atlasResolution, image.getHeight() / (float) atlasResolution);
-                this.fileToTexture.put(image.getFile(), texture);
+                Texture texture = new Texture(atlasNumber, layerStart, layer - 1, image.width / (float) atlasResolution, image.height / (float) atlasResolution);
+                this.fileToTexture.put(image.file, texture);
             }
             glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
             glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
@@ -98,11 +100,20 @@ public class TextureRepository {
 
         images.forEach(image -> {
             if (!usedImages.contains(image)) {
-                log.error(String.format("Image %s has not been loaded into atlas because it exceeds maximal size", image.getFile()));
+                log.error(String.format("Image %s has not been loaded into atlas because it exceeds maximal size", image.file));
             }
         });
 
         bind();
+    }
+
+    public void updateTexture(Texture texture, ByteBuffer byteBuffer, int startX, int startY, int width, int height, int layerOffset) {
+        glActiveTexture(GL_TEXTURE0 + texture.atlasNumber);
+        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, startX, startY, texture.layerStart + layerOffset, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, byteBuffer);
+    }
+
+    public Texture getTexture(TextureType textureType) {
+        return getTexture(textureType.file);
     }
 
     public Texture getTexture(File file) {
@@ -142,16 +153,15 @@ public class TextureRepository {
         }
     }
 
-    @Getter
-    private static class Image {
+    public static class Image {
 
         public static int COMPONENT_RGBA = 4;
 
-        private final File file;
-        private final int width;
-        private final int height;
-        private final byte[][] frameData;
-        private final int[] frameDelay;
+        public final File file;
+        public final int width;
+        public final int height;
+        public final byte[][] frameData;
+        public final int[] frameDelay;
 
         @SneakyThrows
         Image(File file) {

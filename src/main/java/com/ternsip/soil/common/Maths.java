@@ -175,4 +175,8 @@ public class Maths {
         return (Math.abs(a) > Math.abs(b)) ? a : b;
     }
 
+    public static int divideRoundUp(int a, int b) {
+        return (a + b - 1) / b;
+    }
+
 }

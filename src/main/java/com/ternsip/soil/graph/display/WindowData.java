@@ -1,6 +1,8 @@
 package com.ternsip.soil.graph.display;
 
 import com.ternsip.soil.Soil;
+import com.ternsip.soil.common.Maths;
+import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.events.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,10 +15,13 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.lwjgl.system.Callback;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.ARBFramebufferObject.GL_RENDERBUFFER;
+import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL43.*;
 import static org.lwjgl.system.MemoryUtil.*;
@@ -26,7 +31,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 @Slf4j
 public class WindowData {
 
-    public static final Vector4fc BACKGROUND_COLOR = new Vector4f(0f, 0f, 0f, 1f);
+    public static final Vector4fc BACKGROUND_COLOR = new Vector4f(0f, 0f, 0f, 0f);
 
     private final ArrayList<Callback> callbacks = new ArrayList<>();
     private final long window;
@@ -45,11 +50,18 @@ public class WindowData {
         }
         Vector2i mainDisplaySize = getMainDisplaySize();
         this.windowSize = new Vector2i((int) (mainDisplaySize.x() * 0.8), (int) (mainDisplaySize.y() * 0.8));
+        glfwWindowHint(GLFW_RESIZABLE, 1);
+        //glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1); // output alpha in fragment shader affects this
+        glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
+        //glfwWindowHint(GLFW_SAMPLES , 4);
+        glfwWindowHint(GLFW_ALPHA_BITS, 8);
         this.window = glfwCreateWindow(windowSize.x(), windowSize.y(), "Soil", NULL, NULL);
         if (window == NULL) {
             glfwTerminate();
             throw new RuntimeException("Failed to create the GLFW window");
         }
+
+        setUpIcon();
 
         registerScrollEvent();
         registerCursorPosEvent();
@@ -62,13 +74,19 @@ public class WindowData {
 
         // Create OpenGL context
         glfwMakeContextCurrent(window);
-        GL.createCapabilities();
+        createCapabilities();
 
         // Disable vertical synchronization
         glfwSwapInterval(0);
 
+        glEnable(GL_MULTISAMPLE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glBlendEquation(GL_FUNC_ADD);
+        //glBlendFuncSeparate(GL_DST_ALPHA, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA); // https://community.khronos.org/t/front-to-back-blending/65155
+        //glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE); FOR front-back rendering, dont forget to tweak initial background alpha
+        //glEnable(GL_ALPHA_TEST);
+        // glAlphaFunc (GL_GREATER, 0.9f);
         glDisable(GL_LIGHTING);
         glDisable(GL_TEXTURE_2D);
 
@@ -159,6 +177,17 @@ public class WindowData {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         setCursorEnabled(false);
         registerEvent(new CursorVisibilityEvent(false));
+    }
+
+    private void setUpIcon() {
+        TextureRepository.Image imageT = new TextureRepository.Image(new File("soil/interface/lawn.png"));
+        GLFWImage.Buffer images = GLFWImage.malloc(1);
+        GLFWImage image = GLFWImage.malloc();
+        image.set(imageT.width, imageT.height, Utils.arrayToBuffer(imageT.frameData[0]));
+        images.put(0, image);
+        glfwSetWindowIcon(window, images);
+        image.free();
+        images.free();
     }
 
     private Vector2i getMainDisplaySize() {
@@ -265,5 +294,6 @@ public class WindowData {
         setWindowSize(new Vector2i(resizeEvent.getWidth(), resizeEvent.getHeight()));
         glViewport(0, 0, getWidth(), getHeight());
     }
+
 
 }
