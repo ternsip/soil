@@ -12,6 +12,7 @@ import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.lwjgl.system.Callback;
 
@@ -50,8 +51,8 @@ public class WindowData {
         }
         Vector2i mainDisplaySize = getMainDisplaySize();
         this.windowSize = new Vector2i((int) (mainDisplaySize.x() * 0.8), (int) (mainDisplaySize.y() * 0.8));
-        glfwWindowHint(GLFW_RESIZABLE, 1);
-        //glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1); // output alpha in fragment shader affects this
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        //glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE); // output alpha in fragment shader affects this
         glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
         //glfwWindowHint(GLFW_SAMPLES , 4);
         glfwWindowHint(GLFW_ALPHA_BITS, 8);
@@ -89,13 +90,11 @@ public class WindowData {
         // glAlphaFunc (GL_GREATER, 0.9f);
         glDisable(GL_LIGHTING);
         glDisable(GL_TEXTURE_2D);
+        glDisable(GL_DEPTH_TEST);
 
         glEnable(GL_DEBUG_OUTPUT);
         registerDebugEvent();
         //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        OpenGlSettings.antialias(true);
-        OpenGlSettings.enableDepthTesting(false);
-        OpenGlSettings.goWireframe(false);
 
         glClearColor(BACKGROUND_COLOR.x(), BACKGROUND_COLOR.y(), BACKGROUND_COLOR.z(), BACKGROUND_COLOR.w());
 
