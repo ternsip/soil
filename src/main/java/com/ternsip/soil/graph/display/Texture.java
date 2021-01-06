@@ -1,6 +1,5 @@
 package com.ternsip.soil.graph.display;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

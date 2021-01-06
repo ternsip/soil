@@ -5,7 +5,6 @@ import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
 import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.graph.shader.TextureType;
-import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.BufferUtils;
@@ -19,7 +18,6 @@ import java.nio.IntBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.lwjgl.glfw.GLFW.glfwSetWindowIcon;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.glTexSubImage3D;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;

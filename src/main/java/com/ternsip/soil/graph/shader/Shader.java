@@ -3,11 +3,11 @@ package com.ternsip.soil.graph.shader;
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Finishable;
 import com.ternsip.soil.common.Utils;
+import com.ternsip.soil.game.blocks.BlocksRepository;
+import com.ternsip.soil.game.entities.EntityQuad;
 import com.ternsip.soil.graph.display.Camera;
 import com.ternsip.soil.graph.display.Texture;
 import com.ternsip.soil.graph.display.TextureRepository;
-import com.ternsip.soil.game.blocks.BlocksRepository;
-import com.ternsip.soil.game.entities.EntityQuad;
 import lombok.SneakyThrows;
 import org.lwjgl.opengl.GL11;
 
@@ -23,11 +23,12 @@ public final class Shader implements Finishable {
 
     private static final File VERTEX_SHADER = new File("soil/shaders/VertexShader.glsl");
     private static final File FRAGMENT_SHADER = new File("soil/shaders/FragmentShader.glsl");
-
+    public final BufferLayout blocksBuffer = new BufferLayout(BlocksRepository.SIZE_X * BlocksRepository.SIZE_Y, 5);
+    public final BufferLayout heightsBuffer = new BufferLayout(BlocksRepository.SIZE_X, 1);
+    public final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length, 6);
+    public final BufferLayout quadBuffer = new BufferLayout(MAX_LAYERS * Mesh.MAX_QUADS, 14);
     private final int programID;
-
     private final Mesh mesh = new Mesh();
-
     private final UniformVec2 cameraPos = new UniformVec2();
     private final UniformVec2 cameraScale = new UniformVec2();
     private final UniformVec2 aspect = new UniformVec2();
@@ -35,11 +36,6 @@ public final class Shader implements Finishable {
     private final UniformInteger time = new UniformInteger();
     private final UniformBoolean debugging = new UniformBoolean();
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
-
-    public final BufferLayout blocksBuffer = new BufferLayout(BlocksRepository.SIZE_X * BlocksRepository.SIZE_Y, 5);
-    public final BufferLayout heightsBuffer = new BufferLayout(BlocksRepository.SIZE_X, 1);
-    public final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length,  6);
-    public final BufferLayout quadBuffer = new BufferLayout(MAX_LAYERS * Mesh.MAX_QUADS, 14);
 
     public Shader() {
         int vertexShaderID = loadShader(VERTEX_SHADER, GL_VERTEX_SHADER);

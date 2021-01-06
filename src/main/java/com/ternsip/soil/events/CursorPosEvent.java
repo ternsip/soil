@@ -1,6 +1,5 @@
 package com.ternsip.soil.events;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

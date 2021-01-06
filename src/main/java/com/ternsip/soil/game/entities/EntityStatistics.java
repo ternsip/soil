@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EntityStatistics extends Entity implements Updatable {
 
-    private final EntityText entityText = new EntityText("FPS:XXX", 10, -1, 1, 0.1f , 0.1f, false, true);
+    private final EntityText entityText = new EntityText("FPS:XXX", 10, -1, 1, 0.1f, 0.1f, false, true);
 
     @Override
     public void update() {

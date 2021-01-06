@@ -3,8 +3,6 @@ package com.ternsip.soil.graph.display;
 import com.ternsip.soil.Soil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
 
 import java.io.File;
 
@@ -16,11 +14,11 @@ import java.io.File;
 public class Sound {
 
     public final File file;
-    public float x, y;
     public final float magnitude;
     public final float pitch;
     public final int playTimes;
     public final boolean local;
+    public float x, y;
 
     public Sound(File file) {
         this.file = file;

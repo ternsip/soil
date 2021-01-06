@@ -14,13 +14,19 @@ import java.util.stream.Collectors;
 
 public class BlocksRepository implements Finishable {
 
-    private static final List<ChunkGenerator> CHUNK_GENERATORS = constructChunkGenerators();
     public static final int SIZE_X = 4000;
     public static final int SIZE_Y = 3000;
     public static final int MAX_LIGHT = 16;
-
     public static final Indexer INDEXER = new Indexer(SIZE_X, SIZE_Y);
+    private static final List<ChunkGenerator> CHUNK_GENERATORS = constructChunkGenerators();
     public final Block[][] blocks = new Block[SIZE_X][SIZE_Y];
+
+    private static List<ChunkGenerator> constructChunkGenerators() {
+        return Utils.getAllClasses(ChunkGenerator.class).stream()
+                .map(Utils::createInstanceSilently)
+                .sorted(Comparator.comparing(ChunkGenerator::getPriority))
+                .collect(Collectors.toList());
+    }
 
     public void init() {
         for (ChunkGenerator chunkGenerator : CHUNK_GENERATORS) {
@@ -134,19 +140,11 @@ public class BlocksRepository implements Finishable {
         visualUpdate(0, 0, SIZE_X, SIZE_Y);
     }
 
-
     public void update() {
 
     }
 
     public void finish() {
-    }
-
-    private static List<ChunkGenerator> constructChunkGenerators() {
-        return Utils.getAllClasses(ChunkGenerator.class).stream()
-                .map(Utils::createInstanceSilently)
-                .sorted(Comparator.comparing(ChunkGenerator::getPriority))
-                .collect(Collectors.toList());
     }
 
 }

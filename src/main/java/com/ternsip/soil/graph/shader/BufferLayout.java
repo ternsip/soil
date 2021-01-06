@@ -28,12 +28,11 @@ public class BufferLayout extends Locatable implements Finishable {
     private static final int FOUR_BYTES = 4;
     private static final ByteOrder BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
     private static final int BUFFER_FLAGS = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
-
-    private final int ssbo;
-    private final ByteBuffer data;
     public final int size;
     public final int maxStructures;
     public final int structureLength;
+    private final int ssbo;
+    private final ByteBuffer data;
 
     public BufferLayout(int maxStructures, int structureLength) {
         this.maxStructures = maxStructures;

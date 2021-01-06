@@ -1,9 +1,9 @@
 package com.ternsip.soil.network;
 
 import com.ternsip.soil.Soil;
+import com.ternsip.soil.common.Threadable;
 import com.ternsip.soil.events.OnConnectToServer;
 import com.ternsip.soil.events.OnDisconnectedFromServer;
-import com.ternsip.soil.common.Threadable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;

@@ -4,9 +4,9 @@ import com.ternsip.soil.common.Timer;
 
 public class FpsCounter {
 
+    public volatile int fps = 0;
     private Timer timer = new Timer(1000);
     private int frameCount = 0;
-    public volatile int fps = 0;
 
     public void updateFps() {
         frameCount++;

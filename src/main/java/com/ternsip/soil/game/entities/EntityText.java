@@ -1,7 +1,5 @@
 package com.ternsip.soil.game.entities;
 
-import com.ternsip.soil.Soil;
-import com.ternsip.soil.graph.display.Camera;
 import com.ternsip.soil.graph.shader.TextureType;
 
 public class EntityText extends Entity {

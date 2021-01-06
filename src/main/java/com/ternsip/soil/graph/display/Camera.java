@@ -6,7 +6,6 @@ import com.ternsip.soil.events.ResizeEvent;
 import com.ternsip.soil.events.ScrollEvent;
 import org.joml.Vector2f;
 
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
 
 public class Camera {
@@ -55,9 +54,9 @@ public class Camera {
         height = resizeEvent.getHeight();
         if (width >= height) {
             aspectX = 1;
-            aspectY = (float)width / height;
+            aspectY = (float) width / height;
         } else {
-            aspectX = (float)height / width;
+            aspectX = (float) height / width;
             aspectY = 1;
         }
     }

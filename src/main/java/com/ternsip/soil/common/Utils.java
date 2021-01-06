@@ -188,7 +188,7 @@ public class Utils {
     }
 
     @SneakyThrows
-    public static Object invokeSilently(Method method, Object obj, Object ...args) {
+    public static Object invokeSilently(Method method, Object obj, Object... args) {
         return method.invoke(obj, args);
     }
 

@@ -14,10 +14,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SoundRepository {
 
     private final Set<Sound> sounds = Collections.newSetFromMap(new ConcurrentHashMap<>());
-
-    public float x, y;
     private final Vector3f orientationFront = new Vector3f(0);
     private final Vector3f orientationUp = new Vector3f(0);
+    public float x, y;
 
     public void setListenerPosition(float x, float y) {
         this.x = x;

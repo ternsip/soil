@@ -1,7 +1,6 @@
 package com.ternsip.soil.game.entities;
 
 import com.ternsip.soil.Soil;
-import com.ternsip.soil.graph.display.Camera;
 import com.ternsip.soil.graph.shader.BufferLayout;
 import com.ternsip.soil.graph.shader.Mesh;
 import com.ternsip.soil.graph.shader.Shader;
@@ -9,7 +8,6 @@ import com.ternsip.soil.graph.shader.TextureType;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
 public class EntityQuad {
@@ -60,13 +58,17 @@ public class EntityQuad {
         this.metadata2 = metadata2;
     }
 
+    public static int getCount(int layer) {
+        return LAYER_QUADS.quads[layer].entityQuads.size();
+    }
+
     public void writeToBufferLayout() {
         if (index == EntityQuad.UNASSIGNED) {
             throw new IllegalArgumentException("Quad is not registered yet");
         }
         Shader shader = Soil.THREADS.client.shader;
         BufferLayout quadBuffer = shader.quadBuffer;
-        int quadOffset = layer * shader.quadBuffer.size / Shader.MAX_LAYERS + index *  shader.quadBuffer.structureLength;
+        int quadOffset = layer * shader.quadBuffer.size / Shader.MAX_LAYERS + index * shader.quadBuffer.structureLength;
         quadBuffer.writeInt(quadOffset, textureType.ordinal());
         quadBuffer.writeInt(quadOffset + 1, animationStart);
         quadBuffer.writeFloat(quadOffset + 2, animationPeriod);
@@ -114,10 +116,6 @@ public class EntityQuad {
         }
         entityQuads.remove(lastIndex);
         index = UNASSIGNED;
-    }
-
-    public static int getCount(int layer) {
-        return LAYER_QUADS.quads[layer].entityQuads.size();
     }
 
     private static final class LayerQuads {

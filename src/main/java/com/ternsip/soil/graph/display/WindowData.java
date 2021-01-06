@@ -1,7 +1,6 @@
 package com.ternsip.soil.graph.display;
 
 import com.ternsip.soil.Soil;
-import com.ternsip.soil.common.Maths;
 import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.events.*;
 import lombok.Getter;
@@ -11,8 +10,6 @@ import org.joml.Vector2i;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.lwjgl.glfw.*;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.lwjgl.system.Callback;
 
@@ -21,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.ARBFramebufferObject.GL_RENDERBUFFER;
 import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL43.*;
