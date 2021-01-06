@@ -71,6 +71,7 @@ public class Client implements Threadable {
     // TODO think about sync order
     public void update() {
         windowData.clear();
+        windowData.cursor.update();
         windowData.waitBuffer();
         fpsCounter.updateFps();
         eventIOReceiver.update();
@@ -123,7 +124,7 @@ public class Client implements Threadable {
         //If you have a 800x600 screen, and a 2D quad over the whole screen, that 2D quad will have 480000 fragment shader calls, although it has only 4 vertexes.
         //Now, moving further, let's assume you have 10 such quads, on on top of another.
         //If you don't sort your geometry Front to Back or if you are using alpha blend with no depth test, then you will end up with 10x800x600 = 4800000 fragment calls.
-        for (int i = 0; i < 100; ++i)
+        for (int i = 0; i < 1000; ++i)
             new EntityQuad(1, TextureType.HOMER, false, 1000.0f, -0.4f, 0.2f, -0.2f, 0.2f, -0.2f, 0, -0.4f, 0, 0, 0).register();
         //new EntityQuad(1, TextureType.FONT, 1000.0f, -0.4f, 0.2f, -0.2f, 0.2f, -0.2f, 0, -0.4f, 0, 'c', 0).register();
         new EntityQuad(1, TextureType.TEST, false, 3000.0f, -0.8f, 0.2f, -0.4f, 0.2f, -0.4f, 0, -0.8f, 0, 0, 0).register();

@@ -8,6 +8,7 @@ import com.ternsip.soil.events.MouseButtonEvent;
 import com.ternsip.soil.game.blocks.Block;
 import com.ternsip.soil.game.common.PhysicalPoint;
 import com.ternsip.soil.graph.display.Camera;
+import com.ternsip.soil.graph.display.WindowData;
 import com.ternsip.soil.graph.shader.TextureType;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -53,6 +54,12 @@ public class EntityPlayer extends Entity implements Updatable {
 
     @Override
     public void update() {
+        if (Soil.THREADS.client.eventIOReceiver.isKeyDown(GLFW_KEY_Z)) {
+            Soil.THREADS.client.windowData.cursor.selectCursorType(WindowData.CursorType.SELECT);
+        }
+        if (Soil.THREADS.client.eventIOReceiver.isKeyDown(GLFW_KEY_L)) {
+            Soil.THREADS.client.windowData.cursor.selectCursorType(WindowData.CursorType.LOADING);
+        }
         if (Soil.THREADS.client.eventIOReceiver.isKeyDown(GLFW_KEY_W)) {
             processMovement(0, 0.1f);
         }

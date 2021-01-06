@@ -4,6 +4,7 @@ import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.events.*;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.joml.Vector2i;
@@ -12,6 +13,7 @@ import org.joml.Vector4fc;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.lwjgl.system.Callback;
+import org.lwjgl.system.MemoryUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ public class WindowData {
     private Vector2i windowSize;
     private boolean cursorEnabled;
     private long gSync;
+    public Cursor cursor;
 
     public WindowData() {
 
@@ -59,6 +62,7 @@ public class WindowData {
         }
 
         setUpIcon();
+        cursor = new Cursor();
 
         registerScrollEvent();
         registerCursorPosEvent();
@@ -174,6 +178,7 @@ public class WindowData {
         registerEvent(new CursorVisibilityEvent(false));
     }
 
+
     private void setUpIcon() {
         TextureRepository.Image imageT = new TextureRepository.Image(new File("soil/interface/lawn.png"));
         GLFWImage.Buffer images = GLFWImage.malloc(1);
@@ -288,6 +293,59 @@ public class WindowData {
     private void handleResize(ResizeEvent resizeEvent) {
         setWindowSize(new Vector2i(resizeEvent.getWidth(), resizeEvent.getHeight()));
         glViewport(0, 0, getWidth(), getHeight());
+    }
+
+    @RequiredArgsConstructor
+    public enum CursorType {
+
+        SIMPLE(new File("soil/interface/cursor_simple.png")),
+        SELECT(new File("soil/interface/grass.gif")),
+        LOADING(new File("soil/interface/loading.gif"));
+
+        public final File file;
+
+    }
+
+    public class Cursor {
+
+        public long[][] cursorPointers;
+        public CursorType currentCursorType;
+        public long[] animationDelays;
+
+        Cursor() {
+            cursorPointers = new long[CursorType.values().length][];
+            animationDelays = new long[CursorType.values().length];
+            int cursorNumber = 0;
+            for (CursorType cursorType : CursorType.values()) {
+                TextureRepository.Image imageT = new TextureRepository.Image(cursorType.file);
+                cursorPointers[cursorNumber] = new long[imageT.frameData.length];
+                animationDelays[cursorNumber] = imageT.frameDelay[0];
+                for (int frame = 0; frame < imageT.frameData.length; ++frame) {
+                    GLFWImage image = GLFWImage.malloc();
+                    image.set(imageT.width, imageT.height, Utils.arrayToBuffer(imageT.frameData[frame]));
+                    long cursorIndex = glfwCreateCursor(image, 0, 0);
+                    image.free();
+                    if (cursorIndex == MemoryUtil.NULL) {
+                        throw new RuntimeException("Error creating cursor");
+                    }
+                    cursorPointers[cursorNumber][frame] = cursorIndex;
+                }
+                ++cursorNumber;
+            }
+            selectCursorType(CursorType.SIMPLE);
+        }
+
+        public void selectCursorType(CursorType cursorType) {
+            currentCursorType = cursorType;
+            update();
+        }
+
+        public void update() {
+            int idx = currentCursorType.ordinal();
+            int frame = (int) ((Math.abs(System.currentTimeMillis()) / Math.max(1, animationDelays[idx])) % cursorPointers[idx].length);
+            glfwSetCursor(window, cursorPointers[idx][frame]);
+        }
+
     }
 
 

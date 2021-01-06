@@ -177,9 +177,9 @@ public class TextureRepository {
                 d.read(Utils.loadResourceAsStream(file));
                 this.width = d.getFrameSize().width;
                 this.height = d.getFrameSize().height;
-                for (int i = 0; i < d.getFrameCount(); i++) {
-                    frameDelay[i] = d.getDelay(i);
-                    frameData[i] = bufferedImageToBitmapRGBA(d.getFrame(i));
+                for (int frame = 0; frame < d.getFrameCount(); frame++) {
+                    frameDelay[frame] = d.getDelay(frame);
+                    frameData[frame] = bufferedImageToBitmapRGBA(d.getFrame(frame));
                 }
             } else {
                 ByteBuffer imageData = Utils.loadResourceToByteBuffer(file);
