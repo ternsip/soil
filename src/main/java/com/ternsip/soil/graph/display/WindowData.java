@@ -34,70 +34,51 @@ public class WindowData {
 
     private final ArrayList<Callback> callbacks = new ArrayList<>();
     private final long window;
+    public final Cursor cursor;
     private Vector2i windowSize;
     private boolean cursorEnabled;
     private long gSync;
-    public Cursor cursor;
 
     public WindowData() {
-
         registerErrorEvent();
-
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
         Vector2i mainDisplaySize = getMainDisplaySize();
         this.windowSize = new Vector2i((int) (mainDisplaySize.x() * 0.8), (int) (mainDisplaySize.y() * 0.8));
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        //glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE); // output alpha in fragment shader affects this
+        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_FALSE); // output alpha in fragment shader affects this
         glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
-        //glfwWindowHint(GLFW_SAMPLES , 4);
+        glfwWindowHint(GLFW_SAMPLES, 1); // TODO consider using another value
         glfwWindowHint(GLFW_ALPHA_BITS, 8);
         this.window = glfwCreateWindow(windowSize.x(), windowSize.y(), "Soil", NULL, NULL);
         if (window == NULL) {
             glfwTerminate();
             throw new RuntimeException("Failed to create the GLFW window");
         }
-
         setUpIcon();
         cursor = new Cursor();
-
         registerScrollEvent();
         registerCursorPosEvent();
         registerKeyEvent();
         registerFrameBufferSizeEvent();
         registerMouseButtonEvent();
         registerCharEvent();
-
         glfwSetWindowPos(window, (int) (mainDisplaySize.x() * 0.1), (int) (mainDisplaySize.y() * 0.1));
-
-        // Create OpenGL context
         glfwMakeContextCurrent(window);
         createCapabilities();
-
-        // Disable vertical synchronization
-        glfwSwapInterval(0);
-
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glBlendEquation(GL_FUNC_ADD);
-        //glBlendFuncSeparate(GL_DST_ALPHA, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA); // https://community.khronos.org/t/front-to-back-blending/65155
-        //glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE); FOR front-back rendering, dont forget to tweak initial background alpha
-        //glEnable(GL_ALPHA_TEST);
-        // glAlphaFunc (GL_GREATER, 0.9f);
         glDisable(GL_LIGHTING);
         glDisable(GL_TEXTURE_2D);
         glDisable(GL_DEPTH_TEST);
-
         glEnable(GL_DEBUG_OUTPUT);
-        registerDebugEvent();
         //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-
+        registerDebugEvent();
+        glfwSwapInterval(0); // Disable vertical synchronization
         glClearColor(BACKGROUND_COLOR.x(), BACKGROUND_COLOR.y(), BACKGROUND_COLOR.z(), BACKGROUND_COLOR.w());
-
         enableCursor();
-
         registerEvent(new ResizeEvent(getWidth(), getHeight()));
     }
 
@@ -165,13 +146,13 @@ public class WindowData {
 
     public void enableCursor() {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        setCursorEnabled(true);
+        cursorEnabled = true;
         registerEvent(new CursorVisibilityEvent(true));
     }
 
     public void disableCursor() {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        setCursorEnabled(false);
+        cursorEnabled = false;
         registerEvent(new CursorVisibilityEvent(false));
     }
 
@@ -202,7 +183,7 @@ public class WindowData {
 
     private void registerErrorEvent() {
         GLFWErrorCallback errorCallback = GLFWErrorCallback.create(
-                (error, description) -> registerEvent(new ErrorEvent(error, description))
+                (error, description) -> GLFWErrorCallback.createPrint(System.err).invoke(error, description)
         );
         getCallbacks().add(errorCallback);
         glfwSetErrorCallback(errorCallback);
@@ -281,11 +262,6 @@ public class WindowData {
 
     private <T extends Event> void registerEvent(T event) {
         Soil.THREADS.client.eventIOReceiver.registerEvent(event);
-    }
-
-    @EventHook
-    private void handleError(ErrorEvent errorEvent) {
-        GLFWErrorCallback.createPrint(System.err).invoke(errorEvent.getError(), errorEvent.getDescription());
     }
 
     @EventHook
