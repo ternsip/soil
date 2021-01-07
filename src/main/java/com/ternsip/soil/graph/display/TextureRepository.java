@@ -34,7 +34,13 @@ import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
 @Slf4j
 public class TextureRepository {
 
-    public final static int MIPMAP_LEVELS = 4;
+    /*
+     * It is important for mipmap levels to be strictly one due to next reasons:
+     * For fast-dynamic-texture changes
+     * To not smooth 2d picture in far distance
+     * There is no significant impact on performance
+     */
+    public final static int MIPMAP_LEVELS = 1;
     public final static File MISSING_TEXTURE = new File("soil/tools/missing.jpg");
     public final static String[] EXTENSIONS = {"jpg", "png", "bmp", "jpeg", "gif"};
     public final static int[] ATLAS_RESOLUTIONS = new int[]{16, 32, 64, 128, 256, 512, 1024, 2048, 4096};
