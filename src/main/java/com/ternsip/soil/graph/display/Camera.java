@@ -2,6 +2,7 @@ package com.ternsip.soil.graph.display;
 
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.events.CursorPosEvent;
+import com.ternsip.soil.events.EventHook;
 import com.ternsip.soil.events.ResizeEvent;
 import com.ternsip.soil.events.ScrollEvent;
 import org.joml.Vector2f;
@@ -33,6 +34,7 @@ public class Camera {
         Soil.THREADS.client.eventIOReceiver.unregister(this);
     }
 
+    @EventHook
     private void recalculatePos(CursorPosEvent event) {
         if (Soil.THREADS.client.eventIOReceiver.isMouseDown(GLFW_MOUSE_BUTTON_2)) {
             pos.x -= event.dx / (scale.x * 500.0f);
@@ -42,6 +44,7 @@ public class Camera {
         mousePosY = event.normalY;
     }
 
+    @EventHook
     private void recalculateZoom(ScrollEvent event) {
         scale.x += scale.x * event.getYOffset() / 25.0f;
         scale.y += scale.y * event.getYOffset() / 25.0f;
@@ -49,6 +52,7 @@ public class Camera {
         scale.y = Math.max(MIN_SCALE, scale.y);
     }
 
+    @EventHook
     private void handleResize(ResizeEvent resizeEvent) {
         width = resizeEvent.getWidth();
         height = resizeEvent.getHeight();

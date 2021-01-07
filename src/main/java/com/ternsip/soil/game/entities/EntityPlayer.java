@@ -3,6 +3,7 @@ package com.ternsip.soil.game.entities;
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Maths;
 import com.ternsip.soil.common.Updatable;
+import com.ternsip.soil.events.EventHook;
 import com.ternsip.soil.events.KeyEvent;
 import com.ternsip.soil.events.MouseButtonEvent;
 import com.ternsip.soil.game.blocks.Block;
@@ -147,6 +148,7 @@ public class EntityPlayer extends Entity implements Updatable {
         processMovement(0, 0);
     }
 
+    @EventHook
     private void handleKeyEvent(KeyEvent event) {
         if (event.getKey() == GLFW_KEY_T && event.getAction() == GLFW_PRESS) {
             teleport(50, 50);
@@ -163,6 +165,7 @@ public class EntityPlayer extends Entity implements Updatable {
         }
     }
 
+    @EventHook
     private void handleMouseButtonEvent(MouseButtonEvent event) {
         if (event.getButton() == GLFW_MOUSE_BUTTON_1 && event.getAction() == GLFW_PRESS) {
             Camera camera = Soil.THREADS.client.camera;

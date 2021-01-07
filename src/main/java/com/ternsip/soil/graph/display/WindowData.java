@@ -286,10 +286,12 @@ public class WindowData {
         Soil.THREADS.client.eventIOReceiver.registerEvent(event);
     }
 
+    @EventHook
     private void handleError(ErrorEvent errorEvent) {
         GLFWErrorCallback.createPrint(System.err).invoke(errorEvent.getError(), errorEvent.getDescription());
     }
 
+    @EventHook
     private void handleResize(ResizeEvent resizeEvent) {
         setWindowSize(new Vector2i(resizeEvent.getWidth(), resizeEvent.getHeight()));
         glViewport(0, 0, getWidth(), getHeight());

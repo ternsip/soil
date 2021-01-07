@@ -4,6 +4,7 @@ import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Threadable;
 import com.ternsip.soil.common.Timer;
 import com.ternsip.soil.common.Utils;
+import com.ternsip.soil.events.EventHook;
 import com.ternsip.soil.events.EventIOReceiver;
 import com.ternsip.soil.events.OnConnectedToServer;
 import com.ternsip.soil.game.blocks.BlocksRepository;
@@ -139,6 +140,7 @@ public class Client implements Threadable {
     private void spawnEntities() {
     }
 
+    @EventHook
     private void whenConnected(OnConnectedToServer onConnectedToServer) {
         spawnEntities();
     }

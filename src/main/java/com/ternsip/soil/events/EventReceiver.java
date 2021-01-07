@@ -2,7 +2,6 @@ package com.ternsip.soil.events;
 
 import com.ternsip.soil.common.Utils;
 import lombok.Getter;
-import lombok.SneakyThrows;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -50,21 +49,24 @@ public class EventReceiver {
         }
     }
 
-    @SneakyThrows
     public void register(Object obj) {
         for (Method method : obj.getClass().getDeclaredMethods()) {
-            if (method.getParameterCount() == 1) {
-                if (!method.getName().equalsIgnoreCase("registerEvent") && Event.class.isAssignableFrom(method.getParameterTypes()[0])) {
-                    method.setAccessible(true);
-                    Callback callback = e -> Utils.invokeSilently(method, obj, e);
-                    classToCallbacks.get(method.getParameterTypes()[0]).add(callback);
-                    objectToCallbacks.computeIfAbsent(obj, e -> new HashSet<>()).add(callback);
-                }
+            if (!method.isAnnotationPresent(EventHook.class)) {
+                continue;
             }
+            if (method.getParameterCount() != 1) {
+                throw new IllegalArgumentException("Method annotated with EventHook has to have only one argument");
+            }
+            if (!Event.class.isAssignableFrom(method.getParameterTypes()[0])) {
+                throw new IllegalArgumentException("Method annotated with EventHook must include Event heir as a parameter");
+            }
+            method.setAccessible(true);
+            Callback callback = e -> Utils.invokeSilently(method, obj, e);
+            classToCallbacks.get(method.getParameterTypes()[0]).add(callback);
+            objectToCallbacks.computeIfAbsent(obj, e -> new HashSet<>()).add(callback);
         }
     }
 
-    @SneakyThrows
     public void unregister(Object obj) {
         Set<Callback> callbacks = objectToCallbacks.remove(obj);
         for (Set<Callback> callbackSet : classToCallbacks.values()) {

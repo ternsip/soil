@@ -22,12 +22,14 @@ public class EventIOReceiver extends EventReceiver {
         return mouseButtonPressed[button];
     }
 
+    @EventHook
     private void onKeyEvent(KeyEvent keyEvent) {
         if (keyEvent.getKey() >= 0 && keyEvent.getKey() < keyPressed.length) {
             keyPressed[keyEvent.getKey()] = keyEvent.getAction() != GLFW_RELEASE;
         }
     }
 
+    @EventHook
     private void onMouseButtonEvent(MouseButtonEvent mouseButtonEvent) {
         if (mouseButtonEvent.getButton() >= 0 && mouseButtonEvent.getButton() < mouseButtonPressed.length) {
             mouseButtonPressed[mouseButtonEvent.getButton()] = mouseButtonEvent.getAction() != GLFW_RELEASE;
