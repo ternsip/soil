@@ -64,6 +64,7 @@ public class WindowData {
         glfwSetWindowPos(window, (int) (mainDisplaySize.x() * 0.1), (int) (mainDisplaySize.y() * 0.1));
         glfwMakeContextCurrent(window);
         createCapabilities();
+        log.info("Running on version: " + glGetString(GL_VERSION));
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
