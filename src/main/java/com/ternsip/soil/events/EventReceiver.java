@@ -2,7 +2,9 @@ package com.ternsip.soil.events;
 
 import com.ternsip.soil.common.Utils;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +51,16 @@ public class EventReceiver {
         }
     }
 
+    public void registerWithSubObjects(Object obj) {
+        register(obj);
+        Utils.findSubObjects(obj).forEach(this::register);
+    }
+
+
     public void register(Object obj) {
+        if (objectToCallbacks.containsKey(obj)) {
+            throw new IllegalArgumentException("This object is already registered");
+        }
         for (Method method : obj.getClass().getDeclaredMethods()) {
             if (!method.isAnnotationPresent(EventHook.class)) {
                 continue;
@@ -67,7 +78,16 @@ public class EventReceiver {
         }
     }
 
+    public void unregisterWithSubObjects(Object obj) {
+        unregister(obj);
+        Utils.findSubObjects(obj).stream().filter(objectToCallbacks::containsKey).forEach(this::unregister);
+    }
+
+
     public void unregister(Object obj) {
+        if (!objectToCallbacks.containsKey(obj)) {
+            throw new IllegalArgumentException("This object is not registered yet");
+        }
         Set<Callback> callbacks = objectToCallbacks.remove(obj);
         for (Set<Callback> callbackSet : classToCallbacks.values()) {
             callbackSet.removeIf(callbacks::contains);

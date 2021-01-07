@@ -1,6 +1,7 @@
 package com.ternsip.soil.graph.display;
 
 import com.ternsip.soil.Soil;
+import com.ternsip.soil.common.Finishable;
 import com.ternsip.soil.common.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +26,7 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.libc.LibCStdlib.free;
 
 @Getter
-public class AudioRepository {
+public class AudioRepository implements Finishable {
 
     private static FloatBuffer ORIENTATION_BUFFER = BufferUtils.createFloatBuffer(6);
 
@@ -97,7 +98,7 @@ public class AudioRepository {
 
     }
 
-
+    @Override
     public void finish() {
         getFileToBufferPointer().values().forEach(AL10::alDeleteBuffers);
         getSoundToMetaInformation().values().forEach(SoundPlayer::finish);

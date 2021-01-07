@@ -56,7 +56,7 @@ public class Client implements Threadable {
         blocksRepository = new BlocksRepository();
         blocksRepository.init();
         blocksRepository.fullVisualUpdate();
-        eventIOReceiver.register(this);
+        eventIOReceiver.registerWithSubObjects(this);
         physicsClock = new Timer(1000 / settings.physicalTicksPerSecond);
         new EntityStatistics().register();
         // TODO REMOVE
@@ -98,7 +98,7 @@ public class Client implements Threadable {
 
     @Override
     public void finish() {
-        Soil.THREADS.client.eventIOReceiver.unregister(this);
+        eventIOReceiver.unregisterWithSubObjects(this);
         shader.finish();
         textureRepository.finish();
         windowData.finish();

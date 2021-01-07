@@ -43,14 +43,12 @@ public class EntityPlayer extends Entity implements Updatable {
     public void register() {
         super.register();
         body.register();
-        Soil.THREADS.client.eventIOReceiver.register(this);
     }
 
     @Override
     public void unregister() {
         super.unregister();
         body.unregister();
-        Soil.THREADS.client.eventIOReceiver.unregister(this);
     }
 
     @Override

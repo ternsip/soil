@@ -14,10 +14,12 @@ public class Entity {
 
     public void register() {
         Soil.THREADS.client.entityRepository.register(this);
+        Soil.THREADS.client.eventIOReceiver.register(this);
     }
 
     public void unregister() {
         Soil.THREADS.client.entityRepository.unregister(uuid);
+        Soil.THREADS.client.eventIOReceiver.unregister(this);
     }
 
 

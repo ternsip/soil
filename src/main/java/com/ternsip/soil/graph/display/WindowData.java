@@ -41,8 +41,6 @@ public class WindowData {
 
     public WindowData() {
 
-        Soil.THREADS.client.eventIOReceiver.register(this);
-
         registerErrorEvent();
 
         if (!glfwInit()) {
@@ -124,7 +122,6 @@ public class WindowData {
     }
 
     public void finish() {
-        Soil.THREADS.client.eventIOReceiver.unregister(this);
         glfwDestroyWindow(getWindow());
         for (Callback callback : getCallbacks()) {
             callback.free();

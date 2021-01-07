@@ -178,8 +178,20 @@ public class Utils {
         return false;
     }
 
+    public static Set<Object> findSubObjects(Object object) {
+        return ReflectionUtils.getAllFields(object.getClass())
+                .stream()
+                .map(field -> getFieldValueSilently(field, object))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
     public static Field findFieldInHierarchy(String fieldName, Class<?> objectClass) {
-        return ReflectionUtils.getAllFields(objectClass).stream().filter(e -> e.getName().equals(fieldName)).findFirst().orElseThrow(() -> new IllegalArgumentException("Field not found"));
+        return ReflectionUtils.getAllFields(objectClass)
+                .stream()
+                .filter(e -> e.getName().equals(fieldName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Field not found"));
     }
 
     @SneakyThrows
@@ -191,6 +203,13 @@ public class Utils {
     public static Object invokeSilently(Method method, Object obj, Object... args) {
         return method.invoke(obj, args);
     }
+
+    @SneakyThrows
+    public static Object getFieldValueSilently(Field field, Object obj) {
+        field.setAccessible(true);
+        return field.get(obj);
+    }
+
 
     public static boolean isSubDirectoryPresent(File file, String subDirectory) {
         for (File parentDirectory : getAllParentDirectories(file)) {

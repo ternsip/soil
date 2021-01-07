@@ -10,10 +10,6 @@ public class EventIOReceiver extends EventReceiver {
     private final boolean[] keyPressed = new boolean[512];
     private final boolean[] mouseButtonPressed = new boolean[8];
 
-    public EventIOReceiver() {
-        register(this);
-    }
-
     public boolean isKeyDown(int key) {
         return keyPressed[key];
     }

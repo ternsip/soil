@@ -22,16 +22,8 @@ public class Camera {
     public float aspectX = 1;
     public float aspectY = 1;
 
-    public Camera() {
-        Soil.THREADS.client.eventIOReceiver.register(this);
-    }
-
     public void update() {
         Soil.THREADS.client.soundRepository.setListenerPosition(pos.x, pos.y);
-    }
-
-    public void finish() {
-        Soil.THREADS.client.eventIOReceiver.unregister(this);
     }
 
     @EventHook
