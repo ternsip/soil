@@ -25,8 +25,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL43.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-@Getter
-@Setter
 @Slf4j
 public class WindowData {
 
@@ -36,7 +34,6 @@ public class WindowData {
     private final long window;
     public final Cursor cursor;
     private Vector2i windowSize;
-    private boolean cursorEnabled;
     private long gSync;
 
     public WindowData() {
@@ -78,16 +75,15 @@ public class WindowData {
         registerDebugEvent();
         glfwSwapInterval(0); // Disable vertical synchronization
         glClearColor(BACKGROUND_COLOR.x(), BACKGROUND_COLOR.y(), BACKGROUND_COLOR.z(), BACKGROUND_COLOR.w());
-        enableCursor();
         registerEvent(new ResizeEvent(getWidth(), getHeight()));
     }
 
     public int getWidth() {
-        return getWindowSize().x();
+        return windowSize.x();
     }
 
     public int getHeight() {
-        return getWindowSize().y();
+        return windowSize.y();
     }
 
     public float getRatio() {
@@ -95,16 +91,16 @@ public class WindowData {
     }
 
     public boolean isActive() {
-        return !glfwWindowShouldClose(getWindow());
+        return !glfwWindowShouldClose(window);
     }
 
     public void close() {
-        glfwSetWindowShouldClose(getWindow(), true);
+        glfwSetWindowShouldClose(window, true);
     }
 
     public void finish() {
-        glfwDestroyWindow(getWindow());
-        for (Callback callback : getCallbacks()) {
+        glfwDestroyWindow(window);
+        for (Callback callback : callbacks) {
             callback.free();
         }
         glfwTerminate();
@@ -114,7 +110,7 @@ public class WindowData {
         //glFinish();
         //glDrawBuffer(GL_FRONT);
         //https://stackoverflow.com/questions/41233696/opengl-prevent-double-buffers
-        glfwSwapBuffers(getWindow());
+        glfwSwapBuffers(window);
     }
 
 
@@ -144,19 +140,6 @@ public class WindowData {
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    public void enableCursor() {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        cursorEnabled = true;
-        registerEvent(new CursorVisibilityEvent(true));
-    }
-
-    public void disableCursor() {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        cursorEnabled = false;
-        registerEvent(new CursorVisibilityEvent(false));
-    }
-
-
     private void setUpIcon() {
         TextureRepository.Image imageT = new TextureRepository.Image(new File("soil/interface/lawn.png"));
         GLFWImage.Buffer images = GLFWImage.malloc(1);
@@ -177,15 +160,15 @@ public class WindowData {
         GLFWCharCallback charCallback = GLFWCharCallback.create(
                 (window, unicodePoint) -> registerEvent(new CharEvent(unicodePoint))
         );
-        getCallbacks().add(charCallback);
-        glfwSetCharCallback(getWindow(), charCallback);
+        callbacks.add(charCallback);
+        glfwSetCharCallback(window, charCallback);
     }
 
     private void registerErrorEvent() {
         GLFWErrorCallback errorCallback = GLFWErrorCallback.create(
                 (error, description) -> GLFWErrorCallback.createPrint(System.err).invoke(error, description)
         );
-        getCallbacks().add(errorCallback);
+        callbacks.add(errorCallback);
         glfwSetErrorCallback(errorCallback);
     }
 
@@ -204,7 +187,7 @@ public class WindowData {
                     }
                 }
         );
-        getCallbacks().add(debugMessageCallback);
+        callbacks.add(debugMessageCallback);
         glDebugMessageCallback(debugMessageCallback, NULL);
     }
 
@@ -212,8 +195,8 @@ public class WindowData {
         GLFWScrollCallback scrollCallback = GLFWScrollCallback.create(
                 (window, xOffset, yOffset) -> registerEvent(new ScrollEvent(xOffset, yOffset))
         );
-        getCallbacks().add(scrollCallback);
-        glfwSetScrollCallback(getWindow(), scrollCallback);
+        callbacks.add(scrollCallback);
+        glfwSetScrollCallback(window, scrollCallback);
     }
 
     private void registerCursorPosEvent() {
@@ -232,32 +215,32 @@ public class WindowData {
                 registerEvent(new CursorPosEvent(xPos, yPos, dx, dy, normalX, normalY));
             }
         }));
-        getCallbacks().add(posCallback);
-        glfwSetCursorPosCallback(getWindow(), posCallback);
+        callbacks.add(posCallback);
+        glfwSetCursorPosCallback(window, posCallback);
     }
 
     private void registerKeyEvent() {
         GLFWKeyCallback keyCallback = GLFWKeyCallback.create(
                 (window, key, scanCode, action, mods) -> registerEvent(new KeyEvent(key, scanCode, action, mods))
         );
-        getCallbacks().add(keyCallback);
-        glfwSetKeyCallback(getWindow(), keyCallback);
+        callbacks.add(keyCallback);
+        glfwSetKeyCallback(window, keyCallback);
     }
 
     private void registerFrameBufferSizeEvent() {
         GLFWFramebufferSizeCallback framebufferSizeCallback = GLFWFramebufferSizeCallback.create(
                 (window, width, height) -> registerEvent(new ResizeEvent(width, height))
         );
-        getCallbacks().add(framebufferSizeCallback);
-        glfwSetFramebufferSizeCallback(getWindow(), framebufferSizeCallback);
+        callbacks.add(framebufferSizeCallback);
+        glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
     }
 
     private void registerMouseButtonEvent() {
         GLFWMouseButtonCallback mouseButtonCallback = GLFWMouseButtonCallback.create(
                 (window, button, action, mods) -> registerEvent(new MouseButtonEvent(button, action, mods))
         );
-        getCallbacks().add(mouseButtonCallback);
-        glfwSetMouseButtonCallback(getWindow(), mouseButtonCallback);
+        callbacks.add(mouseButtonCallback);
+        glfwSetMouseButtonCallback(window, mouseButtonCallback);
     }
 
     private <T extends Event> void registerEvent(T event) {
@@ -266,7 +249,7 @@ public class WindowData {
 
     @EventHook
     private void handleResize(ResizeEvent resizeEvent) {
-        setWindowSize(new Vector2i(resizeEvent.getWidth(), resizeEvent.getHeight()));
+        windowSize = new Vector2i(resizeEvent.getWidth(), resizeEvent.getHeight());
         glViewport(0, 0, getWidth(), getHeight());
     }
 
@@ -286,6 +269,7 @@ public class WindowData {
         public long[][] cursorPointers;
         public CursorType currentCursorType;
         public long[] animationDelays;
+        private boolean visible;
 
         Cursor() {
             cursorPointers = new long[CursorType.values().length][];
@@ -308,6 +292,7 @@ public class WindowData {
                 ++cursorNumber;
             }
             selectCursorType(CursorType.SIMPLE);
+            show();
         }
 
         public void selectCursorType(CursorType cursorType) {
@@ -319,6 +304,18 @@ public class WindowData {
             int idx = currentCursorType.ordinal();
             int frame = (int) ((Math.abs(System.currentTimeMillis()) / Math.max(1, animationDelays[idx])) % cursorPointers[idx].length);
             glfwSetCursor(window, cursorPointers[idx][frame]);
+        }
+
+        public void show() {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            visible = true;
+            registerEvent(new CursorVisibilityEvent(true));
+        }
+
+        public void hide() {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            visible = false;
+            registerEvent(new CursorVisibilityEvent(false));
         }
 
     }
