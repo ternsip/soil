@@ -54,6 +54,7 @@ public class EntityPlayer extends Entity implements Updatable {
     @Override
     public void update() {
         if (Soil.THREADS.client.eventIOReceiver.isKeyDown(GLFW_KEY_Z)) {
+            Soil.THREADS.client.windowData.requestAttention();
             Soil.THREADS.client.windowData.cursor.selectCursorType(WindowData.CursorType.SELECT);
         }
         if (Soil.THREADS.client.eventIOReceiver.isKeyDown(GLFW_KEY_L)) {

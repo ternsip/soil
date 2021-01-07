@@ -72,7 +72,7 @@ public class Client implements Threadable {
     // TODO think about sync order
     public void update() {
         windowData.clear();
-        windowData.cursor.update();
+        windowData.update();
         windowData.waitBuffer();
         fpsCounter.updateFps();
         eventIOReceiver.update();

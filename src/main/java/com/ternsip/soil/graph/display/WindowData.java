@@ -3,9 +3,7 @@ package com.ternsip.soil.graph.display;
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.events.*;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.joml.Vector2i;
 import org.joml.Vector4f;
@@ -53,7 +51,7 @@ public class WindowData {
             glfwTerminate();
             throw new RuntimeException("Failed to create the GLFW window");
         }
-        setUpIcon();
+        setWindowIcon(new File("soil/interface/lawn.png"));
         cursor = new Cursor();
         registerScrollEvent();
         registerCursorPosEvent();
@@ -61,6 +59,14 @@ public class WindowData {
         registerFrameBufferSizeEvent();
         registerMouseButtonEvent();
         registerCharEvent();
+        registerWindowPosEvent();
+        registerWindowSizeEvent();
+        registerWindowRefreshEvent();
+        registerWindowFocusEvent();
+        registerWindowIconifyEvent();
+        registerWindowMaximizeEvent();
+        registerWindowContentScaleEvent();
+        registerWindowCloseEvent();
         glfwSetWindowPos(window, (int) (mainDisplaySize.x() * 0.1), (int) (mainDisplaySize.y() * 0.1));
         glfwMakeContextCurrent(window);
         createCapabilities();
@@ -97,6 +103,10 @@ public class WindowData {
 
     public void close() {
         glfwSetWindowShouldClose(window, true);
+    }
+
+    public void update() {
+        cursor.update();
     }
 
     public void finish() {
@@ -141,15 +151,53 @@ public class WindowData {
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    private void setUpIcon() {
-        TextureRepository.Image imageT = new TextureRepository.Image(new File("soil/interface/lawn.png"));
-        GLFWImage.Buffer images = GLFWImage.malloc(1);
-        GLFWImage image = GLFWImage.malloc();
-        image.set(imageT.width, imageT.height, Utils.arrayToBuffer(imageT.frameData[0]));
-        images.put(0, image);
-        glfwSetWindowIcon(window, images);
-        image.free();
-        images.free();
+    public void requestAttention() {
+        glfwRequestWindowAttention(window);
+    }
+
+    public void focusWindow() {
+        glfwFocusWindow(window);
+    }
+
+    public void hideWindow() {
+        glfwHideWindow(window);
+    }
+
+    public void showWindow() {
+        glfwShowWindow(window);
+    }
+
+    public void maximizeWindow() {
+        glfwMaximizeWindow(window);
+    }
+
+    public void restoreWindow() {
+        glfwRestoreWindow(window);
+    }
+
+    public void iconifyWindow() {
+        glfwIconifyWindow(window);
+    }
+
+    public void setWindowOpacity(float opacity) {
+        glfwSetWindowOpacity(window, opacity);
+    }
+
+    public void setWindowSize(int width, int height) {
+        glfwSetWindowSize(window, width, height);
+    }
+
+    public void setWindowPos(int x, int y) {
+        glfwSetWindowPos(window, x, y);
+    }
+
+    private void setWindowIcon(File file) {
+        TextureRepository.Image imageT = new TextureRepository.Image(file);
+        try (GLFWImage.Buffer images = GLFWImage.malloc(1); GLFWImage image = GLFWImage.malloc()) {
+            image.set(imageT.width, imageT.height, Utils.arrayToBuffer(imageT.frameData[0]));
+            images.put(0, image);
+            glfwSetWindowIcon(window, images);
+        }
     }
 
     private Vector2i getMainDisplaySize() {
@@ -244,6 +292,70 @@ public class WindowData {
         glfwSetMouseButtonCallback(window, mouseButtonCallback);
     }
 
+    private void registerWindowPosEvent() {
+        GLFWWindowPosCallback windowPosCallback = GLFWWindowPosCallback.create(
+                (window, x, y) -> registerEvent(new WindowPosEvent(x, y))
+        );
+        callbacks.add(windowPosCallback);
+        glfwSetWindowPosCallback(window, windowPosCallback);
+    }
+
+    private void registerWindowSizeEvent() {
+        GLFWWindowSizeCallback windowSizeCallback = GLFWWindowSizeCallback.create(
+                (window, width, height) -> registerEvent(new WindowSizeEvent(width, height))
+        );
+        callbacks.add(windowSizeCallback);
+        glfwSetWindowSizeCallback(window, windowSizeCallback);
+    }
+
+    private void registerWindowRefreshEvent() {
+        GLFWWindowRefreshCallback windowRefreshCallback = GLFWWindowRefreshCallback.create(
+                (window) -> registerEvent(new WindowRefreshEvent())
+        );
+        callbacks.add(windowRefreshCallback);
+        glfwSetWindowRefreshCallback(window, windowRefreshCallback);
+    }
+
+    private void registerWindowFocusEvent() {
+        GLFWWindowFocusCallback windowFocusCallback = GLFWWindowFocusCallback.create(
+                (window, focused) -> registerEvent(new WindowFocusEvent(focused))
+        );
+        callbacks.add(windowFocusCallback);
+        glfwSetWindowFocusCallback(window, windowFocusCallback);
+    }
+
+    private void registerWindowIconifyEvent() {
+        GLFWWindowIconifyCallback windowIconifyCallback = GLFWWindowIconifyCallback.create(
+                (window, iconified) -> registerEvent(new WindowIconifyEvent(iconified))
+        );
+        callbacks.add(windowIconifyCallback);
+        glfwSetWindowIconifyCallback(window, windowIconifyCallback);
+    }
+
+    private void registerWindowMaximizeEvent() {
+        GLFWWindowMaximizeCallback windowMaximizeCallback = GLFWWindowMaximizeCallback.create(
+                (window, maximized) -> registerEvent(new WindowMaximizeEvent(maximized))
+        );
+        callbacks.add(windowMaximizeCallback);
+        glfwSetWindowMaximizeCallback(window, windowMaximizeCallback);
+    }
+
+    private void registerWindowContentScaleEvent() {
+        GLFWWindowContentScaleCallback windowContentScaleCallback = GLFWWindowContentScaleCallback.create(
+                (window, xScale, yScale) -> registerEvent(new WindowContentScaleEvent(xScale, yScale))
+        );
+        callbacks.add(windowContentScaleCallback);
+        glfwSetWindowContentScaleCallback(window, windowContentScaleCallback);
+    }
+
+    private void registerWindowCloseEvent() {
+        GLFWWindowCloseCallback windowCloseCallback = GLFWWindowCloseCallback.create(
+                (window) -> registerEvent(new WindowCloseEvent())
+        );
+        callbacks.add(windowCloseCallback);
+        glfwSetWindowCloseCallback(window, windowCloseCallback);
+    }
+
     private <T extends Event> void registerEvent(T event) {
         Soil.THREADS.client.eventIOReceiver.registerEvent(event);
     }
@@ -281,14 +393,14 @@ public class WindowData {
                 cursorPointers[cursorNumber] = new long[imageT.frameData.length];
                 animationDelays[cursorNumber] = imageT.frameDelay[0];
                 for (int frame = 0; frame < imageT.frameData.length; ++frame) {
-                    GLFWImage image = GLFWImage.malloc();
-                    image.set(imageT.width, imageT.height, Utils.arrayToBuffer(imageT.frameData[frame]));
-                    long cursorIndex = glfwCreateCursor(image, 0, 0);
-                    image.free();
-                    if (cursorIndex == MemoryUtil.NULL) {
-                        throw new RuntimeException("Error creating cursor");
+                    try (GLFWImage image = GLFWImage.malloc()) {
+                        image.set(imageT.width, imageT.height, Utils.arrayToBuffer(imageT.frameData[frame]));
+                        long cursorIndex = glfwCreateCursor(image, 0, 0);
+                        if (cursorIndex == MemoryUtil.NULL) {
+                            throw new RuntimeException("Error creating cursor");
+                        }
+                        cursorPointers[cursorNumber][frame] = cursorIndex;
                     }
-                    cursorPointers[cursorNumber][frame] = cursorIndex;
                 }
                 ++cursorNumber;
             }
@@ -317,6 +429,10 @@ public class WindowData {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             visible = false;
             registerEvent(new CursorVisibilityEvent(false));
+        }
+
+        public void move(int x, int y) {
+
         }
 
     }
