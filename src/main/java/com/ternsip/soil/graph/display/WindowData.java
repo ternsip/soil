@@ -33,6 +33,7 @@ public class WindowData {
     public final Cursor cursor;
     private Vector2i windowSize;
     private long gSync;
+    private boolean fullscreen = false;
 
     public WindowData() {
         registerErrorEvent();
@@ -82,6 +83,7 @@ public class WindowData {
         glDisable(GL_LIGHTING);
         glDisable(GL_TEXTURE_2D);
         glDisable(GL_DEPTH_TEST);
+        glDisable(GL_ALPHA_TEST);
         glEnable(GL_DEBUG_OUTPUT);
         //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         registerDebugEvent();
@@ -218,6 +220,28 @@ public class WindowData {
 
     public void setWindowTime(double time) {
         glfwSetTime(time);
+    }
+
+    public void enterFullscreen() {
+        if (fullscreen) {
+            return;
+        }
+        long monitor = glfwGetPrimaryMonitor();
+        GLFWVidMode glfwVidMode = glfwGetVideoMode(monitor);
+        glfwSetWindowMonitor(window, monitor, 0, 0, glfwVidMode.width(), glfwVidMode.height(), glfwVidMode.refreshRate());
+        fullscreen = true;
+    }
+
+    public void enterWindowed() {
+        if (!fullscreen) {
+            return;
+        }
+        long monitor = glfwGetPrimaryMonitor();
+        GLFWVidMode glfwVidMode = glfwGetVideoMode(monitor);
+        int w = glfwVidMode.width();
+        int h = glfwVidMode.height();
+        glfwSetWindowMonitor(window, 0, (int) (w * 0.1), (int) (h * 0.1), (int) (w * 0.8), (int) (h * 0.8), glfwVidMode.refreshRate());
+        fullscreen = false;
     }
 
     private void setWindowIcon(File file) {
@@ -433,6 +457,17 @@ public class WindowData {
     private void handleResize(ResizeEvent resizeEvent) {
         windowSize = new Vector2i(resizeEvent.getWidth(), resizeEvent.getHeight());
         glViewport(0, 0, getWidth(), getHeight());
+    }
+
+    @EventHook
+    private void handleKeyEvent(KeyEvent event) {
+        if (event.getKey() == GLFW_KEY_F11 && event.getAction() == GLFW_PRESS) {
+            if (fullscreen) {
+                enterWindowed();
+            } else {
+                enterFullscreen();
+            }
+        }
     }
 
     @RequiredArgsConstructor
