@@ -5,7 +5,7 @@ import com.ternsip.soil.common.Threadable;
 import com.ternsip.soil.common.Timer;
 import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.events.EventHook;
-import com.ternsip.soil.events.EventIOReceiver;
+import com.ternsip.soil.events.EventReceiver;
 import com.ternsip.soil.events.OnConnectedToServer;
 import com.ternsip.soil.game.blocks.BlocksRepository;
 import com.ternsip.soil.game.entities.EntityPlayer;
@@ -27,7 +27,7 @@ import java.util.Random;
 public class Client implements Threadable {
 
     public WindowData windowData;
-    public EventIOReceiver eventIOReceiver;
+    public EventReceiver eventReceiver;
     public Camera camera;
     public TextureRepository textureRepository;
     public Shader shader;
@@ -43,7 +43,7 @@ public class Client implements Threadable {
 
     @Override
     public void init() {
-        eventIOReceiver = new EventIOReceiver();
+        eventReceiver = new EventReceiver();
         windowData = new WindowData();
         camera = new Camera();
         textureRepository = new TextureRepository();
@@ -56,7 +56,7 @@ public class Client implements Threadable {
         blocksRepository = new BlocksRepository();
         blocksRepository.init();
         blocksRepository.fullVisualUpdate();
-        eventIOReceiver.registerWithSubObjects(this);
+        eventReceiver.registerWithSubObjects(this);
         physicsClock = new Timer(1000 / settings.physicalTicksPerSecond);
         new EntityStatistics().register();
         // TODO REMOVE
@@ -75,7 +75,7 @@ public class Client implements Threadable {
         windowData.update();
         windowData.waitBuffer();
         fpsCounter.updateFps();
-        eventIOReceiver.update();
+        eventReceiver.update();
         if (physicsClock.isOver()) {
             physicsClock.drop();
             blocksRepository.update();
@@ -98,7 +98,7 @@ public class Client implements Threadable {
 
     @Override
     public void finish() {
-        eventIOReceiver.unregisterWithSubObjects(this);
+        eventReceiver.unregisterWithSubObjects(this);
         shader.finish();
         textureRepository.finish();
         windowData.finish();

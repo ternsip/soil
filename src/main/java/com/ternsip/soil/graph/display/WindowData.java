@@ -67,6 +67,8 @@ public class WindowData {
         registerWindowMaximizeEvent();
         registerWindowContentScaleEvent();
         registerWindowCloseEvent();
+        registerCursorEnterLeaveEvent();
+        registerCharModsEvent();
         glfwSetWindowPos(window, (int) (mainDisplaySize.x() * 0.1), (int) (mainDisplaySize.y() * 0.1));
         glfwMakeContextCurrent(window);
         createCapabilities();
@@ -189,6 +191,22 @@ public class WindowData {
 
     public void setWindowPos(int x, int y) {
         glfwSetWindowPos(window, x, y);
+    }
+
+    public void setClipboard(String value) {
+        glfwSetClipboardString(window, value);
+    }
+
+    public String getClipboard() {
+        return glfwGetClipboardString(window);
+    }
+
+    public boolean isJoystickPresent(int joy) {
+        return glfwJoystickPresent(joy);
+    }
+
+    public int getKeyState(int key) {
+        return glfwGetKey(window, key);
     }
 
     private void setWindowIcon(File file) {
@@ -356,8 +374,24 @@ public class WindowData {
         glfwSetWindowCloseCallback(window, windowCloseCallback);
     }
 
+    private void registerCursorEnterLeaveEvent() {
+        GLFWCursorEnterCallback cursorEnterCallback = GLFWCursorEnterCallback.create(
+                (window, entered) -> registerEvent(new CursorEnterLeaveEvent(entered))
+        );
+        callbacks.add(cursorEnterCallback);
+        glfwSetCursorEnterCallback(window, cursorEnterCallback);
+    }
+
+    private void registerCharModsEvent() {
+        GLFWCharModsCallback charModsCallback = GLFWCharModsCallback.create(
+                (window, codepoint, mods) -> registerEvent(new CharModsEvent(codepoint, mods))
+        );
+        callbacks.add(charModsCallback);
+        glfwSetCharModsCallback(window, charModsCallback);
+    }
+
     private <T extends Event> void registerEvent(T event) {
-        Soil.THREADS.client.eventIOReceiver.registerEvent(event);
+        Soil.THREADS.client.eventReceiver.registerEvent(event);
     }
 
     @EventHook
@@ -431,8 +465,12 @@ public class WindowData {
             registerEvent(new CursorVisibilityEvent(false));
         }
 
-        public void move(int x, int y) {
+        public void setPos(double x, double y) {
+            glfwSetCursorPos(window, x, y);
+        }
 
+        public int getButtonState(int button) {
+            return glfwGetMouseButton(window, button);
         }
 
     }

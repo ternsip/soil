@@ -8,6 +8,7 @@ import com.ternsip.soil.events.ScrollEvent;
 import org.joml.Vector2f;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 
 public class Camera {
 
@@ -28,7 +29,7 @@ public class Camera {
 
     @EventHook
     private void recalculatePos(CursorPosEvent event) {
-        if (Soil.THREADS.client.eventIOReceiver.isMouseDown(GLFW_MOUSE_BUTTON_2)) {
+        if (Soil.THREADS.client.windowData.cursor.getButtonState(GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) {
             pos.x -= event.dx / (scale.x * 500.0f);
             pos.y += event.dy / (scale.y * 500.0f);
         }

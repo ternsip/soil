@@ -53,24 +53,24 @@ public class EntityPlayer extends Entity implements Updatable {
 
     @Override
     public void update() {
-        if (Soil.THREADS.client.eventIOReceiver.isKeyDown(GLFW_KEY_Z)) {
+        if (Soil.THREADS.client.windowData.getKeyState(GLFW_KEY_Z) == GLFW_PRESS) {
             Soil.THREADS.client.windowData.requestAttention();
             Soil.THREADS.client.windowData.cursor.selectCursorType(WindowData.CursorType.SELECT);
         }
-        if (Soil.THREADS.client.eventIOReceiver.isKeyDown(GLFW_KEY_L)) {
+        if (Soil.THREADS.client.windowData.getKeyState(GLFW_KEY_L) == GLFW_PRESS) {
             Soil.THREADS.client.windowData.cursor.selectCursorType(WindowData.CursorType.LOADING);
         }
-        if (Soil.THREADS.client.eventIOReceiver.isKeyDown(GLFW_KEY_W)) {
+        if (Soil.THREADS.client.windowData.getKeyState(GLFW_KEY_W) == GLFW_PRESS) {
             processMovement(0, 0.1f);
         }
-        if (Soil.THREADS.client.eventIOReceiver.isKeyDown(GLFW_KEY_S)) {
+        if (Soil.THREADS.client.windowData.getKeyState(GLFW_KEY_S) == GLFW_PRESS) {
             processMovement(0, -0.1f);
         }
-        if (Soil.THREADS.client.eventIOReceiver.isKeyDown(GLFW_KEY_D)) {
+        if (Soil.THREADS.client.windowData.getKeyState(GLFW_KEY_D) == GLFW_PRESS) {
             watchingLeft = false;
             processMovement(0.1f, 0);
         }
-        if (Soil.THREADS.client.eventIOReceiver.isKeyDown(GLFW_KEY_A)) {
+        if (Soil.THREADS.client.windowData.getKeyState(GLFW_KEY_A) == GLFW_PRESS) {
             watchingLeft = true;
             processMovement(-0.1f, 0);
         }
