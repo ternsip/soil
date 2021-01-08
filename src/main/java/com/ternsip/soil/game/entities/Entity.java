@@ -13,12 +13,13 @@ public class Entity {
     }
 
     public void register() {
-        Soil.THREADS.client.entityRepository.register(this);
+        uuid = Soil.THREADS.client.entityRepository.register(this);
         Soil.THREADS.client.eventReceiver.register(this);
     }
 
     public void unregister() {
         Soil.THREADS.client.entityRepository.unregister(uuid);
+        uuid = null;
         Soil.THREADS.client.eventReceiver.unregister(this);
     }
 

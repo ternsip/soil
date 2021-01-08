@@ -2,12 +2,11 @@ package com.ternsip.soil.events;
 
 import com.ternsip.soil.common.Utils;
 import lombok.Getter;
-import lombok.SneakyThrows;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -30,6 +29,7 @@ public class EventReceiver {
 
     private final HashMap<Class, Set<Callback>> classToCallbacks = new HashMap<>();
     private final HashMap<Object, Set<Callback>> objectToCallbacks = new HashMap<>();
+    private final LinkedList<Object> objectsToUnregister = new LinkedList<>();
     private final LinkedBlockingQueue events = new LinkedBlockingQueue<>();
 
     public EventReceiver() {
@@ -47,6 +47,16 @@ public class EventReceiver {
             Object event = events.poll();
             for (Callback callback : classToCallbacks.get(event.getClass())) {
                 callback.apply((Event) event);
+            }
+        }
+        while (!objectsToUnregister.isEmpty()) {
+            Object obj = objectsToUnregister.poll();
+            Set<Callback> callbacks = objectToCallbacks.remove(obj);
+            if (callbacks == null) {
+                continue;
+            }
+            for (Set<Callback> callbackSet : classToCallbacks.values()) {
+                callbackSet.removeIf(callbacks::contains);
             }
         }
     }
@@ -80,18 +90,12 @@ public class EventReceiver {
 
     public void unregisterWithSubObjects(Object obj) {
         unregister(obj);
-        Utils.findSubObjects(obj).stream().filter(objectToCallbacks::containsKey).forEach(this::unregister);
+        Utils.findSubObjects(obj).forEach(this::unregister);
     }
 
 
     public void unregister(Object obj) {
-        if (!objectToCallbacks.containsKey(obj)) {
-            throw new IllegalArgumentException("This object is not registered yet");
-        }
-        Set<Callback> callbacks = objectToCallbacks.remove(obj);
-        for (Set<Callback> callbackSet : classToCallbacks.values()) {
-            callbackSet.removeIf(callbacks::contains);
-        }
+        objectsToUnregister.add(obj);
     }
 
 }

@@ -2,7 +2,11 @@ package com.ternsip.soil.game.entities;
 
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Updatable;
+import com.ternsip.soil.events.EventHook;
+import com.ternsip.soil.events.KeyEvent;
 import lombok.RequiredArgsConstructor;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 @RequiredArgsConstructor
 public class EntityStatistics extends Entity implements Updatable {
@@ -24,6 +28,17 @@ public class EntityStatistics extends Entity implements Updatable {
     public void unregister() {
         super.unregister();
         entityText.unregister();
+    }
+
+    @EventHook
+    private void handleKeyEvent(KeyEvent event) {
+        if (event.getKey() == GLFW_KEY_F3 && event.getAction() == GLFW_PRESS) {
+            if (entityText.isRegistered()) {
+                entityText.unregister();
+            } else {
+                entityText.register();
+            }
+        }
     }
 
 

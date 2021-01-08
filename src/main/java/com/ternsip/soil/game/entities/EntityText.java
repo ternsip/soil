@@ -69,7 +69,9 @@ public class EntityText extends Entity {
     public void unregister() {
         super.unregister();
         for (EntityQuad quad : quads) {
-            quad.unregister();
+            if (quad.isRegistered()) {
+                quad.unregister();
+            }
         }
     }
 

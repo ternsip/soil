@@ -18,7 +18,6 @@ public class EntityRepository {
 
     public UUID register(Entity entity) {
         UUID uuid = UUID.randomUUID();
-        entity.uuid = uuid;
         uuidToEntity.put(uuid, entity);
         if (entity instanceof Updatable) {
             uuidToUpdatable.put(uuid, (Updatable) entity);
