@@ -371,6 +371,11 @@ public class WindowData {
         Vector4i windowFrameSize = getWindowFrameSize();
         Vector2i windowFrameBufferSize = getWindowFrameBufferSize();
         Vector2i windowPos = getWindowPos();
+        log.info("OS: {} (ver {}) (arch {})", System.getProperty("os.name"), System.getProperty("os.version"), System.getProperty("os.arch"));
+        log.info("Java: {}, {}", System.getProperty("java.version"), System.getProperty("java.vendor"));
+        log.info("Java VM: {}, {}", System.getProperty("java.vm.specification.version"), System.getProperty("java.vm.specification.vendor"));
+        log.info("System user: {}", System.getProperty("user.name"));
+        log.info("Running directory: {}", System.getProperty("user.dir"));
         log.info("OpenGL: {}", glGetString(GL_VERSION));
         log.info("Renderer: {}", glGetString(GL_RENDERER));
         log.info("Vendor: {}", glGetString(GL_VENDOR));
