@@ -69,6 +69,9 @@ public class WindowData {
         registerWindowCloseEvent();
         registerCursorEnterLeaveEvent();
         registerCharModsEvent();
+        registerMonitorEvent();
+        registerWindowDropEvent();
+        registerJoystickEvent();
         glfwSetWindowPos(window, (int) (mainDisplaySize.x() * 0.1), (int) (mainDisplaySize.y() * 0.1));
         glfwMakeContextCurrent(window);
         createCapabilities();
@@ -207,6 +210,14 @@ public class WindowData {
 
     public int getKeyState(int key) {
         return glfwGetKey(window, key);
+    }
+
+    public double getWindowTime() {
+        return glfwGetTime();
+    }
+
+    public void setWindowTime(double time) {
+        glfwSetTime(time);
     }
 
     private void setWindowIcon(File file) {
@@ -388,6 +399,30 @@ public class WindowData {
         );
         callbacks.add(charModsCallback);
         glfwSetCharModsCallback(window, charModsCallback);
+    }
+
+    private void registerMonitorEvent() {
+        GLFWMonitorCallback monitorCallback = GLFWMonitorCallback.create(
+                (monitor, event) -> registerEvent(new MonitorEvent(monitor, event))
+        );
+        callbacks.add(monitorCallback);
+        glfwSetMonitorCallback(monitorCallback);
+    }
+
+    private void registerWindowDropEvent() {
+        GLFWDropCallback dropCallback = GLFWDropCallback.create(
+                (window, count, names) -> registerEvent(new WindowDropEvent(count, names))
+        );
+        callbacks.add(dropCallback);
+        glfwSetDropCallback(window, dropCallback);
+    }
+
+    private void registerJoystickEvent() {
+        GLFWJoystickCallback joystickCallback = GLFWJoystickCallback.create(
+                (jid, event) -> registerEvent(new JoystickEvent(jid, event))
+        );
+        callbacks.add(joystickCallback);
+        glfwSetJoystickCallback(joystickCallback);
     }
 
     private <T extends Event> void registerEvent(T event) {
