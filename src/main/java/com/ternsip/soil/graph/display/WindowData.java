@@ -31,23 +31,26 @@ public class WindowData {
     private final ArrayList<Callback> callbacks = new ArrayList<>();
     private final long window;
     public final Cursor cursor;
-    private Vector2i windowSize;
-    private long gSync;
-    private boolean fullscreen = false;
+    public int width;
+    public int height;
+    public long gSync;
+    public boolean fullscreen = false;
 
     public WindowData() {
         registerErrorEvent();
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
-        Vector2i mainDisplaySize = getMainDisplaySize();
-        this.windowSize = new Vector2i((int) (mainDisplaySize.x() * 0.8), (int) (mainDisplaySize.y() * 0.8));
+        long monitor = glfwGetPrimaryMonitor();
+        GLFWVidMode glfwVidMode = glfwGetVideoMode(monitor);
+        this.width = (int) (glfwVidMode.width() * 0.8);
+        this.height = (int) (glfwVidMode.height() * 0.8);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_FALSE); // output alpha in fragment shader affects this
         glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
         glfwWindowHint(GLFW_SAMPLES, 1); // TODO consider using another value
         glfwWindowHint(GLFW_ALPHA_BITS, 8);
-        this.window = glfwCreateWindow(windowSize.x(), windowSize.y(), "Soil", NULL, NULL);
+        this.window = glfwCreateWindow(width, height, "Soil", NULL, NULL);
         if (window == NULL) {
             glfwTerminate();
             throw new RuntimeException("Failed to create the GLFW window");
@@ -73,7 +76,7 @@ public class WindowData {
         registerMonitorEvent();
         registerWindowDropEvent();
         registerJoystickEvent();
-        glfwSetWindowPos(window, (int) (mainDisplaySize.x() * 0.1), (int) (mainDisplaySize.y() * 0.1));
+        glfwSetWindowPos(window, (int) (glfwVidMode.width() * 0.1), (int) (glfwVidMode.height() * 0.1));
         glfwMakeContextCurrent(window);
         createCapabilities();
         log.info("Running on version: " + glGetString(GL_VERSION));
@@ -89,19 +92,11 @@ public class WindowData {
         registerDebugEvent();
         glfwSwapInterval(0); // Disable vertical synchronization
         glClearColor(BACKGROUND_COLOR.x(), BACKGROUND_COLOR.y(), BACKGROUND_COLOR.z(), BACKGROUND_COLOR.w());
-        registerEvent(new ResizeEvent(getWidth(), getHeight()));
-    }
-
-    public int getWidth() {
-        return windowSize.x();
-    }
-
-    public int getHeight() {
-        return windowSize.y();
+        registerEvent(new ResizeEvent(width, height));
     }
 
     public float getRatio() {
-        return getWidth() / (float) getHeight();
+        return width / (float) height;
     }
 
     public boolean isActive() {
@@ -253,11 +248,6 @@ public class WindowData {
         }
     }
 
-    private Vector2i getMainDisplaySize() {
-        GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        return new Vector2i(vidMode.width(), vidMode.height());
-    }
-
     private void registerCharEvent() {
         GLFWCharCallback charCallback = GLFWCharCallback.create(
                 (window, unicodePoint) -> registerEvent(new CharEvent(unicodePoint))
@@ -312,8 +302,8 @@ public class WindowData {
                 double dy = yPos - prevY;
                 prevX = xPos;
                 prevY = yPos;
-                double normalX = 2f * (xPos / getWidth() - 0.5f);
-                double normalY = -2f * (yPos / getHeight() - 0.5f);
+                double normalX = 2f * (xPos / width - 0.5f);
+                double normalY = -2f * (yPos / height - 0.5f);
                 registerEvent(new CursorPosEvent(xPos, yPos, dx, dy, normalX, normalY));
             }
         }));
@@ -455,8 +445,9 @@ public class WindowData {
 
     @EventHook
     private void handleResize(ResizeEvent resizeEvent) {
-        windowSize = new Vector2i(resizeEvent.getWidth(), resizeEvent.getHeight());
-        glViewport(0, 0, getWidth(), getHeight());
+        width = resizeEvent.getWidth();
+        height = resizeEvent.getHeight();
+        glViewport(0, 0, width, height);
     }
 
     @EventHook
