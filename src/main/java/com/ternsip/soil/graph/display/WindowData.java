@@ -3,7 +3,6 @@ package com.ternsip.soil.graph.display;
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.events.*;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joml.Vector2i;
 import org.joml.Vector4f;
@@ -21,11 +20,11 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL43.*;
-import static org.lwjgl.system.MemoryUtil.*;
 
 @Slf4j
 public class WindowData {
 
+    public static final Vector2i MINIMUM_WINDOW = new Vector2i(32, 32);
     public static final Vector4fc BACKGROUND_COLOR = new Vector4f(0f, 0f, 0f, 0f);
 
     private final ArrayList<Callback> callbacks = new ArrayList<>();
@@ -48,15 +47,20 @@ public class WindowData {
         this.height = (int) (glfwVidMode.height() * 0.8);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_FALSE); // output alpha in fragment shader affects this
+        glfwWindowHint(GLFW_RED_BITS, glfwVidMode.redBits());
+        glfwWindowHint(GLFW_GREEN_BITS, glfwVidMode.greenBits());
+        glfwWindowHint(GLFW_BLUE_BITS, glfwVidMode.blueBits());
         glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
         glfwWindowHint(GLFW_SAMPLES, 1); // TODO consider using another value
         glfwWindowHint(GLFW_ALPHA_BITS, 8);
-        this.window = glfwCreateWindow(width, height, "Soil", NULL, NULL);
-        if (window == NULL) {
+        this.window = glfwCreateWindow(width, height, "Soil", MemoryUtil.NULL, MemoryUtil.NULL);
+        if (window == MemoryUtil.NULL) {
             glfwTerminate();
             throw new RuntimeException("Failed to create the GLFW window");
         }
         setWindowIcon(new File("soil/interface/lawn.png"));
+        glfwSetWindowSizeLimits(window, MINIMUM_WINDOW.x, MINIMUM_WINDOW.y, GLFW_DONT_CARE, GLFW_DONT_CARE);
+        glfwSetWindowAspectRatio(window, GLFW_DONT_CARE, GLFW_DONT_CARE);
         this.cursor = new Cursor(window);
         registerScrollEvent();
         registerCursorPosEvent();
@@ -227,6 +231,18 @@ public class WindowData {
         glfwSetTime(time);
     }
 
+    public void setWindowTitle(String title) {
+        glfwSetWindowTitle(window, title);
+    }
+
+    public int getWindowAttribute(int attribute) {
+        return glfwGetWindowAttrib(window, attribute);
+    }
+
+    public void setWindowAttribute(int attribute, int value) {
+        glfwSetWindowAttrib(window, attribute, value);
+    }
+
     public void enterFullscreen() {
         if (fullscreen) {
             return;
@@ -245,7 +261,7 @@ public class WindowData {
         GLFWVidMode glfwVidMode = glfwGetVideoMode(monitor);
         int w = glfwVidMode.width();
         int h = glfwVidMode.height();
-        glfwSetWindowMonitor(window, 0, (int) (w * 0.1), (int) (h * 0.1), (int) (w * 0.8), (int) (h * 0.8), glfwVidMode.refreshRate());
+        glfwSetWindowMonitor(window, MemoryUtil.NULL, (int) (w * 0.1), (int) (h * 0.1), (int) (w * 0.8), (int) (h * 0.8), glfwVidMode.refreshRate());
         fullscreen = false;
     }
 
@@ -287,7 +303,7 @@ public class WindowData {
     private void registerDebugEvent() {
         GLDebugMessageCallback debugMessageCallback = GLDebugMessageCallback.create(
                 (source, type, id, severity, length, message, userParam) -> {
-                    String messageString = memUTF8(memByteBuffer(message, length));
+                    String messageString = MemoryUtil.memUTF8(MemoryUtil.memByteBuffer(message, length));
                     String stackTrace = Arrays.stream(Soil.THREADS.getMainThread().getStackTrace())
                             .map(StackTraceElement::toString)
                             .reduce((s1, s2) -> s1 + System.lineSeparator() + s2)
@@ -300,7 +316,7 @@ public class WindowData {
                 }
         );
         callbacks.add(debugMessageCallback);
-        glDebugMessageCallback(debugMessageCallback, NULL);
+        glDebugMessageCallback(debugMessageCallback, MemoryUtil.NULL);
     }
 
     private void registerScrollEvent() {
