@@ -26,10 +26,9 @@ public class WindowData {
 
     public static final Vector2i MINIMUM_WINDOW = new Vector2i(32, 32);
     public static final Vector4fc BACKGROUND_COLOR = new Vector4f(0f, 0f, 0f, 0f);
-
+    public final Cursor cursor;
     private final ArrayList<Callback> callbacks = new ArrayList<>();
     private final long window;
-    public final Cursor cursor;
     public int width;
     public int height;
     public long gSync;
@@ -238,12 +237,12 @@ public class WindowData {
         glfwSetWindowPos(window, x, y);
     }
 
-    public void setClipboard(String value) {
-        glfwSetClipboardString(window, value);
-    }
-
     public String getClipboard() {
         return glfwGetClipboardString(window);
+    }
+
+    public void setClipboard(String value) {
+        glfwSetClipboardString(window, value);
     }
 
     public boolean isJoystickPresent(int joy) {
@@ -260,6 +259,14 @@ public class WindowData {
 
     public void setWindowTime(double time) {
         glfwSetTime(time);
+    }
+
+    public long getWindowTimer() {
+        return glfwGetTimerValue();
+    }
+
+    public long getWindowTimerFrequency() {
+        return glfwGetTimerFrequency();
     }
 
     public void setWindowTitle(String title) {

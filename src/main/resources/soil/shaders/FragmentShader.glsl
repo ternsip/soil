@@ -85,7 +85,6 @@ uniform vec2 cameraPos;
 uniform vec2 cameraScale;
 uniform vec2 aspect;
 uniform int time;
-uniform float glTime;
 uniform bool debugging;
 uniform sampler2DArray[MAX_SAMPLERS] samplers;
 

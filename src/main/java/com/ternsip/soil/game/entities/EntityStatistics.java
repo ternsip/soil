@@ -6,7 +6,8 @@ import com.ternsip.soil.events.EventHook;
 import com.ternsip.soil.events.KeyEvent;
 import lombok.RequiredArgsConstructor;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_F3;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 
 @RequiredArgsConstructor
 public class EntityStatistics extends Entity implements Updatable {
