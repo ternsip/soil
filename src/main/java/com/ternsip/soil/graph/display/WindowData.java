@@ -93,7 +93,7 @@ public class WindowData {
         registerScrollEvent();
         registerCursorPosEvent();
         registerKeyEvent();
-        registerFrameBufferSizeEvent();
+        registerFramebufferSizeEvent();
         registerMouseButtonEvent();
         registerCharEvent();
         registerWindowPosEvent();
@@ -107,7 +107,7 @@ public class WindowData {
         registerCursorEnterLeaveEvent();
         registerCharModsEvent();
         registerMonitorEvent();
-        registerWindowDropEvent();
+        registerDragAndDropEvent();
         registerJoystickEvent();
         glfwSetWindowPos(window, (int) (glfwVidMode.width() * 0.1), (int) (glfwVidMode.height() * 0.1));
         glfwMakeContextCurrent(window);
@@ -136,7 +136,7 @@ public class WindowData {
         registerDebugEvent();
         disableVsync();
         glClearColor(BACKGROUND_COLOR.x(), BACKGROUND_COLOR.y(), BACKGROUND_COLOR.z(), BACKGROUND_COLOR.w());
-        registerEvent(new ResizeEvent(width, height));
+        registerEvent(new FramebufferSizeEvent(width, height));
     }
 
     public float getRatio() {
@@ -331,21 +331,13 @@ public class WindowData {
         return glfwGetPrimaryMonitor();
     }
 
-    private void setWindowIcon(File file) {
+    public void setWindowIcon(File file) {
         TextureRepository.Image imageT = new TextureRepository.Image(file);
         try (GLFWImage.Buffer images = GLFWImage.malloc(1); GLFWImage image = GLFWImage.malloc()) {
             image.set(imageT.width, imageT.height, Utils.arrayToBuffer(imageT.frameData[0]));
             images.put(0, image);
             glfwSetWindowIcon(window, images);
         }
-    }
-
-    private void registerCharEvent() {
-        GLFWCharCallback charCallback = GLFWCharCallback.create(
-                (window, unicodePoint) -> registerEvent(new CharEvent(unicodePoint))
-        );
-        callbacks.add(charCallback);
-        glfwSetCharCallback(window, charCallback);
     }
 
     private void registerErrorEvent() {
@@ -375,14 +367,6 @@ public class WindowData {
         glDebugMessageCallback(debugMessageCallback, MemoryUtil.NULL);
     }
 
-    private void registerScrollEvent() {
-        GLFWScrollCallback scrollCallback = GLFWScrollCallback.create(
-                (window, xOffset, yOffset) -> registerEvent(new ScrollEvent(xOffset, yOffset))
-        );
-        callbacks.add(scrollCallback);
-        glfwSetScrollCallback(window, scrollCallback);
-    }
-
     private void registerCursorPosEvent() {
         GLFWCursorPosCallback posCallback = GLFWCursorPosCallback.create((new GLFWCursorPosCallbackI() {
             private double prevX;
@@ -403,6 +387,22 @@ public class WindowData {
         glfwSetCursorPosCallback(window, posCallback);
     }
 
+    private void registerCharEvent() {
+        GLFWCharCallback charCallback = GLFWCharCallback.create(
+                (window, unicodePoint) -> registerEvent(new CharEvent(unicodePoint))
+        );
+        callbacks.add(charCallback);
+        glfwSetCharCallback(window, charCallback);
+    }
+
+    private void registerScrollEvent() {
+        GLFWScrollCallback scrollCallback = GLFWScrollCallback.create(
+                (window, xOffset, yOffset) -> registerEvent(new ScrollEvent(xOffset, yOffset))
+        );
+        callbacks.add(scrollCallback);
+        glfwSetScrollCallback(window, scrollCallback);
+    }
+
     private void registerKeyEvent() {
         GLFWKeyCallback keyCallback = GLFWKeyCallback.create(
                 (window, key, scanCode, action, mods) -> registerEvent(new KeyEvent(key, scanCode, action, mods))
@@ -411,9 +411,9 @@ public class WindowData {
         glfwSetKeyCallback(window, keyCallback);
     }
 
-    private void registerFrameBufferSizeEvent() {
+    private void registerFramebufferSizeEvent() {
         GLFWFramebufferSizeCallback framebufferSizeCallback = GLFWFramebufferSizeCallback.create(
-                (window, width, height) -> registerEvent(new ResizeEvent(width, height))
+                (window, width, height) -> registerEvent(new FramebufferSizeEvent(width, height))
         );
         callbacks.add(framebufferSizeCallback);
         glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
@@ -493,7 +493,7 @@ public class WindowData {
 
     private void registerCursorEnterLeaveEvent() {
         GLFWCursorEnterCallback cursorEnterCallback = GLFWCursorEnterCallback.create(
-                (window, entered) -> registerEvent(new CursorEnterLeaveEvent(entered))
+                (window, entered) -> registerEvent(new CursorEnterEvent(entered))
         );
         callbacks.add(cursorEnterCallback);
         glfwSetCursorEnterCallback(window, cursorEnterCallback);
@@ -515,9 +515,15 @@ public class WindowData {
         glfwSetMonitorCallback(monitorCallback);
     }
 
-    private void registerWindowDropEvent() {
+    private void registerDragAndDropEvent() {
         GLFWDropCallback dropCallback = GLFWDropCallback.create(
-                (window, count, names) -> registerEvent(new WindowDropEvent(count, names))
+                (window, count, names) -> {
+                    String[] stringNames = new String[count];
+                    for (int i = 0; i < count; ++i) {
+                        stringNames[i]  = GLFWDropCallback.getName(names, i);
+                    }
+                    registerEvent(new DragAndDropEvent(count, stringNames));
+                }
         );
         callbacks.add(dropCallback);
         glfwSetDropCallback(window, dropCallback);
@@ -536,9 +542,9 @@ public class WindowData {
     }
 
     @EventHook
-    private void handleResize(ResizeEvent resizeEvent) {
-        width = resizeEvent.getWidth();
-        height = resizeEvent.getHeight();
+    private void handleResize(FramebufferSizeEvent framebufferSizeEvent) {
+        width = framebufferSizeEvent.getWidth();
+        height = framebufferSizeEvent.getHeight();
         glViewport(0, 0, width, height);
     }
 

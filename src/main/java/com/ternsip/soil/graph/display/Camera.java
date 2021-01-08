@@ -3,7 +3,7 @@ package com.ternsip.soil.graph.display;
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.events.CursorPosEvent;
 import com.ternsip.soil.events.EventHook;
-import com.ternsip.soil.events.ResizeEvent;
+import com.ternsip.soil.events.FramebufferSizeEvent;
 import com.ternsip.soil.events.ScrollEvent;
 import org.joml.Vector2f;
 
@@ -46,9 +46,9 @@ public class Camera {
     }
 
     @EventHook
-    private void handleResize(ResizeEvent resizeEvent) {
-        width = resizeEvent.getWidth();
-        height = resizeEvent.getHeight();
+    private void handleResize(FramebufferSizeEvent framebufferSizeEvent) {
+        width = framebufferSizeEvent.getWidth();
+        height = framebufferSizeEvent.getHeight();
         if (width >= height) {
             aspectX = 1;
             aspectY = (float) width / height;
