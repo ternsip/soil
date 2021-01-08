@@ -9,6 +9,7 @@ import com.ternsip.soil.events.MouseButtonEvent;
 import com.ternsip.soil.game.blocks.Block;
 import com.ternsip.soil.game.common.PhysicalPoint;
 import com.ternsip.soil.graph.display.Camera;
+import com.ternsip.soil.graph.display.CursorType;
 import com.ternsip.soil.graph.display.WindowData;
 import com.ternsip.soil.graph.shader.TextureType;
 
@@ -55,10 +56,10 @@ public class EntityPlayer extends Entity implements Updatable {
     public void update() {
         if (Soil.THREADS.client.windowData.getKeyState(GLFW_KEY_Z) == GLFW_PRESS) {
             Soil.THREADS.client.windowData.requestAttention();
-            Soil.THREADS.client.windowData.cursor.selectCursorType(WindowData.CursorType.SELECT);
+            Soil.THREADS.client.windowData.cursor.selectCursorType(CursorType.SELECT);
         }
         if (Soil.THREADS.client.windowData.getKeyState(GLFW_KEY_L) == GLFW_PRESS) {
-            Soil.THREADS.client.windowData.cursor.selectCursorType(WindowData.CursorType.LOADING);
+            Soil.THREADS.client.windowData.cursor.selectCursorType(CursorType.LOADING);
         }
         if (Soil.THREADS.client.windowData.getKeyState(GLFW_KEY_W) == GLFW_PRESS) {
             processMovement(0, 0.1f);
