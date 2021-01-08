@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL11.*;
@@ -155,6 +156,7 @@ public class WindowData {
         for (Callback callback : callbacks) {
             callback.free();
         }
+        glfwFreeCallbacks(window);
         glfwTerminate();
     }
 
