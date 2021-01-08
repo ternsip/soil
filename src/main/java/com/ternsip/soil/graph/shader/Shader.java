@@ -34,6 +34,7 @@ public final class Shader implements Finishable {
     private final UniformVec2 aspect = new UniformVec2();
     private final UniformInteger layer = new UniformInteger();
     private final UniformInteger time = new UniformInteger();
+    private final UniformFloat glTime = new UniformFloat();
     private final UniformBoolean debugging = new UniformBoolean();
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
 
@@ -74,6 +75,7 @@ public final class Shader implements Finishable {
         debugging.load(camera.scale.x < 0.01 || camera.scale.y < 0.01);
         //debugging.load(true);
         this.time.load((int) (System.currentTimeMillis() % Integer.MAX_VALUE));
+        this.glTime.load((float) Soil.THREADS.client.windowData.getWindowTime());
         for (int layerIndex = 0; layerIndex < MAX_LAYERS; ++layerIndex) {
             int quads = EntityQuad.getCount(layerIndex);
             if (quads <= 0) {
