@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- *  This is called when a key is pressed, repeated or released.
+ * This is called when a key is pressed, repeated or released.
  */
 @EqualsAndHashCode
 @RequiredArgsConstructor

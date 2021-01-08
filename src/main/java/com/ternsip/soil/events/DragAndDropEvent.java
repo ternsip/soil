@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- *  Called when one or more dragged paths are dropped on the window.
+ * Called when one or more dragged paths are dropped on the window.
  */
 @RequiredArgsConstructor
 @Getter

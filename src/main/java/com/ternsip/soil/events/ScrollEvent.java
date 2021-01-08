@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- *  This is called when a scrolling device is used.
+ * This is called when a scrolling device is used.
  */
 @RequiredArgsConstructor
 @Getter

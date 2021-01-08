@@ -161,12 +161,8 @@ public class WindowData {
     }
 
     public void swapBuffers() {
-        //glFinish();
-        //glDrawBuffer(GL_FRONT);
-        //https://stackoverflow.com/questions/41233696/opengl-prevent-double-buffers
         glfwSwapBuffers(window);
     }
-
 
     public void lockBuffer() {
         if (gSync > 0) {
@@ -184,7 +180,6 @@ public class WindowData {
             }
         }
     }
-
 
     public void pollEvents() {
         glfwPollEvents();

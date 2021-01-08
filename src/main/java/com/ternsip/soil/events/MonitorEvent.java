@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- *  This is called when a monitor is connected to or disconnected from the system.
+ * This is called when a monitor is connected to or disconnected from the system.
  */
 @RequiredArgsConstructor
 @Getter
