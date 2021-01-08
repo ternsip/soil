@@ -371,18 +371,23 @@ public class WindowData {
         Vector4i windowFrameSize = getWindowFrameSize();
         Vector2i windowFrameBufferSize = getWindowFrameBufferSize();
         Vector2i windowPos = getWindowPos();
-        log.info("OpenGL: " + glGetString(GL_VERSION));
-        log.info("Renderer: " + glGetString(GL_RENDERER));
-        log.info("Vendor: " + glGetString(GL_VENDOR));
-        log.info("GLSL: " + glGetString(GL_SHADING_LANGUAGE_VERSION));
-        log.debug("Extensions: " + glGetString(GL_EXTENSIONS));
-        log.info("Monitor: " + getMonitorName(monitor) + " " + monitorPhysicalSize.x + "x" + monitorPhysicalSize.y);
-        log.info("Video mode: " + glfwVidMode.width() + "x" + glfwVidMode.height() + " - " + glfwVidMode.refreshRate() + " Hz");
-        log.info("Frame buffer size: " + windowFrameBufferSize.x + "x" + windowFrameBufferSize.y);
-        log.info("Window size: " + windowSize.x + "x" + windowSize.y);
-        log.info("Window frame size: " + windowFrameSize.w + "x" + windowFrameSize.y + "x" + windowFrameSize.z + "x" + windowFrameSize.w);
-        log.info("Window Content scale: " + windowContentScale.x + " x " + windowContentScale.y);
-        log.info("Window position: (" + windowPos.x + "," + windowPos.y + ")");
+        log.info("OpenGL: {}", glGetString(GL_VERSION));
+        log.info("Renderer: {}", glGetString(GL_RENDERER));
+        log.info("Vendor: {}", glGetString(GL_VENDOR));
+        log.info("GLSL: {}", glGetString(GL_SHADING_LANGUAGE_VERSION));
+        log.debug("Extensions: {}", glGetString(GL_EXTENSIONS));
+        log.info("Monitor: {} {}x{}", getMonitorName(monitor), monitorPhysicalSize.x, monitorPhysicalSize.y);
+        log.info("Video mode: {}x{} - {} Hz", glfwVidMode.width(), glfwVidMode.height(), glfwVidMode.refreshRate());
+        log.info("Frame buffer size: {}x{}", windowFrameBufferSize.x, windowFrameBufferSize.y);
+        log.info("Window size: {}x{}", windowSize.x, windowSize.y);
+        log.info("Window frame size: {}x{}x{}x{}", windowFrameSize.w, windowFrameSize.y, windowFrameSize.z, windowFrameSize.w);
+        log.info("Window content scale: {} x {}", windowContentScale.x, windowContentScale.y);
+        log.info("Window position: ({}, {})", windowPos.x, windowPos.y);
+        log.info("JVM cores: {}", Runtime.getRuntime().availableProcessors());
+        log.info("JVM used memory: {} mb", (int) ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024.0 * 1024.0)));
+        log.info("JVM total memory: {} mb", (int) (Runtime.getRuntime().totalMemory() / (1024.0 * 1024.0)));
+        log.info("JVM max memory: {} mb", (int) (Runtime.getRuntime().maxMemory() / (1024.0 * 1024.0)));
+        log.info("JVM free memory: {} mb", (int) (Runtime.getRuntime().freeMemory() / (1024.0 * 1024.0)));
     }
 
     private void registerErrorEvent() {
