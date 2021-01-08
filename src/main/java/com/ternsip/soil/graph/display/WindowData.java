@@ -35,6 +35,7 @@ public class WindowData {
     public int height;
     public long gSync;
     public boolean fullscreen = false;
+    public boolean vsync = false;
 
     public WindowData() {
         registerErrorEvent();
@@ -83,14 +84,23 @@ public class WindowData {
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DITHER);
         glDisable(GL_LIGHTING);
         glDisable(GL_TEXTURE_2D);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_ALPHA_TEST);
-        glEnable(GL_DEBUG_OUTPUT);
-        //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDisable(GL_SCISSOR_TEST);
+        glDisable(GL_STENCIL_TEST);
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDisable(GL_POLYGON_OFFSET_FILL);
+        glDisable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+        glDisable(GL_RASTERIZER_DISCARD);
+        glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+        glDisable(GL_SAMPLE_MASK);
         registerDebugEvent();
-        glfwSwapInterval(0); // Disable vertical synchronization
+        disableVsync();
         glClearColor(BACKGROUND_COLOR.x(), BACKGROUND_COLOR.y(), BACKGROUND_COLOR.z(), BACKGROUND_COLOR.w());
         registerEvent(new ResizeEvent(width, height));
     }
@@ -237,6 +247,16 @@ public class WindowData {
         int h = glfwVidMode.height();
         glfwSetWindowMonitor(window, 0, (int) (w * 0.1), (int) (h * 0.1), (int) (w * 0.8), (int) (h * 0.8), glfwVidMode.refreshRate());
         fullscreen = false;
+    }
+
+    public void enableVsync() {
+        glfwSwapInterval(1);
+        vsync = true;
+    }
+
+    public void disableVsync() {
+        glfwSwapInterval(0);
+        vsync = false;
     }
 
     private void setWindowIcon(File file) {
@@ -457,6 +477,13 @@ public class WindowData {
                 enterWindowed();
             } else {
                 enterFullscreen();
+            }
+        }
+        if (event.getKey() == GLFW_KEY_F12 && event.getAction() == GLFW_PRESS) {
+            if (vsync) {
+                disableVsync();
+            } else {
+                enableVsync();
             }
         }
     }
