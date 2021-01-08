@@ -4,9 +4,7 @@ import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.events.*;
 import lombok.extern.slf4j.Slf4j;
-import org.joml.Vector2i;
-import org.joml.Vector4f;
-import org.joml.Vector4fc;
+import org.joml.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.lwjgl.system.Callback;
@@ -27,8 +25,8 @@ public class WindowData {
     public static final Vector2i MINIMUM_WINDOW = new Vector2i(32, 32);
     public static final Vector4fc BACKGROUND_COLOR = new Vector4f(0f, 0f, 0f, 0f);
     public final Cursor cursor;
-    private final ArrayList<Callback> callbacks = new ArrayList<>();
-    private final long window;
+    public final ArrayList<Callback> callbacks = new ArrayList<>();
+    public final long window;
     public int width;
     public int height;
     public long gSync;
@@ -42,7 +40,6 @@ public class WindowData {
         }
         long monitor = getPrimaryMonitor();
         GLFWVidMode glfwVidMode = getVideoMode(monitor);
-        Vector2i monitorPhysicalSize = getMonitorPhysicalSize(monitor);
         this.width = (int) (glfwVidMode.width() * 0.8);
         this.height = (int) (glfwVidMode.height() * 0.8);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -112,9 +109,6 @@ public class WindowData {
         glfwSetWindowPos(window, (int) (glfwVidMode.width() * 0.1), (int) (glfwVidMode.height() * 0.1));
         glfwMakeContextCurrent(window);
         createCapabilities();
-        log.info("Running on version: " + glGetString(GL_VERSION));
-        log.info("Monitor: " + getMonitorName(monitor) + " " + monitorPhysicalSize.x() + "x" + monitorPhysicalSize.y());
-        log.info("Video mode: " + glfwVidMode.width() + "x" + glfwVidMode.height() + " - " + glfwVidMode.refreshRate() + " Hz");
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -137,6 +131,7 @@ public class WindowData {
         disableVsync();
         glClearColor(BACKGROUND_COLOR.x(), BACKGROUND_COLOR.y(), BACKGROUND_COLOR.z(), BACKGROUND_COLOR.w());
         registerEvent(new FramebufferSizeEvent(width, height));
+        logInfo();
     }
 
     public float getRatio() {
@@ -323,6 +318,36 @@ public class WindowData {
         return new Vector2i(x[0], y[0]);
     }
 
+    public Vector2f getWindowContentScale() {
+        float[] x = {0}, y = {0};
+        glfwGetWindowContentScale(window, x, y);
+        return new Vector2f(x[0], y[0]);
+    }
+
+    public Vector2i getWindowSize() {
+        int[] x = {0}, y = {0};
+        glfwGetWindowSize(window, x, y);
+        return new Vector2i(x[0], y[0]);
+    }
+
+    public Vector2i getWindowFrameBufferSize() {
+        int[] x = {0}, y = {0};
+        glfwGetFramebufferSize(window, x, y);
+        return new Vector2i(x[0], y[0]);
+    }
+
+    public Vector4i getWindowFrameSize() {
+        int[] left = {0}, top = {0}, right = {0}, bottom = {0};
+        glfwGetWindowFrameSize(window, left, top, right, bottom);
+        return new Vector4i(left[0], top[0], right[0], bottom[0]);
+    }
+
+    public Vector2i getWindowPos() {
+        int[] x = {0}, y = {0};
+        glfwGetWindowPos(window, x, y);
+        return new Vector2i(x[0], y[0]);
+    }
+
     public GLFWVidMode getVideoMode(long monitor) {
         return glfwGetVideoMode(monitor);
     }
@@ -338,6 +363,29 @@ public class WindowData {
             images.put(0, image);
             glfwSetWindowIcon(window, images);
         }
+    }
+
+    public void logInfo() {
+        long monitor = getPrimaryMonitor();
+        GLFWVidMode glfwVidMode = getVideoMode(monitor);
+        Vector2i monitorPhysicalSize = getMonitorPhysicalSize(monitor);
+        Vector2i windowSize = getWindowSize();
+        Vector2f windowContentScale = getWindowContentScale();
+        Vector4i windowFrameSize = getWindowFrameSize();
+        Vector2i windowFrameBufferSize = getWindowFrameBufferSize();
+        Vector2i windowPos = getWindowPos();
+        log.info("OpenGL: " + glGetString(GL_VERSION));
+        log.info("Renderer: " + glGetString(GL_RENDERER));
+        log.info("Vendor: " + glGetString(GL_VENDOR));
+        log.info("GLSL: " + glGetString(GL_SHADING_LANGUAGE_VERSION));
+        log.debug("Extensions: " + glGetString(GL_EXTENSIONS));
+        log.info("Monitor: " + getMonitorName(monitor) + " " + monitorPhysicalSize.x + "x" + monitorPhysicalSize.y);
+        log.info("Video mode: " + glfwVidMode.width() + "x" + glfwVidMode.height() + " - " + glfwVidMode.refreshRate() + " Hz");
+        log.info("Frame buffer size: " + windowFrameBufferSize.x + "x" + windowFrameBufferSize.y);
+        log.info("Window size: " + windowSize.x + "x" + windowSize.y);
+        log.info("Window frame size: " + windowFrameSize.w + "x" + windowFrameSize.y + "x" + windowFrameSize.z + "x" + windowFrameSize.w);
+        log.info("Window Content scale: " + windowContentScale.x + " x " + windowContentScale.y);
+        log.info("Window position: (" + windowPos.x + "," + windowPos.y + ")");
     }
 
     private void registerErrorEvent() {
@@ -520,7 +568,7 @@ public class WindowData {
                 (window, count, names) -> {
                     String[] stringNames = new String[count];
                     for (int i = 0; i < count; ++i) {
-                        stringNames[i]  = GLFWDropCallback.getName(names, i);
+                        stringNames[i] = GLFWDropCallback.getName(names, i);
                     }
                     registerEvent(new DragAndDropEvent(count, stringNames));
                 }
