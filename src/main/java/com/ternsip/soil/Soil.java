@@ -19,6 +19,7 @@ import java.util.Set;
  * - be careful with @Delegate sometimes it breaks navigation or debugger, also recursive delegate does not allowed
  *
  * @author Ternsip
+ * TODO test double monitors swap (including different Hz and color pallet) and screen resize
  */
 public class Soil {
 

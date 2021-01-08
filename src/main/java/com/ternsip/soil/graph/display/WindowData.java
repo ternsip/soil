@@ -46,13 +46,41 @@ public class WindowData {
         this.width = (int) (glfwVidMode.width() * 0.8);
         this.height = (int) (glfwVidMode.height() * 0.8);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_FALSE); // output alpha in fragment shader affects this
-        glfwWindowHint(GLFW_RED_BITS, glfwVidMode.redBits());
-        glfwWindowHint(GLFW_GREEN_BITS, glfwVidMode.greenBits());
-        glfwWindowHint(GLFW_BLUE_BITS, glfwVidMode.blueBits());
-        glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
-        glfwWindowHint(GLFW_SAMPLES, 1); // TODO consider using another value
+        glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
+        glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
+        glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_TRUE);
+        glfwWindowHint(GLFW_FLOATING, GLFW_FALSE);
+        glfwWindowHint(GLFW_MAXIMIZED, GLFW_FALSE);
+        glfwWindowHint(GLFW_CENTER_CURSOR, GLFW_FALSE);
+        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_FALSE);
+        glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
+        glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_FALSE);
+        glfwWindowHint(GLFW_RED_BITS, 8);
+        glfwWindowHint(GLFW_GREEN_BITS, 8);
+        glfwWindowHint(GLFW_BLUE_BITS, 8);
         glfwWindowHint(GLFW_ALPHA_BITS, 8);
+        glfwWindowHint(GLFW_DEPTH_BITS, 0);
+        glfwWindowHint(GLFW_STENCIL_BITS, 0);
+        glfwWindowHint(GLFW_ACCUM_RED_BITS, 0);
+        glfwWindowHint(GLFW_ACCUM_GREEN_BITS, 0);
+        glfwWindowHint(GLFW_ACCUM_BLUE_BITS, 0);
+        glfwWindowHint(GLFW_ACCUM_ALPHA_BITS, 0);
+        glfwWindowHint(GLFW_AUX_BUFFERS, 0);
+        glfwWindowHint(GLFW_SAMPLES, GLFW_DONT_CARE);
+        glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
+        glfwWindowHint(GLFW_STEREO, GLFW_FALSE);
+        glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+        glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+        glfwWindowHint(GLFW_CONTEXT_ROBUSTNESS, GLFW_NO_ROBUSTNESS);
+        glfwWindowHint(GLFW_CONTEXT_RELEASE_BEHAVIOR, GLFW_ANY_RELEASE_BEHAVIOR);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_FALSE);
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
         this.window = glfwCreateWindow(width, height, "Soil", MemoryUtil.NULL, MemoryUtil.NULL);
         if (window == MemoryUtil.NULL) {
             glfwTerminate();
