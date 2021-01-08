@@ -41,8 +41,9 @@ public class WindowData {
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
-        long monitor = glfwGetPrimaryMonitor();
-        GLFWVidMode glfwVidMode = glfwGetVideoMode(monitor);
+        long monitor = getPrimaryMonitor();
+        GLFWVidMode glfwVidMode = getVideoMode(monitor);
+        Vector2i monitorPhysicalSize = getMonitorPhysicalSize(monitor);
         this.width = (int) (glfwVidMode.width() * 0.8);
         this.height = (int) (glfwVidMode.height() * 0.8);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -113,6 +114,8 @@ public class WindowData {
         glfwMakeContextCurrent(window);
         createCapabilities();
         log.info("Running on version: " + glGetString(GL_VERSION));
+        log.info("Monitor: " + getMonitorName(monitor) + " " + monitorPhysicalSize.x() + "x" + monitorPhysicalSize.y());
+        log.info("Video mode: " + glfwVidMode.width() + "x" + glfwVidMode.height() + " - " + glfwVidMode.refreshRate() + " Hz");
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -275,8 +278,8 @@ public class WindowData {
         if (fullscreen) {
             return;
         }
-        long monitor = glfwGetPrimaryMonitor();
-        GLFWVidMode glfwVidMode = glfwGetVideoMode(monitor);
+        long monitor = getPrimaryMonitor();
+        GLFWVidMode glfwVidMode = getVideoMode(monitor);
         glfwSetWindowMonitor(window, monitor, 0, 0, glfwVidMode.width(), glfwVidMode.height(), glfwVidMode.refreshRate());
         fullscreen = true;
     }
@@ -285,8 +288,8 @@ public class WindowData {
         if (!fullscreen) {
             return;
         }
-        long monitor = glfwGetPrimaryMonitor();
-        GLFWVidMode glfwVidMode = glfwGetVideoMode(monitor);
+        long monitor = getPrimaryMonitor();
+        GLFWVidMode glfwVidMode = getVideoMode(monitor);
         int w = glfwVidMode.width();
         int h = glfwVidMode.height();
         glfwSetWindowMonitor(window, MemoryUtil.NULL, (int) (w * 0.1), (int) (h * 0.1), (int) (w * 0.8), (int) (h * 0.8), glfwVidMode.refreshRate());
@@ -301,6 +304,24 @@ public class WindowData {
     public void disableVsync() {
         glfwSwapInterval(0);
         vsync = false;
+    }
+
+    public String getMonitorName(long monitor) {
+        return glfwGetMonitorName(monitor);
+    }
+
+    public Vector2i getMonitorPhysicalSize(long monitor) {
+        int[] x = {0}, y = {0};
+        glfwGetMonitorPhysicalSize(monitor, x, y);
+        return new Vector2i(x[0], y[0]);
+    }
+
+    public GLFWVidMode getVideoMode(long monitor) {
+        return glfwGetVideoMode(monitor);
+    }
+
+    public long getPrimaryMonitor() {
+        return glfwGetPrimaryMonitor();
     }
 
     private void setWindowIcon(File file) {
