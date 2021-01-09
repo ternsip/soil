@@ -43,7 +43,7 @@ public class TextureRepository {
     public final static int MIPMAP_LEVELS = 1;
     public final static File MISSING_TEXTURE = new File("soil/tools/missing.jpg");
     public final static String[] EXTENSIONS = {"jpg", "png", "bmp", "jpeg", "gif"};
-    public final static int[] ATLAS_RESOLUTIONS = new int[]{16, 32, 64, 128, 256, 512, 1024, 2048, 4096};
+    public final static int[] ATLAS_RESOLUTIONS = new int[]{16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192};
 
     private final int[] atlases;
     private final Map<File, Texture> fileToTexture;

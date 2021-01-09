@@ -11,35 +11,13 @@ const int MAX_LIGHT = 16;
 const float MAX_LIGHT_F = MAX_LIGHT;
 const int MAX_SAMPLERS = 16;
 const int POWER4 = 16;
-const int BLOCKS_X = 4000;
-const int BLOCKS_Y = 3000;
-const int TOTAL_BLOCKS = BLOCKS_X * BLOCKS_Y;
-const int[] SIMPLE_DELTA_X = { -1, 1, 0, 0 };
-const int[] SIMPLE_DELTA_Y = { 0, 0, -1, 1 };
-const int[] SIMPLE_DELTA_INDEX = { -1, 1, -BLOCKS_X, BLOCKS_X };
-const int[] ANCHOR_DELTA_X = { -1, -1, -1, 0, 0, 1, 1, 1 };
-const int[] ANCHOR_DELTA_Y = { -1, 0, 1, -1, 1, -1, 0, 1 };
-const int[] ANCHOR_DELTA_INDEX = { -BLOCKS_X-1, -1, BLOCKS_X-1, -BLOCKS_X, BLOCKS_X, -BLOCKS_X+1, 1, BLOCKS_X+1 };
 
 const int TEXTURE_STYLE_EMPTY = 0;
 const int TEXTURE_STYLE_NORMAL = 1;
 const int TEXTURE_STYLE_SHADOW = 2;
-const int TEXTURE_STYLE_BLOCKS = 3;
-const int TEXTURE_STYLE_FONT256 = 4;
-const int TEXTURE_STYLE_WATER = 5;
-const int TEXTURE_STYLE_LAVA = 6;
-const int TEXTURE_STYLE_4_SIMPLE_VARIATION = 7;
-const int TEXTURE_STYLE_4_ADJACENT8_VARIATION = 8;
+const int TEXTURE_STYLE_FONT256 = 3;
 
 const int QUAD_FLAG_PINNED = 0x1;
-
-struct Block {
-    int type;
-    int sky;
-    int emit;
-    int opacity;
-    int glow;
-};
 
 struct TextureData {
     int layerStart;
@@ -60,19 +38,11 @@ struct Quad {
     float vertices[8];
 };
 
-layout (std430, binding = 0) buffer blocksBuffer {
-    Block blocks[];
-};
-
-layout (std430, binding = 3) buffer heightsBuffer {
-    int heights[];
-};
-
 layout (std430, binding = 1) buffer textureBuffer {
     TextureData textures[];
 };
 
-layout (std430, binding = 2) buffer quadBuffer {
+layout (std430, binding = 0) buffer quadBuffer {
     Quad quadData[];
 };
 
@@ -165,82 +135,8 @@ vec4 resolveQuadTexel() {
     float realX = (texture_xy.x * 2 - 1) / (cameraScale.x * aspect.x) + cameraPos.x;
     float realY = (texture_xy.y * 2 - 1) / (cameraScale.y * aspect.y) + cameraPos.y;
     vec4 overlapTexel = vec4(0);
-    if (textureData.textureStyle == TEXTURE_STYLE_BLOCKS || textureData.textureStyle == TEXTURE_STYLE_SHADOW) {
-        if (realX < 0 || realY < 0 || realX >= BLOCKS_X || realY >= BLOCKS_Y || (debugging && textureData.textureStyle == TEXTURE_STYLE_SHADOW)) {
-            discard;
-        }
-        int blockX = int(realX);
-        int blockY = int(realY);
-        int blockIndex = blockY * BLOCKS_X + blockX;
-        Block block = blocks[blockIndex];
-        vec2 blockFragment = vec2(realX - blockX, realY - blockY);
-        if (textureData.textureStyle == TEXTURE_STYLE_SHADOW) {
-            block.emit = block.glow; // TODO compress sky, emit, opacity, glow into one integer
-            block.sky = (heights[blockX] <= blockY) ? MAX_LIGHT : 0;
-            for (int k = 0; k < 4; ++k) {
-                if (blockX + SIMPLE_DELTA_X[k] < 0 || blockY + SIMPLE_DELTA_Y[k] < 0 || blockX + SIMPLE_DELTA_X[k] >= BLOCKS_X || blockY + SIMPLE_DELTA_Y[k] >= BLOCKS_Y) continue;
-                Block nextBlock = blocks[blockIndex + SIMPLE_DELTA_INDEX[k]];
-                block.emit = max(block.emit, nextBlock.emit - block.opacity);
-                block.sky = max(block.sky, nextBlock.sky - block.opacity);
-            }
-            blocks[blockIndex].sky = block.sky;
-            blocks[blockIndex].emit = block.emit;
-            float light = max(block.emit / MAX_LIGHT_F, block.sky / MAX_LIGHT_F);
-            float receiveMaxLight[8];
-            float receiveLight[8];
-            for (int k = 0; k < 8; ++k) {
-                int nextBlockIndex = blockIndex + ANCHOR_DELTA_INDEX[k];
-                if (blockX + ANCHOR_DELTA_X[k] < 0 || blockY + ANCHOR_DELTA_Y[k] < 0 || blockX + ANCHOR_DELTA_X[k] >= BLOCKS_X || blockY + ANCHOR_DELTA_Y[k] >= BLOCKS_Y) continue;
-                Block nextBlock = blocks[nextBlockIndex];
-                vec2 anchor = vec2(ANCHOR_DELTA_X[k] + 0.5, ANCHOR_DELTA_Y[k] + 0.5);
-                float dist = (SQRT2 - min(SQRT2, distance(blockFragment, anchor))) / SQRT2;
-                float angle = atan(anchor.y - blockFragment.y, anchor.x - blockFragment.x);
-                float strobe = 1 + 2 * noise(vec3(loopValue(time + randInt(nextBlockIndex), 100000) * 100, 2 + sin(angle) * 2, 2 + cos(angle) * 2));
-                receiveMaxLight[k] = max(nextBlock.emit / MAX_LIGHT_F, nextBlock.sky / MAX_LIGHT_F);
-                receiveLight[k] = receiveMaxLight[k] * pow(dist, strobe);
-            }
-            for (int iteration = 0; iteration < LIGHT_ACCURACY; ++iteration) {
-                for (int k = 0; k < 8; ++k) {
-                    light = max(light, min(receiveMaxLight[k], light + receiveLight[k]));
-                }
-            }
-            return vec4(0, 0, 0, 1 - light);
-        }
-        textureData = textures[block.type];
-        animation_start = randInt(blockIndex);
-        pos.x = blockFragment.x;
-        pos.y = 1 - blockFragment.y;
-        if (textureData.textureStyle == TEXTURE_STYLE_4_SIMPLE_VARIATION) {
-            int variation = abs(randInt(blockIndex)) % 4;
-            pos = translateSquareIndex(pos, 2, variation);
-        }
-        if (textureData.textureStyle == TEXTURE_STYLE_4_ADJACENT8_VARIATION) {
-            int variation = abs(randInt(blockIndex)) % 4;
-            int dx = 1 + (variation % 2) * 3;
-            int dy = 1 + (variation / 2) * 3;
-            pos = translateSquarePos(pos, 6, dx, dy);
-        }
-        for (int k = 0; k < 8; ++k) {
-            int nextBlockIndex = blockIndex + ANCHOR_DELTA_INDEX[k];
-            if (blockX + ANCHOR_DELTA_X[k] < 0 || blockY + ANCHOR_DELTA_Y[k] < 0 || blockX + ANCHOR_DELTA_X[k] >= BLOCKS_X || blockY + ANCHOR_DELTA_Y[k] >= BLOCKS_Y) continue;
-            Block nextBlock = blocks[nextBlockIndex];
-            TextureData nextTextureData = textures[nextBlock.type];
-            if (nextTextureData.textureStyle != TEXTURE_STYLE_4_ADJACENT8_VARIATION || nextBlock.type == block.type) continue;
-            int variation = abs(randInt(nextBlockIndex)) % 4;
-            int dx = 1 + (variation % 2) * 3 - ANCHOR_DELTA_X[k];
-            int dy = 1 + (variation / 2) * 3 + ANCHOR_DELTA_Y[k];
-            overlapTexel = mix4(overlapTexel, resolveTexture(nextTextureData, randInt(nextBlockIndex), quad.animation_period, translateSquarePos(pos, 6, dx, dy)));
-        }
-    }
     if (textureData.textureStyle == TEXTURE_STYLE_EMPTY) {
         return overlapTexel;
-    }
-    if (textureData.textureStyle == TEXTURE_STYLE_LAVA) {
-        vec3 orange = vec3(1., .45, 0.);
-        vec3 yellow = vec3(1., 1., 0.);
-        // TODO make lava better https://www.shadertoy.com/view/llsBR4 https://www.shadertoy.com/view/lslXRS https://thebookofshaders.com/edit.php#11/lava-lamp.frag http://www.science-and-fiction.org/rendering/noise.html
-        float noiseValue = noise(vec3(realX, realY, loopValue(time, 10000) * 10));
-        return mix4(vec4(mix(yellow, orange, vec3(smoothstep(0., 1., noiseValue))), 0.9f), overlapTexel);
     }
     if (textureData.textureStyle == TEXTURE_STYLE_FONT256) {
         pos = translateSquareIndex(pos, POWER4, quad.meta1);

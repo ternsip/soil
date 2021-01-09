@@ -14,10 +14,7 @@ import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
+import java.nio.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -103,6 +100,14 @@ public class Utils {
         buf.put(array);
         buf.flip();
         return buf;
+    }
+
+    public static ByteBuffer sliceBuffer(ByteBuffer data, int offset, int size, ByteOrder byteOrder) {
+        ByteBuffer byteBuffer = data.slice();
+        byteBuffer.order(byteOrder);
+        byteBuffer.position(offset);
+        byteBuffer.limit(size);
+        return byteBuffer;
     }
 
     public static int[] listToIntArray(List<Integer> list) {

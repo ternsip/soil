@@ -23,8 +23,6 @@ public final class Shader implements Finishable {
 
     private static final File VERTEX_SHADER = new File("soil/shaders/VertexShader.glsl");
     private static final File FRAGMENT_SHADER = new File("soil/shaders/FragmentShader.glsl");
-    public final BufferLayout blocksBuffer = new BufferLayout(BlocksRepository.SIZE_X * BlocksRepository.SIZE_Y, 5);
-    public final BufferLayout heightsBuffer = new BufferLayout(BlocksRepository.SIZE_X, 1);
     public final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length, 6);
     public final BufferLayout quadBuffer = new BufferLayout(MAX_LAYERS * Mesh.MAX_QUADS, 14);
     private final int programID;

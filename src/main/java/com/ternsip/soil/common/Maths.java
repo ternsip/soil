@@ -179,4 +179,8 @@ public class Maths {
         return (a + b - 1) / b;
     }
 
+    public static int packRGBA(int r, int g, int b, int a) {
+        return ((0xFF & r) << 24) | ((0xFF & g) << 16) | ((0xFF & b) << 8) | (0xFF & a);
+    }
+
 }

@@ -6,7 +6,7 @@ import com.ternsip.soil.common.Updatable;
 import com.ternsip.soil.events.EventHook;
 import com.ternsip.soil.events.KeyEvent;
 import com.ternsip.soil.events.MouseButtonEvent;
-import com.ternsip.soil.game.blocks.Block;
+import com.ternsip.soil.game.blocks.Material;
 import com.ternsip.soil.game.common.PhysicalPoint;
 import com.ternsip.soil.graph.display.Camera;
 import com.ternsip.soil.graph.display.CursorType;
@@ -155,7 +155,7 @@ public class EntityPlayer extends Entity implements Updatable {
         if (event.getKey() == GLFW_KEY_Q && event.getAction() == GLFW_PRESS) {
             int blockX = (int) Math.floor(x);
             int blockY = (int) Math.floor(y - 1);
-            Soil.THREADS.client.blocksRepository.setBlockSafe(blockX, blockY, Block.AIR);
+            Soil.THREADS.client.blocksRepository.setMaterialSafe(blockX, blockY, Material.AIR, 0);
             processMovement(0, 0);
         }
         if (event.getKey() == GLFW_KEY_SPACE && event.getAction() == GLFW_PRESS && touchingBottom) {
@@ -172,7 +172,7 @@ public class EntityPlayer extends Entity implements Updatable {
             double realY = (camera.mousePosY) / (camera.scale.y * camera.aspectY) + camera.pos.y;
             int blockX = (int) Math.floor(realX);
             int blockY = (int) Math.floor(realY);
-            Soil.THREADS.client.blocksRepository.setBlockSafe(blockX, blockY, Block.AIR);
+            Soil.THREADS.client.blocksRepository.setMaterialSafe(blockX, blockY, Material.AIR, 0);
             processMovement(0, 0);
         }
     }

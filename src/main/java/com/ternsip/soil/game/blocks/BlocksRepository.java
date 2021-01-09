@@ -7,19 +7,23 @@ import com.ternsip.soil.common.Maths;
 import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.game.generators.ChunkGenerator;
 import com.ternsip.soil.graph.shader.Shader;
+import com.ternsip.soil.graph.shader.TextureType;
+import org.lwjgl.BufferUtils;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class BlocksRepository implements Finishable {
 
-    public static final int SIZE_X = 4000;
-    public static final int SIZE_Y = 3000;
-    public static final int MAX_LIGHT = 16;
-    public static final Indexer INDEXER = new Indexer(SIZE_X, SIZE_Y);
-    private static final List<ChunkGenerator> CHUNK_GENERATORS = constructChunkGenerators();
-    public final Block[][] blocks = new Block[SIZE_X][SIZE_Y];
+    public static final int SIZE_X = 8192;
+    public static final int SIZE_Y = 4096;
+    public static final List<ChunkGenerator> CHUNK_GENERATORS = constructChunkGenerators();
+    public final int[][] rgbas = new int[SIZE_X][SIZE_Y];
+    public final Material[][] materials = new Material[SIZE_X][SIZE_Y];
+    public final ByteBuffer buffer = BufferUtils.createByteBuffer(SIZE_X * SIZE_Y * 4);
 
     private static List<ChunkGenerator> constructChunkGenerators() {
         return Utils.getAllClasses(ChunkGenerator.class).stream()
@@ -86,54 +90,41 @@ public class BlocksRepository implements Finishable {
         return 1;
     }
 
-    public boolean setBlockSafe(int x, int y, Block block) {
-        if (INDEXER.isInside(x, y)) {
-            blocks[x][y] = block;
+    public void setMaterialSafe(int x, int y, Material material, int rgba) {
+        if (isInside(x, y)) {
+            materials[x][y] = material;
+            rgbas[x][y] = rgba;
             visualUpdate(x, y, 1, 1);
-            return true;
         }
-        return false;
+    }
+
+    public boolean isInside(int x, int y) {
+        return x >= 0 && x < SIZE_X && y >= 0 && y < SIZE_Y;
     }
 
     public boolean isObstacle(int x, int y) {
-        return INDEXER.isInside(x, y) && blocks[x][y].obstacle;
-    }
-
-    public void updateBlocks(int startX, int startY, Block[][] blocks) {
-        int sizeX = blocks.length;
-        int sizeY = blocks[0].length;
-        int endX = startX + sizeX - 1;
-        int endY = startX + sizeY - 1;
-        for (int x = startX; x <= endX; ++x) {
-            for (int y = startY; y <= endY; ++y) {
-                this.blocks[x][y] = blocks[x][y];
-            }
-        }
-        visualUpdate(startX, startY, sizeX, sizeY);
+        return materials[x][y].obstacle;
     }
 
     public void visualUpdate(int startX, int startY, int sizeX, int sizeY) {
-        Shader shader = Soil.THREADS.client.shader;
         int endX = startX + sizeX - 1;
         int endY = startY + sizeY - 1;
-        for (int x = startX; x <= endX; ++x) {
-            int height = SIZE_Y - 1;
-            while (
-                    height > 0 && !blocks[x][height].obstacle &&
-                    x > 0 && !blocks[x - 1][height].obstacle &&
-                    x < (SIZE_X - 1) && !blocks[x + 1][height].obstacle
-            ) {
-                height--;
-            }
-            shader.heightsBuffer.writeInt(x, height + 1);
-            for (int y = startY; y <= endY; ++y) {
-                int index = (int) INDEXER.getIndex(x, y);
-                int offset = index * shader.blocksBuffer.structureLength;
-                shader.blocksBuffer.writeInt(offset, blocks[x][y].textureType.ordinal());
-                shader.blocksBuffer.writeInt(offset + 3, Math.max(0, blocks[x][y].opacity));
-                shader.blocksBuffer.writeInt(offset + 4, Math.max(0, -blocks[x][y].opacity));
+        int volume = sizeX * sizeY;
+        ByteBuffer smallBuffer = Utils.sliceBuffer(buffer, 0, volume * Integer.BYTES, ByteOrder.BIG_ENDIAN);
+        for (int x = startX, idx = 0; x <= endX; ++x) {
+            for (int y = startY; y <= endY; ++y, ++idx) {
+                smallBuffer.putInt(idx * Integer.BYTES, rgbas[x][y]);
             }
         }
+        Soil.THREADS.client.textureRepository.updateTexture(
+                Soil.THREADS.client.textureRepository.getTexture(TextureType.SOIL),
+                smallBuffer,
+                startX,
+                startY,
+                sizeX,
+                sizeY,
+                0
+        );
     }
 
     public void fullVisualUpdate() {

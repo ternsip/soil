@@ -1,6 +1,7 @@
 package com.ternsip.soil.general;
 
 import com.ternsip.soil.Soil;
+import com.ternsip.soil.common.Maths;
 import com.ternsip.soil.common.Threadable;
 import com.ternsip.soil.common.Timer;
 import com.ternsip.soil.common.Utils;
@@ -18,6 +19,9 @@ import com.ternsip.soil.graph.shader.TextureType;
 
 import java.nio.ByteBuffer;
 import java.util.Random;
+
+import static com.ternsip.soil.game.blocks.BlocksRepository.SIZE_X;
+import static com.ternsip.soil.game.blocks.BlocksRepository.SIZE_Y;
 
 /**
  * Provides full control over user Input/Output channels
@@ -38,8 +42,6 @@ public class Client implements Threadable {
     public EntityRepository entityRepository;
     public BlocksRepository blocksRepository;
     public Timer physicsClock;
-    // TODO REMOVE
-    ByteBuffer cleanData = Utils.arrayToBuffer(new byte[40 * 40 * 4]);
 
     @Override
     public void init() {
@@ -59,12 +61,6 @@ public class Client implements Threadable {
         eventReceiver.registerWithSubObjects(this);
         physicsClock = new Timer(1000 / settings.physicalTicksPerSecond);
         new EntityStatistics().register();
-        // TODO REMOVE
-        byte[] b = new byte[40 * 40 * 4];
-        new Random().nextBytes(b);
-        cleanData = Utils.arrayToBuffer(b);
-        cleanData.rewind();
-        // --
         spawnMenu();
     }
 
@@ -82,11 +78,12 @@ public class Client implements Threadable {
             entityRepository.update();
             // TODO REMOVE
             Random r = new Random();
-            for (int i = 0; i < cleanData.limit(); ++i) {
-                cleanData.put(i, (byte) r.nextInt());
+            for (int i = 0; i < 1000; ++i) {
+                int x = Math.abs(r.nextInt()) % SIZE_X;
+                int y = Math.abs(r.nextInt()) % SIZE_Y;
+                Soil.THREADS.client.blocksRepository.rgbas[x][y] = Maths.packRGBA(0, 0, 255, 255);
+                Soil.THREADS.client.blocksRepository.visualUpdate(x, y, 1, 1);
             }
-            for (int i = 0; i < 100; ++i)
-                textureRepository.updateTexture(textureRepository.getTexture(TextureType.BACKGROUND), cleanData, Math.abs(r.nextInt()) % 900, Math.abs(r.nextInt()) % 900, 40, 40, 0);
             // --
         }
         shader.render();
@@ -125,15 +122,14 @@ public class Client implements Threadable {
         //If you have a 800x600 screen, and a 2D quad over the whole screen, that 2D quad will have 480000 fragment shader calls, although it has only 4 vertexes.
         //Now, moving further, let's assume you have 10 such quads, on on top of another.
         //If you don't sort your geometry Front to Back or if you are using alpha blend with no depth test, then you will end up with 10x800x600 = 4800000 fragment calls.
-        for (int i = 0; i < 1000; ++i)
+        for (int i = 0; i < 100; ++i)
             new EntityQuad(1, TextureType.HOMER, false, 1000.0f, -0.4f, 0.2f, -0.2f, 0.2f, -0.2f, 0, -0.4f, 0, 0, 0).register();
         //new EntityQuad(1, TextureType.FONT, 1000.0f, -0.4f, 0.2f, -0.2f, 0.2f, -0.2f, 0, -0.4f, 0, 'c', 0).register();
         new EntityQuad(1, TextureType.TEST, false, 3000.0f, -0.8f, 0.2f, -0.4f, 0.2f, -0.4f, 0, -0.8f, 0, 0, 0).register();
         new EntityQuad(1, TextureType.KITTY, false, 1000.0f, -0.8f, 0.4f, -0.4f, 0.4f, -0.4f, 0.2f, -0.8f, 0.2f, 0, 0).register();
         new EntityQuad(2, TextureType.PLAYER_IDLE, false, 1000.0f, 0, 0, -0.9f, -0, -0.9f, -0.5f, 0, -0.5f, 0, 0).register();
-        new EntityQuad(3, TextureType.BLOCKS, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
-        new EntityQuad(4, TextureType.SHADOW, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
-        new EntityQuad(5, TextureType.CB, false, 1000.0f, -0.5f, -1, 0.5f, -1, 1, 1, -1, 1, 0, 0).register();
+        new EntityQuad(5, TextureType.OVERLAY, false, 1000.0f, -0.5f, -1, 0.5f, -1, 1, 1, -1, 1, 0, 0).register();
+        new EntityQuad(6, TextureType.SOIL, false, 1000.0f, 0, 0, SIZE_X, 0, SIZE_X, BlocksRepository.SIZE_Y, 0, BlocksRepository.SIZE_Y, 0, 0).register();
         new EntityPlayer(1).register();
     }
 

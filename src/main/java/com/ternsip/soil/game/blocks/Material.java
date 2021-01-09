@@ -3,20 +3,23 @@ package com.ternsip.soil.game.blocks;
 import com.ternsip.soil.graph.shader.TextureType;
 import lombok.RequiredArgsConstructor;
 
+import java.io.File;
+
 @RequiredArgsConstructor
 public enum Material {
 
-    AIR(TextureType.EMPTY),
-    DIRT(TextureType.BLOCK_DIRT),
-    STONE(TextureType.BLOCK_DIRT),
-    LAWN(TextureType.BLOCK_LAWN),
-    GRASS(TextureType.GRASS),
-    WOOD(TextureType.BLOCK_DIRT),
-    WATER(TextureType.BLOCK_DIRT),
-    LAVA(TextureType.BLOCK_LAVA),
-    SAND(TextureType.BLOCK_SAND);
+    AIR(new File("soil/interface/lava.png"), false),
+    DIRT(new File("soil/interface/lava.png"), true),
+    STONE(new File("soil/interface/lava.png"), true),
+    LAWN(new File("soil/interface/lava.png"), true),
+    GRASS(new File("soil/interface/lava.png"), false),
+    WOOD(new File("soil/interface/lava.png"), true),
+    WATER(new File("soil/interface/lava.png"), true),
+    LAVA(new File("soil/interface/lava.png"), false),
+    SAND(new File("soil/interface/lava.png"), true);
 
-    public final TextureType textureType;
+    public final File texture;
+    public final boolean obstacle;
 
 
 }

@@ -1,6 +1,5 @@
 package com.ternsip.soil.game.generators;
 
-import com.ternsip.soil.game.blocks.Block;
 import com.ternsip.soil.game.blocks.BlocksRepository;
 import lombok.Getter;
 
@@ -19,7 +18,7 @@ public class AirGenerator implements ChunkGenerator {
     public void populate(BlocksRepository blocksRepository) {
         for (int x = 0; x < SIZE_X; ++x) {
             for (int y = 0; y < SIZE_Y; ++y) {
-                blocksRepository.blocks[x][y] = Block.AIR;
+
             }
         }
     }

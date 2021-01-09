@@ -18,7 +18,7 @@ struct Quad {
     float vertices[8];
 };
 
-layout (std430, binding = 2) buffer quadBuffer {
+layout (std430, binding = 0) buffer quadBuffer {
     Quad quadData[];
 };
 
