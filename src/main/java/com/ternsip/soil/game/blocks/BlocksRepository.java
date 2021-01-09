@@ -117,10 +117,11 @@ public class BlocksRepository implements Finishable {
         int endX = startX + sizeX - 1;
         int endY = startY + sizeY - 1;
         int volume = sizeX * sizeY;
+        if (volume <= 0) return;
         ByteBuffer smallBuffer = Utils.sliceBuffer(buffer, 0, volume * Integer.BYTES, ByteOrder.BIG_ENDIAN);
-        for (int x = startX, idx = 0; x <= endX; ++x) {
-            for (int y = startY; y <= endY; ++y) {
-                smallBuffer.putInt((y * sizeX + x) * Integer.BYTES, rgbas[x][y]);
+        for (int x = startX, dx = 0; x <= endX; ++x, ++dx) {
+            for (int y = startY, dy = 0; y <= endY; ++y, ++dy) {
+                smallBuffer.putInt((dy * sizeX + dx) * Integer.BYTES, rgbas[x][y]);
             }
         }
         Soil.THREADS.client.textureRepository.updateTexture(
