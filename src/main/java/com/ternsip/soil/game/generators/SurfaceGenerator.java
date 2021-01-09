@@ -9,6 +9,7 @@ import lombok.Getter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -19,9 +20,9 @@ import static com.ternsip.soil.game.blocks.BlocksRepository.SIZE_Y;
 public class SurfaceGenerator implements ChunkGenerator {
 
     private final int caveNumber = 311;
-    private final ArrayList<Image> caves = loadImages();
+    private final ArrayList<Image> caves = loadCaves();
 
-    public static ArrayList<Image> loadImages() {
+    public static ArrayList<Image> loadCaves() {
         return Utils.getResourceListing(new File("soil/terrain/caves"), Image.EXTENSIONS)
                 .stream()
                 .map(Image::new)
@@ -36,10 +37,11 @@ public class SurfaceGenerator implements ChunkGenerator {
     @Override
     public void populate(BlocksRepository blocksRepository) {
         Random random = new Random(0);
+        Image sand = new Image(Material.SAND.texture);
         for (int x = 0; x < SIZE_X; ++x) {
             for (int y = 0; y < SIZE_Y; ++y) {
-                blocksRepository.materials[x][y] = Material.DIRT;
-                blocksRepository.rgbas[x][y] = Maths.packRGBA(Math.abs(random.nextInt()) % 256, Math.abs(random.nextInt()) % 256, Math.abs(random.nextInt()) % 256, Math.abs(random.nextInt()) % 256);
+                blocksRepository.materials[x][y] = Material.SAND;
+                blocksRepository.rgbas[x][y] = sand.getRGBA(0, x % sand.width, y % sand.height);
             }
         }
         for (int i = 0; i < caveNumber; ++i) {
@@ -54,7 +56,7 @@ public class SurfaceGenerator implements ChunkGenerator {
                     if (x < 0 || y < 0 || x >= SIZE_X || y >= SIZE_Y) continue;
                     int cx = (int) (dx / scale) % cave.width;
                     int cy = (int) (dy / scale) % cave.height;
-                    int offset = (cy * cave.width + cx) * Image.COMPONENT_RGBA;
+                    int offset = cave.getOffset(cx, cy);
                     byte r = cave.frameData[0][offset];
                     byte g = cave.frameData[0][offset];
                     byte b = cave.frameData[0][offset];

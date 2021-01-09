@@ -3,6 +3,7 @@ package com.ternsip.soil.graph.display;
 import com.madgag.gif.fmsware.GifDecoder;
 import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
+import com.ternsip.soil.common.Maths;
 import com.ternsip.soil.common.Utils;
 import lombok.SneakyThrows;
 import org.lwjgl.BufferUtils;
@@ -74,6 +75,20 @@ public class Image {
             }
         }
         return dataRGBA;
+    }
+
+    public int getOffset(int x, int y) {
+        return (y * width + x) * COMPONENT_RGBA;
+    }
+
+    public int getRGBA(int frame, int x, int y) {
+        int offset = getOffset(x, y);
+        return Maths.packRGBA(
+                frameData[frame][offset],
+                frameData[frame][offset + 1],
+                frameData[frame][offset + 2],
+                frameData[frame][offset + 3]
+        );
     }
 
 }

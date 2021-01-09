@@ -15,7 +15,7 @@ public enum Material {
     WOOD(new File("soil/interface/lava.png"), true),
     WATER(new File("soil/interface/lava.png"), true),
     LAVA(new File("soil/interface/lava.png"), false),
-    SAND(new File("soil/interface/lava.png"), true);
+    SAND(new File("soil/terrain/materials/sand.jpg"), true);
 
     public final File texture;
     public final boolean obstacle;
