@@ -1,6 +1,5 @@
 package com.ternsip.soil.game.blocks;
 
-import com.ternsip.soil.graph.shader.TextureType;
 import lombok.RequiredArgsConstructor;
 
 import java.io.File;

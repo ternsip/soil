@@ -3,7 +3,6 @@ package com.ternsip.soil.graph.shader;
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Finishable;
 import com.ternsip.soil.common.Utils;
-import com.ternsip.soil.game.blocks.BlocksRepository;
 import com.ternsip.soil.game.entities.EntityQuad;
 import com.ternsip.soil.graph.display.Camera;
 import com.ternsip.soil.graph.display.Texture;

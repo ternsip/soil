@@ -2,11 +2,9 @@ package com.ternsip.soil.game.blocks;
 
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Finishable;
-import com.ternsip.soil.common.Indexer;
 import com.ternsip.soil.common.Maths;
 import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.game.generators.ChunkGenerator;
-import com.ternsip.soil.graph.shader.Shader;
 import com.ternsip.soil.graph.shader.TextureType;
 import org.lwjgl.BufferUtils;
 

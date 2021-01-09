@@ -1,10 +1,8 @@
 package com.ternsip.soil.general;
 
 import com.ternsip.soil.Soil;
-import com.ternsip.soil.common.Maths;
 import com.ternsip.soil.common.Threadable;
 import com.ternsip.soil.common.Timer;
-import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.events.EventHook;
 import com.ternsip.soil.events.EventReceiver;
 import com.ternsip.soil.events.OnConnectedToServer;
@@ -16,9 +14,6 @@ import com.ternsip.soil.game.entities.EntityStatistics;
 import com.ternsip.soil.graph.display.*;
 import com.ternsip.soil.graph.shader.Shader;
 import com.ternsip.soil.graph.shader.TextureType;
-
-import java.nio.ByteBuffer;
-import java.util.Random;
 
 import static com.ternsip.soil.game.blocks.BlocksRepository.SIZE_X;
 import static com.ternsip.soil.game.blocks.BlocksRepository.SIZE_Y;

@@ -22,11 +22,8 @@ public class SurfaceGenerator implements ChunkGenerator {
     private final ArrayList<Image> caves = loadImages();
 
     public static ArrayList<Image> loadImages() {
-        String prefix = new File("soil/terrain/caves").getPath();
-        // TODO use regex to pick folder
-        return Utils.getResourceListing(Image.EXTENSIONS)
+        return Utils.getResourceListing(new File("soil/terrain/caves"), Image.EXTENSIONS)
                 .stream()
-                .filter(file -> file.getPath().startsWith(prefix))
                 .map(Image::new)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -47,7 +44,7 @@ public class SurfaceGenerator implements ChunkGenerator {
         }
         for (int i = 0; i < caveNumber; ++i) {
             Image cave = caves.get(Math.abs(random.nextInt()) % caves.size());
-            float scale =  Math.abs(random.nextFloat()) * 3;
+            float scale = Math.abs(random.nextFloat()) * 3;
             int realSizeX = (int) (cave.width * scale);
             int realSizeY = (int) (cave.height * scale);
             int offsetX = Math.abs(random.nextInt()) % (SIZE_X + realSizeX) - realSizeX;
@@ -62,7 +59,7 @@ public class SurfaceGenerator implements ChunkGenerator {
                     byte g = cave.frameData[0][offset];
                     byte b = cave.frameData[0][offset];
                     byte a = cave.frameData[0][offset];
-                    if (r == (byte)255 && g == (byte)255 && b == (byte)255) {
+                    if (r == (byte) 255 && g == (byte) 255 && b == (byte) 255) {
                         blocksRepository.materials[x][y] = Material.AIR;
                         blocksRepository.rgbas[x][y] = Maths.packRGBA(0, 0, 0, 0);
                     }

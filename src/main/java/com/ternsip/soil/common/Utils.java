@@ -31,7 +31,6 @@ import java.util.zip.InflaterOutputStream;
 public class Utils {
 
     public static final String SOURCES_ROOT = "com.ternsip.soil";
-    public static final String RESOURCES_ROOT = "soil";
 
     @SneakyThrows
     public static String getPath(File file) {
@@ -147,8 +146,8 @@ public class Utils {
         return reflections.getSubTypesOf(clazz);
     }
 
-    public static synchronized List<File> getResourceListing(String[] extensions) {
-        Reflections reflections = new Reflections(RESOURCES_ROOT, new ResourcesScanner());
+    public static synchronized List<File> getResourceListing(File root, String[] extensions) {
+        Reflections reflections = new Reflections(getPath(root), new ResourcesScanner());
         String pattern = "(.*\\." + String.join(")|(.*\\.", extensions) + ")";
         return reflections
                 .getResources(Pattern.compile(pattern))

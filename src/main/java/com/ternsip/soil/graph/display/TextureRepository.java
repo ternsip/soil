@@ -9,7 +9,6 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.ternsip.soil.common.Utils.RESOURCES_ROOT;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.glTexSubImage3D;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -40,7 +39,7 @@ public class TextureRepository {
 
     public TextureRepository() {
 
-        ArrayList<Image> images = Utils.getResourceListing(Image.EXTENSIONS)
+        ArrayList<Image> images = Utils.getResourceListing(new File("soil"), Image.EXTENSIONS)
                 .stream()
                 .map(Image::new)
                 .collect(Collectors.toCollection(ArrayList::new));

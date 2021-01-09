@@ -30,6 +30,7 @@ public class Image {
     public Image(File file) {
         this.file = file;
         if (file.getName().endsWith("gif")) {
+            // TODO  com.sun.imageio.plugins.gif.GIFImageReader(Spi) is internal proprietary API and may be removed in a future release
             ImageReader imageReader = new GIFImageReader(new GIFImageReaderSpi());
             imageReader.setInput(ImageIO.createImageInputStream(Utils.loadResourceAsStream(file)));
             int frameCount = imageReader.getNumImages(true);
