@@ -354,10 +354,10 @@ public class WindowData {
     }
 
     public void setWindowIcon(File file) {
-        TextureRepository.Image imageT = new TextureRepository.Image(file);
-        try (GLFWImage.Buffer images = GLFWImage.malloc(1); GLFWImage image = GLFWImage.malloc()) {
-            image.set(imageT.width, imageT.height, Utils.arrayToBuffer(imageT.frameData[0]));
-            images.put(0, image);
+        Image image = new Image(file);
+        try (GLFWImage.Buffer images = GLFWImage.malloc(1); GLFWImage glfwImage = GLFWImage.malloc()) {
+            glfwImage.set(image.width, image.height, Utils.arrayToBuffer(image.frameData[0]));
+            images.put(0, glfwImage);
             glfwSetWindowIcon(window, images);
         }
     }

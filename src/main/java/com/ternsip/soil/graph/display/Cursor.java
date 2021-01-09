@@ -22,13 +22,13 @@ public class Cursor {
         animationDelays = new long[CursorType.values().length];
         int cursorNumber = 0;
         for (CursorType cursorType : CursorType.values()) {
-            TextureRepository.Image imageT = new TextureRepository.Image(cursorType.file);
-            cursorPointers[cursorNumber] = new long[imageT.frameData.length];
-            animationDelays[cursorNumber] = imageT.frameDelay[0];
-            for (int frame = 0; frame < imageT.frameData.length; ++frame) {
-                try (GLFWImage image = GLFWImage.malloc()) {
-                    image.set(imageT.width, imageT.height, Utils.arrayToBuffer(imageT.frameData[frame]));
-                    long cursorIndex = glfwCreateCursor(image, 0, 0);
+            Image image = new Image(cursorType.file);
+            cursorPointers[cursorNumber] = new long[image.frameData.length];
+            animationDelays[cursorNumber] = image.frameDelay[0];
+            for (int frame = 0; frame < image.frameData.length; ++frame) {
+                try (GLFWImage glfwImage = GLFWImage.malloc()) {
+                    glfwImage.set(image.width, image.height, Utils.arrayToBuffer(image.frameData[frame]));
+                    long cursorIndex = glfwCreateCursor(glfwImage, 0, 0);
                     if (cursorIndex == MemoryUtil.NULL) {
                         throw new RuntimeException("Error creating cursor");
                     }

@@ -15,7 +15,7 @@ public class Camera {
     public static final float MIN_SCALE = 0.000001f; // TODO rework
 
     public Vector2f pos = new Vector2f(0);
-    public Vector2f scale = new Vector2f(1f);
+    public Vector2f scale = new Vector2f(0.001f);
     public double mousePosX = 0;
     public double mousePosY = 0;
     public int width = 1;

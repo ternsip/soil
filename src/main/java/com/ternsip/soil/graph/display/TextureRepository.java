@@ -1,23 +1,15 @@
 package com.ternsip.soil.graph.display;
 
-import com.madgag.gif.fmsware.GifDecoder;
-import com.sun.imageio.plugins.gif.GIFImageReader;
-import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
 import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.graph.shader.TextureType;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.lwjgl.BufferUtils;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.ternsip.soil.common.Utils.RESOURCES_ROOT;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.glTexSubImage3D;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -25,7 +17,6 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.GL_TEXTURE_2D_ARRAY;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 import static org.lwjgl.opengl.GL42.glTexStorage3D;
-import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
 
 /**
  * There are two types of atlases:
@@ -42,7 +33,6 @@ public class TextureRepository {
      */
     public final static int MIPMAP_LEVELS = 1;
     public final static File MISSING_TEXTURE = new File("soil/tools/missing.jpg");
-    public final static String[] EXTENSIONS = {"jpg", "png", "bmp", "jpeg", "gif"};
     public final static int[] ATLAS_RESOLUTIONS = new int[]{16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192};
 
     private final int[] atlases;
@@ -50,7 +40,7 @@ public class TextureRepository {
 
     public TextureRepository() {
 
-        ArrayList<Image> images = Utils.getResourceListing(EXTENSIONS)
+        ArrayList<Image> images = Utils.getResourceListing(Image.EXTENSIONS)
                 .stream()
                 .map(Image::new)
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -155,67 +145,6 @@ public class TextureRepository {
             glActiveTexture(GL_TEXTURE0 + atlasNumber);
             glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
         }
-    }
-
-    public static class Image {
-
-        public static int COMPONENT_RGBA = 4;
-
-        public final File file;
-        public final int width;
-        public final int height;
-        public final byte[][] frameData;
-        public final int[] frameDelay;
-
-        @SneakyThrows
-        Image(File file) {
-            this.file = file;
-            if (file.getName().endsWith("gif")) {
-                ImageReader imageReader = new GIFImageReader(new GIFImageReaderSpi());
-                imageReader.setInput(ImageIO.createImageInputStream(Utils.loadResourceAsStream(file)));
-                int frameCount = imageReader.getNumImages(true);
-                if (frameCount <= 0) {
-                    throw new IllegalArgumentException(String.format("File %s has 0 animation frames", file.getName()));
-                }
-                this.frameData = new byte[frameCount][];
-                this.frameDelay = new int[frameCount];
-                GifDecoder d = new GifDecoder();
-                d.read(Utils.loadResourceAsStream(file));
-                this.width = d.getFrameSize().width;
-                this.height = d.getFrameSize().height;
-                for (int frame = 0; frame < d.getFrameCount(); frame++) {
-                    frameDelay[frame] = d.getDelay(frame);
-                    frameData[frame] = bufferedImageToBitmapRGBA(d.getFrame(frame));
-                }
-            } else {
-                ByteBuffer imageData = Utils.loadResourceToByteBuffer(file);
-                IntBuffer w = BufferUtils.createIntBuffer(1);
-                IntBuffer h = BufferUtils.createIntBuffer(1);
-                IntBuffer avChannels = BufferUtils.createIntBuffer(1);
-                this.frameData = new byte[][]{Utils.bufferToArray(stbi_load_from_memory(imageData, w, h, avChannels, COMPONENT_RGBA))};
-                this.frameDelay = new int[]{0};
-                this.width = w.get();
-                this.height = h.get();
-            }
-        }
-
-        private static byte[] bufferedImageToBitmapRGBA(BufferedImage image) {
-            int width = image.getWidth();
-            int height = image.getHeight();
-            byte[] dataRGBA = new byte[width * height * COMPONENT_RGBA];
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    int argb = image.getRGB(x, y);
-                    int offset = (y * width + x) * COMPONENT_RGBA;
-                    dataRGBA[offset] = (byte) (argb >>> 16);
-                    dataRGBA[offset + 1] = (byte) (argb >>> 8);
-                    dataRGBA[offset + 2] = (byte) argb;
-                    dataRGBA[offset + 3] = (byte) (argb >>> 24);
-                }
-            }
-            return dataRGBA;
-        }
-
     }
 
 }

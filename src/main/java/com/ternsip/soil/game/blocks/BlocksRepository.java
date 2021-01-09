@@ -20,20 +20,16 @@ public class BlocksRepository implements Finishable {
 
     public static final int SIZE_X = 8192;
     public static final int SIZE_Y = 4096;
-    public static final List<ChunkGenerator> CHUNK_GENERATORS = constructChunkGenerators();
     public final int[][] rgbas = new int[SIZE_X][SIZE_Y];
     public final Material[][] materials = new Material[SIZE_X][SIZE_Y];
     public final ByteBuffer buffer = BufferUtils.createByteBuffer(SIZE_X * SIZE_Y * 4);
 
-    private static List<ChunkGenerator> constructChunkGenerators() {
-        return Utils.getAllClasses(ChunkGenerator.class).stream()
+    public void init() {
+        List<ChunkGenerator> chunkGenerators = Utils.getAllClasses(ChunkGenerator.class).stream()
                 .map(Utils::createInstanceSilently)
                 .sorted(Comparator.comparing(ChunkGenerator::getPriority))
                 .collect(Collectors.toList());
-    }
-
-    public void init() {
-        for (ChunkGenerator chunkGenerator : CHUNK_GENERATORS) {
+        for (ChunkGenerator chunkGenerator : chunkGenerators) {
             chunkGenerator.populate(this);
         }
     }
@@ -103,17 +99,30 @@ public class BlocksRepository implements Finishable {
     }
 
     public boolean isObstacle(int x, int y) {
-        return materials[x][y].obstacle;
+        return isInside(x, y) && materials[x][y].obstacle;
     }
 
     public void visualUpdate(int startX, int startY, int sizeX, int sizeY) {
+        if (startX < 0) {
+            sizeX += startX;
+            startX = 0;
+        }
+        if (startY < 0) {
+            sizeY += startY;
+            startY = 0;
+        }
+        if (startX >= SIZE_X || startY >= SIZE_Y) {
+            return;
+        }
+        sizeX = Math.min(sizeX, SIZE_X - startX);
+        sizeY = Math.min(sizeY, SIZE_Y - startY);
         int endX = startX + sizeX - 1;
         int endY = startY + sizeY - 1;
         int volume = sizeX * sizeY;
         ByteBuffer smallBuffer = Utils.sliceBuffer(buffer, 0, volume * Integer.BYTES, ByteOrder.BIG_ENDIAN);
         for (int x = startX, idx = 0; x <= endX; ++x) {
-            for (int y = startY; y <= endY; ++y, ++idx) {
-                smallBuffer.putInt(idx * Integer.BYTES, rgbas[x][y]);
+            for (int y = startY; y <= endY; ++y) {
+                smallBuffer.putInt((y * sizeX + x) * Integer.BYTES, rgbas[x][y]);
             }
         }
         Soil.THREADS.client.textureRepository.updateTexture(

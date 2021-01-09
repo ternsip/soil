@@ -76,15 +76,6 @@ public class Client implements Threadable {
             physicsClock.drop();
             blocksRepository.update();
             entityRepository.update();
-            // TODO REMOVE
-            Random r = new Random();
-            for (int i = 0; i < 1000; ++i) {
-                int x = Math.abs(r.nextInt()) % SIZE_X;
-                int y = Math.abs(r.nextInt()) % SIZE_Y;
-                Soil.THREADS.client.blocksRepository.rgbas[x][y] = Maths.packRGBA(0, 0, 255, 255);
-                Soil.THREADS.client.blocksRepository.visualUpdate(x, y, 1, 1);
-            }
-            // --
         }
         shader.render();
         windowData.lockBuffer();
@@ -129,7 +120,7 @@ public class Client implements Threadable {
         new EntityQuad(1, TextureType.KITTY, false, 1000.0f, -0.8f, 0.4f, -0.4f, 0.4f, -0.4f, 0.2f, -0.8f, 0.2f, 0, 0).register();
         new EntityQuad(2, TextureType.PLAYER_IDLE, false, 1000.0f, 0, 0, -0.9f, -0, -0.9f, -0.5f, 0, -0.5f, 0, 0).register();
         new EntityQuad(5, TextureType.OVERLAY, false, 1000.0f, -0.5f, -1, 0.5f, -1, 1, 1, -1, 1, 0, 0).register();
-        new EntityQuad(6, TextureType.SOIL, false, 1000.0f, 0, 0, SIZE_X, 0, SIZE_X, BlocksRepository.SIZE_Y, 0, BlocksRepository.SIZE_Y, 0, 0).register();
+        new EntityQuad(6, TextureType.SOIL, false, 1000.0f, 0, 0, SIZE_X, 0, SIZE_X, SIZE_Y, 0, SIZE_Y, 0, 0).register();
         new EntityPlayer(1).register();
     }
 
