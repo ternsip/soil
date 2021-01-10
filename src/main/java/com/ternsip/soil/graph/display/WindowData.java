@@ -33,6 +33,7 @@ public class WindowData {
     public long gSync;
     public boolean fullscreen = false;
     public boolean vsync = false;
+    public Joysticks joysticks;
 
     public WindowData() {
         registerErrorEvent();
@@ -88,6 +89,7 @@ public class WindowData {
         glfwSetWindowSizeLimits(window, MINIMUM_WINDOW.x, MINIMUM_WINDOW.y, GLFW_DONT_CARE, GLFW_DONT_CARE);
         glfwSetWindowAspectRatio(window, GLFW_DONT_CARE, GLFW_DONT_CARE);
         this.cursor = new Cursor(window);
+        this.joysticks = new Joysticks();
         registerScrollEvent();
         registerCursorPosEvent();
         registerKeyEvent();
@@ -149,6 +151,7 @@ public class WindowData {
 
     public void update() {
         cursor.update();
+        joysticks.update();
     }
 
     public void finish() {
@@ -383,16 +386,16 @@ public class WindowData {
         log.debug("Extensions: {}", glGetString(GL_EXTENSIONS));
         log.info("Monitor: {} {}x{}", getMonitorName(monitor), monitorPhysicalSize.x, monitorPhysicalSize.y);
         log.info("Video mode: {}x{} - {} Hz", glfwVidMode.width(), glfwVidMode.height(), glfwVidMode.refreshRate());
-        log.info("Frame buffer size: {}x{}", windowFrameBufferSize.x, windowFrameBufferSize.y);
-        log.info("Window size: {}x{}", windowSize.x, windowSize.y);
-        log.info("Window frame size: {}x{}x{}x{}", windowFrameSize.w, windowFrameSize.y, windowFrameSize.z, windowFrameSize.w);
-        log.info("Window content scale: {} x {}", windowContentScale.x, windowContentScale.y);
-        log.info("Window position: ({}, {})", windowPos.x, windowPos.y);
-        log.info("JVM cores: {}", Runtime.getRuntime().availableProcessors());
-        log.info("JVM used memory: {} mb", (int) ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024.0 * 1024.0)));
-        log.info("JVM total memory: {} mb", (int) (Runtime.getRuntime().totalMemory() / (1024.0 * 1024.0)));
-        log.info("JVM max memory: {} mb", (int) (Runtime.getRuntime().maxMemory() / (1024.0 * 1024.0)));
-        log.info("JVM free memory: {} mb", (int) (Runtime.getRuntime().freeMemory() / (1024.0 * 1024.0)));
+        log.debug("Frame buffer size: {}x{}", windowFrameBufferSize.x, windowFrameBufferSize.y);
+        log.debug("Window size: {}x{}", windowSize.x, windowSize.y);
+        log.debug("Window frame size: {}x{}x{}x{}", windowFrameSize.w, windowFrameSize.y, windowFrameSize.z, windowFrameSize.w);
+        log.debug("Window content scale: {} x {}", windowContentScale.x, windowContentScale.y);
+        log.debug("Window position: ({}, {})", windowPos.x, windowPos.y);
+        log.debug("JVM cores: {}", Runtime.getRuntime().availableProcessors());
+        log.debug("JVM used memory: {} mb", (int) ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024.0 * 1024.0)));
+        log.debug("JVM total memory: {} mb", (int) (Runtime.getRuntime().totalMemory() / (1024.0 * 1024.0)));
+        log.debug("JVM max memory: {} mb", (int) (Runtime.getRuntime().maxMemory() / (1024.0 * 1024.0)));
+        log.debug("JVM free memory: {} mb", (int) (Runtime.getRuntime().freeMemory() / (1024.0 * 1024.0)));
     }
 
     private void registerErrorEvent() {
@@ -619,6 +622,11 @@ public class WindowData {
                 enableVsync();
             }
         }
+    }
+
+    @EventHook
+    private void handleKeyEvent(JoystickEvent event) {
+        joysticks.discover();
     }
 
 }

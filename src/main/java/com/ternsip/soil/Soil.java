@@ -20,6 +20,7 @@ import java.util.Set;
  *
  * @author Ternsip
  * TODO test double monitors swap (including different Hz and color pallet) and screen resize
+ * TODO use nglfwGetJoystickAxes instead of glfwGetJoystickAxes to not copy buffer etc.
  */
 public class Soil {
 
