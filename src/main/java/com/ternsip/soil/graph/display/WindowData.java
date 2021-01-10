@@ -16,7 +16,6 @@ import java.util.Arrays;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.glfwGetKeyScancode;
 import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL43.*;
@@ -27,6 +26,7 @@ public class WindowData {
     public static final Vector2i MINIMUM_WINDOW = new Vector2i(32, 32);
     public static final Vector4fc BACKGROUND_COLOR = new Vector4f(0f, 0f, 0f, 0f);
     public final Cursor cursor;
+    public final Joysticks joysticks;
     public final ArrayList<Callback> callbacks = new ArrayList<>();
     public final long window;
     public int width;
@@ -34,7 +34,6 @@ public class WindowData {
     public long gSync;
     public boolean fullscreen = false;
     public boolean vsync = false;
-    public Joysticks joysticks;
 
     public WindowData() {
         registerErrorEvent();
