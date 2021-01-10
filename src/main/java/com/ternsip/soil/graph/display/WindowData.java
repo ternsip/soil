@@ -44,47 +44,13 @@ public class WindowData {
         GLFWVidMode glfwVidMode = getVideoMode(monitor);
         this.width = (int) (glfwVidMode.width() * 0.8);
         this.height = (int) (glfwVidMode.height() * 0.8);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
-        glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
-        glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
-        glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_TRUE);
-        glfwWindowHint(GLFW_FLOATING, GLFW_FALSE);
-        glfwWindowHint(GLFW_MAXIMIZED, GLFW_FALSE);
-        glfwWindowHint(GLFW_CENTER_CURSOR, GLFW_FALSE);
-        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_FALSE);
-        glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
-        glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_FALSE);
-        glfwWindowHint(GLFW_RED_BITS, 8);
-        glfwWindowHint(GLFW_GREEN_BITS, 8);
-        glfwWindowHint(GLFW_BLUE_BITS, 8);
-        glfwWindowHint(GLFW_ALPHA_BITS, 8);
-        glfwWindowHint(GLFW_DEPTH_BITS, 0);
-        glfwWindowHint(GLFW_STENCIL_BITS, 0);
-        glfwWindowHint(GLFW_ACCUM_RED_BITS, 0);
-        glfwWindowHint(GLFW_ACCUM_GREEN_BITS, 0);
-        glfwWindowHint(GLFW_ACCUM_BLUE_BITS, 0);
-        glfwWindowHint(GLFW_ACCUM_ALPHA_BITS, 0);
-        glfwWindowHint(GLFW_AUX_BUFFERS, 0);
-        glfwWindowHint(GLFW_SAMPLES, GLFW_DONT_CARE);
-        glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
-        glfwWindowHint(GLFW_STEREO, GLFW_FALSE);
-        glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-        glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-        glfwWindowHint(GLFW_CONTEXT_ROBUSTNESS, GLFW_NO_ROBUSTNESS);
-        glfwWindowHint(GLFW_CONTEXT_RELEASE_BEHAVIOR, GLFW_ANY_RELEASE_BEHAVIOR);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_FALSE);
-        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+        windowHints();
         this.window = glfwCreateWindow(width, height, "Soil", MemoryUtil.NULL, MemoryUtil.NULL);
         if (window == MemoryUtil.NULL) {
             glfwTerminate();
             throw new RuntimeException("Failed to create the GLFW window");
         }
+        glfwSetWindowPos(window, (int) (glfwVidMode.width() * 0.1), (int) (glfwVidMode.height() * 0.1));
         setWindowIcon(new File("soil/interface/lawn.png"));
         glfwSetWindowSizeLimits(window, MINIMUM_WINDOW.x, MINIMUM_WINDOW.y, GLFW_DONT_CARE, GLFW_DONT_CARE);
         glfwSetWindowAspectRatio(window, GLFW_DONT_CARE, GLFW_DONT_CARE);
@@ -109,30 +75,11 @@ public class WindowData {
         registerMonitorEvent();
         registerDragAndDropEvent();
         registerJoystickEvent();
-        glfwSetWindowPos(window, (int) (glfwVidMode.width() * 0.1), (int) (glfwVidMode.height() * 0.1));
         glfwMakeContextCurrent(window);
         createCapabilities();
-        glEnable(GL_MULTISAMPLE);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_DEBUG_OUTPUT);
-        glEnable(GL_DITHER);
-        glDisable(GL_LIGHTING);
-        glDisable(GL_TEXTURE_2D);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_ALPHA_TEST);
-        glDisable(GL_SCISSOR_TEST);
-        glDisable(GL_STENCIL_TEST);
-        glDisable(GL_CULL_FACE);
-        glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        glDisable(GL_POLYGON_OFFSET_FILL);
-        glDisable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
-        glDisable(GL_RASTERIZER_DISCARD);
-        glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
-        glDisable(GL_SAMPLE_MASK);
+        glSettings();
         registerDebugEvent();
         disableVsync();
-        glClearColor(BACKGROUND_COLOR.x(), BACKGROUND_COLOR.y(), BACKGROUND_COLOR.z(), BACKGROUND_COLOR.w());
         registerEvent(new FramebufferSizeEvent(width, height));
         logInfo();
     }
@@ -400,6 +347,67 @@ public class WindowData {
         log.debug("JVM total memory: {} mb", (int) (Runtime.getRuntime().totalMemory() / (1024.0 * 1024.0)));
         log.debug("JVM max memory: {} mb", (int) (Runtime.getRuntime().maxMemory() / (1024.0 * 1024.0)));
         log.debug("JVM free memory: {} mb", (int) (Runtime.getRuntime().freeMemory() / (1024.0 * 1024.0)));
+    }
+
+    private void windowHints() {
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
+        glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
+        glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_TRUE);
+        glfwWindowHint(GLFW_FLOATING, GLFW_FALSE);
+        glfwWindowHint(GLFW_MAXIMIZED, GLFW_FALSE);
+        glfwWindowHint(GLFW_CENTER_CURSOR, GLFW_FALSE);
+        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_FALSE);
+        glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
+        glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_FALSE);
+        glfwWindowHint(GLFW_RED_BITS, 8);
+        glfwWindowHint(GLFW_GREEN_BITS, 8);
+        glfwWindowHint(GLFW_BLUE_BITS, 8);
+        glfwWindowHint(GLFW_ALPHA_BITS, 8);
+        glfwWindowHint(GLFW_DEPTH_BITS, 0);
+        glfwWindowHint(GLFW_STENCIL_BITS, 0);
+        glfwWindowHint(GLFW_ACCUM_RED_BITS, 0);
+        glfwWindowHint(GLFW_ACCUM_GREEN_BITS, 0);
+        glfwWindowHint(GLFW_ACCUM_BLUE_BITS, 0);
+        glfwWindowHint(GLFW_ACCUM_ALPHA_BITS, 0);
+        glfwWindowHint(GLFW_AUX_BUFFERS, 0);
+        glfwWindowHint(GLFW_SAMPLES, GLFW_DONT_CARE);
+        glfwWindowHint(GLFW_REFRESH_RATE, GLFW_DONT_CARE);
+        glfwWindowHint(GLFW_STEREO, GLFW_FALSE);
+        glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+        glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+        glfwWindowHint(GLFW_CONTEXT_ROBUSTNESS, GLFW_NO_ROBUSTNESS);
+        glfwWindowHint(GLFW_CONTEXT_RELEASE_BEHAVIOR, GLFW_ANY_RELEASE_BEHAVIOR);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_FALSE);
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+    }
+
+    private void glSettings() {
+        glEnable(GL_MULTISAMPLE);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DITHER);
+        glDisable(GL_LIGHTING);
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_ALPHA_TEST);
+        glDisable(GL_SCISSOR_TEST);
+        glDisable(GL_STENCIL_TEST);
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDisable(GL_POLYGON_OFFSET_FILL);
+        glDisable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+        glDisable(GL_RASTERIZER_DISCARD);
+        glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+        glDisable(GL_SAMPLE_MASK);
+        glClearColor(BACKGROUND_COLOR.x(), BACKGROUND_COLOR.y(), BACKGROUND_COLOR.z(), BACKGROUND_COLOR.w());
     }
 
     private void registerErrorEvent() {
