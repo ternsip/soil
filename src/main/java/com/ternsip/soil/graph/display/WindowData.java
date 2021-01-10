@@ -16,6 +16,7 @@ import java.util.Arrays;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.glfwGetKeyScancode;
 import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL43.*;
@@ -246,6 +247,10 @@ public class WindowData {
 
     public int getKeyState(int key) {
         return glfwGetKey(window, key);
+    }
+
+    public int getKeyScanCode(int key) {
+        return glfwGetKeyScancode(key);
     }
 
     public double getWindowTime() {
