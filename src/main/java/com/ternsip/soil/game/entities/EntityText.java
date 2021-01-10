@@ -1,11 +1,12 @@
 package com.ternsip.soil.game.entities;
 
+import com.ternsip.soil.graph.display.Quad;
 import com.ternsip.soil.graph.shader.TextureType;
 
 public class EntityText extends Entity {
 
     private final int layer;
-    private EntityQuad[] quads;
+    private Quad[] quads;
     private String text;
     private boolean centered;
     private boolean pinned;
@@ -17,7 +18,7 @@ public class EntityText extends Entity {
 
     public EntityText(String text, int layer, float posX, float posY, float scaleX, float scaleY, boolean centered, boolean pinned) {
         this.layer = layer;
-        this.quads = new EntityQuad[text.length()];
+        this.quads = new Quad[text.length()];
         this.text = text;
         this.posX = posX;
         this.posY = posY;
@@ -26,7 +27,7 @@ public class EntityText extends Entity {
         this.centered = centered;
         this.pinned = pinned;
         for (int i = 0; i < quads.length; ++i) {
-            quads[i] = new EntityQuad(layer, TextureType.FONT, pinned);
+            quads[i] = new Quad(layer, TextureType.FONT, pinned);
         }
         applyText();
     }
@@ -34,14 +35,14 @@ public class EntityText extends Entity {
     public void setText(String text) {
         this.text = text;
         if (text.length() > quads.length) {
-            for (EntityQuad quad : quads) {
+            for (Quad quad : quads) {
                 if (quad.isRegistered()) {
                     quad.unregister();
                 }
             }
-            quads = new EntityQuad[text.length()];
+            quads = new Quad[text.length()];
             for (int i = 0; i < quads.length; ++i) {
-                quads[i] = new EntityQuad(layer, TextureType.FONT, pinned);
+                quads[i] = new Quad(layer, TextureType.FONT, pinned);
             }
         }
         for (int i = 0; i < text.length(); ++i) {
@@ -60,7 +61,7 @@ public class EntityText extends Entity {
     @Override
     public void register() {
         super.register();
-        for (EntityQuad quad : quads) {
+        for (Quad quad : quads) {
             quad.register();
         }
     }
@@ -68,7 +69,7 @@ public class EntityText extends Entity {
     @Override
     public void unregister() {
         super.unregister();
-        for (EntityQuad quad : quads) {
+        for (Quad quad : quads) {
             if (quad.isRegistered()) {
                 quad.unregister();
             }
@@ -90,7 +91,7 @@ public class EntityText extends Entity {
             quads[i].y4 = posY + (offsetY - 1) * scaleY;
             quads[i].metadata1 = text.charAt(i);
             if (quads[i].isRegistered()) {
-                quads[i].writeToBufferLayout();
+                quads[i].updateBuffers();
             }
         }
     }

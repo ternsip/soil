@@ -1,8 +1,6 @@
 #version 430 core
 
-const int MAX_LAYERS = 16;
-const int LAYER_MAX_QUADS = (1 << 16) / 4;
-const int MAX_QUADS = LAYER_MAX_QUADS * MAX_LAYERS;
+const int MESH_MAX_QUADS = (1 << 16) / 4;
 const int[] TEXTURE_X = { 0, 1, 1, 0 };
 const int[] TEXTURE_Y = { 0, 0, 1, 1 };
 
@@ -22,7 +20,11 @@ layout (std430, binding = 0) buffer quadBuffer {
     Quad quadData[];
 };
 
-uniform int layer;
+layout (std430, binding = 2) buffer quadOrderBuffer {
+    int quadOrder[];
+};
+
+uniform int meshIndex;
 uniform vec2 cameraPos;
 uniform vec2 cameraScale;
 uniform vec2 aspect;
@@ -32,7 +34,8 @@ out vec2 texture_xy;
 
 void main(void) {
 
-    int quadIndexi = LAYER_MAX_QUADS * layer + gl_VertexID / 4;
+    int quadIndexi = MESH_MAX_QUADS * meshIndex + gl_VertexID / 4;
+    quadIndexi = quadOrder[quadIndexi];
     Quad quad = quadData[quadIndexi];
     quadIndex = quadIndexi;
     int indexMod = gl_VertexID % 4;

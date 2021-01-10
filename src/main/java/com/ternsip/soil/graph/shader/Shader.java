@@ -3,7 +3,6 @@ package com.ternsip.soil.graph.shader;
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Finishable;
 import com.ternsip.soil.common.Utils;
-import com.ternsip.soil.game.entities.EntityQuad;
 import com.ternsip.soil.graph.display.Camera;
 import com.ternsip.soil.graph.display.Texture;
 import com.ternsip.soil.graph.display.TextureRepository;
@@ -18,18 +17,20 @@ import static org.lwjgl.opengl.GL20.*;
 
 public final class Shader implements Finishable {
 
-    public static final int MAX_LAYERS = 16;
+    public static final int MAX_MESHES = 16;
+    public static final int MAX_QUADS = MAX_MESHES * Mesh.MAX_QUADS;
 
     private static final File VERTEX_SHADER = new File("soil/shaders/VertexShader.glsl");
     private static final File FRAGMENT_SHADER = new File("soil/shaders/FragmentShader.glsl");
     public final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length, 6);
-    public final BufferLayout quadBuffer = new BufferLayout(MAX_LAYERS * Mesh.MAX_QUADS, 14);
+    public final BufferLayout quadBuffer = new BufferLayout(MAX_QUADS, 14);
+    public final BufferLayout quadOrderBuffer = new BufferLayout(MAX_QUADS, 1);
     private final int programID;
     private final Mesh mesh = new Mesh();
     private final UniformVec2 cameraPos = new UniformVec2();
     private final UniformVec2 cameraScale = new UniformVec2();
     private final UniformVec2 aspect = new UniformVec2();
-    private final UniformInteger layer = new UniformInteger();
+    private final UniformInteger meshIndex = new UniformInteger();
     private final UniformInteger time = new UniformInteger();
     private final UniformBoolean debugging = new UniformBoolean();
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
@@ -70,14 +71,13 @@ public final class Shader implements Finishable {
         aspect.load(camera.aspectX, camera.aspectY);
         debugging.load(camera.scale.x < 0.01 || camera.scale.y < 0.01);
         //debugging.load(true);
-        this.time.load((int) (System.currentTimeMillis() % Integer.MAX_VALUE));
-        for (int layerIndex = 0; layerIndex < MAX_LAYERS; ++layerIndex) {
-            int quads = EntityQuad.getCount(layerIndex);
-            if (quads <= 0) {
-                continue;
-            }
-            this.layer.load(layerIndex);
+        time.load((int) (System.currentTimeMillis() % Integer.MAX_VALUE));
+        int quadsToRender = Soil.THREADS.client.quadRepository.getNumberOfQuads();
+        for (int mshIdx = 0; quadsToRender > 0; ++mshIdx) {
+            int quads = Math.min(Mesh.MAX_QUADS, quadsToRender);
+            meshIndex.load(mshIdx);
             mesh.render(quads);
+            quadsToRender -= quads;
         }
     }
 
