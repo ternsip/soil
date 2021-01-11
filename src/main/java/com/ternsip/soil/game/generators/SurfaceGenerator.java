@@ -44,13 +44,13 @@ public class SurfaceGenerator implements ChunkGenerator {
             }
         }
         for (int i = 0; i < caveNumber; ++i) {
-            Image cave = caves.get(Math.abs(random.nextInt()) % caves.size());
+            Image cave = caves.get(random.nextInt(caves.size()));
             float scale = Math.abs(random.nextFloat()) * 3;
             float realSizeX = cave.width * scale;
             float realSizeY = cave.height * scale;
             int realSize = (int) Math.ceil(Math.sqrt(realSizeX * realSizeX + realSizeY * realSizeY));
-            int offsetX = Math.abs(random.nextInt()) % (SIZE_X + realSize) - realSize;
-            int offsetY = Math.abs(random.nextInt()) % (SIZE_Y + realSize) - realSize;
+            int offsetX = random.nextInt((SIZE_X + realSize)) - realSize;
+            int offsetY = random.nextInt((SIZE_Y + realSize)) - realSize;
             float halfRealSizeX = realSizeX * 0.5f;
             float halfRealSizeY = realSizeY * 0.5f;
             float halfRealSize = realSize * 0.5f;
