@@ -49,6 +49,10 @@ public class EventReceiver {
                 callback.apply((Event) event);
             }
         }
+        purge();
+    }
+
+    public void purge() {
         while (!objectsToUnregister.isEmpty()) {
             Object obj = objectsToUnregister.poll();
             Set<Callback> callbacks = objectToCallbacks.remove(obj);
@@ -68,6 +72,7 @@ public class EventReceiver {
 
 
     public void register(Object obj) {
+        purge();
         if (objectToCallbacks.containsKey(obj)) {
             throw new IllegalArgumentException("This object is already registered");
         }

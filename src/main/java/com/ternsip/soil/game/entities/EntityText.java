@@ -62,7 +62,9 @@ public class EntityText extends Entity {
     public void register() {
         super.register();
         for (Quad quad : quads) {
-            quad.register();
+            if (!quad.isRegistered()) {
+                quad.register();
+            }
         }
     }
 

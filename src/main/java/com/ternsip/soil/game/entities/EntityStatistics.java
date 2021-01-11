@@ -33,7 +33,7 @@ public class EntityStatistics extends Entity implements Updatable {
 
     @EventHook
     private void handleKeyEvent(KeyEvent event) {
-        if (event.getKey() == GLFW_KEY_F3 && event.getAction() == GLFW_PRESS) {
+        if (isRegistered() && event.getKey() == GLFW_KEY_F3 && event.getAction() == GLFW_PRESS) {
             if (entityText.isRegistered()) {
                 entityText.unregister();
             } else {

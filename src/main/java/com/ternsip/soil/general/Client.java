@@ -102,7 +102,8 @@ public class Client implements Threadable {
     }
 
     private void spawnMenu() {
-        new EntityStatistics().register();
+        EntityStatistics entityStatistics = new EntityStatistics();
+        entityStatistics.register();
         new Quad(-1, TextureType.BACKGROUND, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
         new Quad(1, TextureType.PLAYER_IDLE, false, 1000.0f, 0, 0, 0.9f, 0, 0.9f, 0.5f, 0, 0.5f, 0, 0).register();
         new Quad(1, TextureType.PLAYER_ATTACK, false, 5000.0f, -0.2f, 0.2f, 0, 0.2f, 0, 0, -0.2f, 0, 0, 0).register();
@@ -134,6 +135,7 @@ public class Client implements Threadable {
         }
         for (int i = 0; i < 1500; i++) {
             int idx = Math.abs(random.nextInt()) % 100;
+            entityStatistics.unregister();
             if (random.nextBoolean()) {
                 if (e[idx].isRegistered()) {
                     e[idx].unregister();
@@ -141,6 +143,7 @@ public class Client implements Threadable {
                     e[idx].register();
                 }
             }
+            entityStatistics.register();
         }
     }
 
