@@ -1,10 +1,7 @@
 package com.ternsip.soil.game.entities;
 
-import com.ternsip.soil.Soil;
 import com.ternsip.soil.graph.display.Quad;
 import lombok.RequiredArgsConstructor;
-
-import java.util.UUID;
 
 @RequiredArgsConstructor
 public class EntitySprite extends Entity {
