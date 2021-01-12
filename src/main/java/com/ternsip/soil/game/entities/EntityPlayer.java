@@ -10,7 +10,7 @@ import com.ternsip.soil.game.blocks.Material;
 import com.ternsip.soil.game.common.PhysicalPoint;
 import com.ternsip.soil.graph.display.Camera;
 import com.ternsip.soil.graph.display.CursorType;
-import com.ternsip.soil.graph.display.Quad;
+import com.ternsip.soil.graph.shader.Quad;
 import com.ternsip.soil.graph.shader.TextureType;
 
 import static org.lwjgl.glfw.GLFW.*;

@@ -11,6 +11,7 @@ import com.ternsip.soil.game.entities.EntityPlayer;
 import com.ternsip.soil.game.entities.EntityRepository;
 import com.ternsip.soil.game.entities.EntityStatistics;
 import com.ternsip.soil.graph.display.*;
+import com.ternsip.soil.graph.shader.Quad;
 import com.ternsip.soil.graph.shader.Shader;
 import com.ternsip.soil.graph.shader.TextureType;
 
@@ -34,7 +35,6 @@ public class Client implements Threadable {
     public AudioRepository audioRepository;
     public FpsCounter fpsCounter;
     public Settings settings;
-    public QuadRepository quadRepository;
     public SoundRepository soundRepository;
     public EntityRepository entityRepository;
     public BlocksRepository blocksRepository;
@@ -50,7 +50,6 @@ public class Client implements Threadable {
         fpsCounter = new FpsCounter();
         audioRepository = new AudioRepository();
         settings = new Settings();
-        quadRepository = new QuadRepository();
         soundRepository = new SoundRepository();
         entityRepository = new EntityRepository();
         blocksRepository = new BlocksRepository();

@@ -12,6 +12,10 @@ import org.lwjgl.opengl.GL11;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static org.lwjgl.opengl.GL20.*;
 
@@ -19,12 +23,17 @@ public final class Shader implements Finishable {
 
     public static final int MAX_MESHES = 16;
     public static final int MAX_QUADS = MAX_MESHES * Mesh.MAX_QUADS;
+    public static final int UNASSIGNED_INDEX = -1;
+    public static final int QUAD_PINNED_FLAG = 0x1;
 
     private static final File VERTEX_SHADER = new File("soil/shaders/VertexShader.glsl");
     private static final File FRAGMENT_SHADER = new File("soil/shaders/FragmentShader.glsl");
-    public final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length, 6);
-    public final BufferLayout quadBuffer = new BufferLayout(MAX_QUADS, 14);
-    public final BufferLayout quadOrderBuffer = new BufferLayout(MAX_QUADS, 1);
+    private final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length, 6);
+    private final BufferLayout quadBuffer = new BufferLayout(MAX_QUADS, 14);
+    private final BufferLayout quadOrderBuffer = new BufferLayout(MAX_QUADS, 1);
+    private final ArrayList<Quad> quads = new ArrayList<>();
+    private final ArrayList<Integer> quadOrder = new ArrayList<>();
+    private final TreeMap<Integer, Integer> layerToQuadOrderOffset = new TreeMap<>(Collections.reverseOrder());
     private final int programID;
     private final Mesh mesh = new Mesh();
     private final UniformVec2 cameraPos = new UniformVec2();
@@ -72,7 +81,7 @@ public final class Shader implements Finishable {
         debugging.load(camera.scale.x < 0.01 || camera.scale.y < 0.01);
         //debugging.load(true);
         time.load((int) (System.currentTimeMillis() % Integer.MAX_VALUE));
-        int quadsToRender = Soil.THREADS.client.quadRepository.getNumberOfQuads();
+        int quadsToRender = quads.size();
         for (int mshIdx = 0; quadsToRender > 0; ++mshIdx) {
             int quads = Math.min(Mesh.MAX_QUADS, quadsToRender);
             meshIndex.load(mshIdx);
@@ -85,6 +94,107 @@ public final class Shader implements Finishable {
         glUseProgram(0);
         finishInputs();
         glDeleteProgram(programID);
+    }
+
+    public void register(Quad quad) {
+        if (quad.index != UNASSIGNED_INDEX) {
+            throw new IllegalArgumentException("Quad is already registered");
+        }
+        if (quads.size() >= MAX_QUADS) {
+            throw new IllegalArgumentException("Trying to register too much quads");
+        }
+        int lastIndex = quads.size();
+        quads.add(quad);
+        quadOrder.add(lastIndex);
+        setQuadOrder(lastIndex, lastIndex);
+        int orderPointer = lastIndex;
+        for (Map.Entry<Integer, Integer> entry : layerToQuadOrderOffset.entrySet()) {
+            int entryLayer = entry.getKey();
+            int layerStart = entry.getValue();
+            if (entryLayer > quad.layer) {
+                setQuadOrder(orderPointer, quadOrder.get(layerStart));
+                setQuadOrder(layerStart, lastIndex);
+                orderPointer = layerStart;
+                entry.setValue(layerStart + 1);
+            } else {
+                break;
+            }
+        }
+        if (!layerToQuadOrderOffset.containsKey(quad.layer)) {
+            layerToQuadOrderOffset.put(quad.layer, orderPointer);
+        }
+        quad.index = lastIndex;
+        quad.orderIndex = orderPointer;
+        updateBuffers(quad);
+    }
+
+    public void unregister(Quad quad) {
+        if (quad.index == UNASSIGNED_INDEX) {
+            throw new IllegalArgumentException("Quad is not registered yet to be unregistered");
+        }
+        int lastIndex = quads.size() - 1;
+        int initialQuadOrderIndex = quad.orderIndex;
+        Quad lastQuad = quads.get(lastIndex);
+        setQuadOrder(lastQuad.orderIndex, quad.index);
+        lastQuad.index = quad.index;
+        quads.set(quad.index, lastQuad);
+        updateBuffers(lastQuad);
+        int orderValuePointer = quadOrder.get(lastIndex);
+        int orderIndexPointer = lastIndex;
+        boolean layerDestroyed = false;
+        for (Map.Entry<Integer, Integer> entry : layerToQuadOrderOffset.entrySet()) {
+            int entryLayer = entry.getKey();
+            int layerStart = entry.getValue();
+            if (entryLayer > quad.layer) {
+                int beforeLayer = layerStart - 1;
+                int oldOrderValue = quadOrder.get(beforeLayer);
+                setQuadOrder(beforeLayer, orderValuePointer);
+                entry.setValue(beforeLayer);
+                orderValuePointer = oldOrderValue;
+                orderIndexPointer = beforeLayer;
+            } else {
+                if (orderIndexPointer == layerStart) {
+                    layerDestroyed = true;
+                } else if (initialQuadOrderIndex != orderIndexPointer) {
+                    setQuadOrder(initialQuadOrderIndex, orderValuePointer);
+                }
+                break;
+            }
+        }
+        if (layerDestroyed) {
+            layerToQuadOrderOffset.remove(quad.layer);
+        }
+        quads.remove(lastIndex);
+        quadOrder.remove(lastIndex);
+        quad.index = UNASSIGNED_INDEX;
+        quad.orderIndex = UNASSIGNED_INDEX;
+    }
+
+    public void updateBuffers(Quad quad) {
+        if (quad.index == UNASSIGNED_INDEX) {
+            throw new IllegalArgumentException("Quad is not registered yet");
+        }
+        int quadOffset = quad.index * quadBuffer.structureLength;
+        quadBuffer.writeInt(quadOffset, quad.textureType.ordinal());
+        quadBuffer.writeInt(quadOffset + 1, quad.animationStart);
+        quadBuffer.writeFloat(quadOffset + 2, quad.animationPeriod);
+        quadBuffer.writeInt(quadOffset + 3, (quad.pinned ? QUAD_PINNED_FLAG : 0));
+        quadBuffer.writeInt(quadOffset + 4, quad.metadata1);
+        quadBuffer.writeInt(quadOffset + 5, quad.metadata2);
+        quadBuffer.writeFloat(quadOffset + 6, quad.x1);
+        quadBuffer.writeFloat(quadOffset + 7, quad.y1);
+        quadBuffer.writeFloat(quadOffset + 8, quad.x2);
+        quadBuffer.writeFloat(quadOffset + 9, quad.y2);
+        quadBuffer.writeFloat(quadOffset + 10, quad.x3);
+        quadBuffer.writeFloat(quadOffset + 11, quad.y3);
+        quadBuffer.writeFloat(quadOffset + 12, quad.x4);
+        quadBuffer.writeFloat(quadOffset + 13, quad.y4);
+    }
+
+    private void setQuadOrder(int quadOrderedIndex, int quadRealIndex) {
+        quadOrder.set(quadOrderedIndex, quadRealIndex);
+        quads.get(quadRealIndex).orderIndex = quadOrderedIndex;
+        quadOrderBuffer.writeInt(quadOrderedIndex, quadRealIndex);
     }
 
     private void loadDefaultData() {

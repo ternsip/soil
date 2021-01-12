@@ -1,6 +1,6 @@
 package com.ternsip.soil.game.entities;
 
-import com.ternsip.soil.graph.display.Quad;
+import com.ternsip.soil.graph.shader.Quad;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
