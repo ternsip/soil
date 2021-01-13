@@ -401,7 +401,7 @@ public class WindowData {
         glDisable(GL_SCISSOR_TEST);
         glDisable(GL_STENCIL_TEST);
         glDisable(GL_CULL_FACE);
-        glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDisable(GL_POLYGON_OFFSET_FILL);
         glDisable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
         glDisable(GL_RASTERIZER_DISCARD);
