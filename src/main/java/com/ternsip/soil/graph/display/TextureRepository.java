@@ -20,22 +20,19 @@ import static org.lwjgl.opengl.GL42.glTexStorage3D;
 /**
  * There are two types of atlases:
  * - GPU 3d array of textures
+ * It is important for mipmap levels to be strictly one due to next reasons:
+ * For fast-dynamic-texture changes
+ * To not smooth 2d picture in far distance
+ * There is no significant impact on performance
  */
 @Slf4j
 public class TextureRepository {
 
-    /*
-     * It is important for mipmap levels to be strictly one due to next reasons:
-     * For fast-dynamic-texture changes
-     * To not smooth 2d picture in far distance
-     * There is no significant impact on performance
-     */
-    public final static int MIPMAP_LEVELS = 1;
     public final static File MISSING_TEXTURE = new File("soil/tools/missing.jpg");
     public final static int[] ATLAS_RESOLUTIONS = new int[]{16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192};
-
-    private final int[] atlases;
-    private final Map<File, Texture> fileToTexture;
+    public final Texture2D[] atlases;
+    public final Map<File, Texture> fileToTexture;
+    public final List<Texture2D> textures2D = new ArrayList<>();
 
     public TextureRepository() {
 
@@ -46,21 +43,22 @@ public class TextureRepository {
 
         Set<Image> usedImages = new HashSet<>();
 
-        this.atlases = new int[ATLAS_RESOLUTIONS.length];
+        this.atlases = new Texture2D[ATLAS_RESOLUTIONS.length];
         this.fileToTexture = new HashMap<>();
 
         for (int atlasNumber = 0; atlasNumber < ATLAS_RESOLUTIONS.length; ++atlasNumber) {
 
-            this.atlases[atlasNumber] = glGenTextures();
+            final int atlasResolution = ATLAS_RESOLUTIONS[atlasNumber];
+            this.atlases[atlasNumber] = new Texture2D(atlasResolution, atlasResolution, glGenTextures(), textures2D.size());
+            textures2D.add(this.atlases[atlasNumber]);
 
-            glBindTexture(GL_TEXTURE_2D_ARRAY, this.atlases[atlasNumber]);
+            glBindTexture(GL_TEXTURE_2D_ARRAY, this.atlases[atlasNumber].bindId);
 
-            glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP);
             glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-            final int atlasResolution = ATLAS_RESOLUTIONS[atlasNumber];
 
             ArrayList<Image> suitableImages = images
                     .stream()
@@ -71,7 +69,7 @@ public class TextureRepository {
 
             int depth = suitableImages.stream().mapToInt(e -> e.frameData.length).sum();
 
-            glTexStorage3D(GL_TEXTURE_2D_ARRAY, MIPMAP_LEVELS, GL_RGBA8, atlasResolution, atlasResolution, Math.max(1, depth));
+            glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, atlasResolution, atlasResolution, Math.max(1, depth));
             ByteBuffer cleanData = Utils.arrayToBuffer(new byte[atlasResolution * atlasResolution * 4]);
 
             int layer = 0;
@@ -97,12 +95,15 @@ public class TextureRepository {
             }
         });
 
-        bind();
+        for (Texture2D atlas : atlases) {
+            atlas.bind();
+        }
     }
 
     public void updateTexture(Texture texture, ByteBuffer byteBuffer, int startX, int startY, int width, int height, int layerOffset) {
-        glActiveTexture(GL_TEXTURE0 + texture.atlasNumber);
+        glActiveTexture(GL_TEXTURE0 + atlases[texture.atlasNumber].activationId);
         glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, startX, startY, texture.layerStart + layerOffset, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, byteBuffer);
+        glActiveTexture(GL_TEXTURE0);
     }
 
     public Texture getTexture(TextureType textureType) {
@@ -117,8 +118,21 @@ public class TextureRepository {
         return fileToTexture.get(file);
     }
 
-    public int[] getAtlases() {
-        return atlases;
+    public Texture2D registerTexture2D(int width, int height) {
+        int textureBindId = glGenTextures();
+        int textureActivationId = textures2D.size();
+        glActiveTexture(GL_TEXTURE0 + textureActivationId);
+        glBindTexture(GL_TEXTURE_2D, textureBindId);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_INT, (ByteBuffer) null);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        Texture2D texture2D = new Texture2D(width, height, textureBindId, textureActivationId);
+        textures2D.add(texture2D);
+        return texture2D;
     }
 
     public boolean isTextureExists(File file) {
@@ -126,23 +140,9 @@ public class TextureRepository {
     }
 
     public void finish() {
-        unbind();
-        for (int atlasNumber = 0; atlasNumber < ATLAS_RESOLUTIONS.length; ++atlasNumber) {
-            glDeleteTextures(atlases[atlasNumber]);
-        }
-    }
-
-    private void bind() {
-        for (int atlasNumber = 0; atlasNumber < ATLAS_RESOLUTIONS.length; ++atlasNumber) {
-            glActiveTexture(GL_TEXTURE0 + atlasNumber);
-            glBindTexture(GL_TEXTURE_2D_ARRAY, atlases[atlasNumber]);
-        }
-    }
-
-    private void unbind() {
-        for (int atlasNumber = 0; atlasNumber < ATLAS_RESOLUTIONS.length; ++atlasNumber) {
-            glActiveTexture(GL_TEXTURE0 + atlasNumber);
-            glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+        for (Texture2D texture2D : textures2D) {
+            texture2D.unbind();
+            texture2D.delete();
         }
     }
 

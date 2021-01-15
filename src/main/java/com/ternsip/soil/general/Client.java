@@ -11,6 +11,7 @@ import com.ternsip.soil.game.entities.EntityPlayer;
 import com.ternsip.soil.game.entities.EntityRepository;
 import com.ternsip.soil.game.entities.EntityStatistics;
 import com.ternsip.soil.graph.display.*;
+import com.ternsip.soil.graph.shader.Light;
 import com.ternsip.soil.graph.shader.Quad;
 import com.ternsip.soil.graph.shader.Shader;
 import com.ternsip.soil.graph.shader.TextureType;
@@ -63,7 +64,6 @@ public class Client implements Threadable {
     @Override
     // TODO think about sync order
     public void update() {
-        windowData.clear();
         windowData.update();
         windowData.waitBuffer();
         fpsCounter.updateFps();
@@ -104,13 +104,10 @@ public class Client implements Threadable {
         EntityStatistics entityStatistics = new EntityStatistics();
         entityStatistics.register();
         new Quad(-1, TextureType.BACKGROUND, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
+        new Quad(7, TextureType.SHADOW, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
         new Quad(1, TextureType.PLAYER_IDLE, false, 1000.0f, 0, 0, 0.9f, 0, 0.9f, 0.5f, 0, 0.5f, 0, 0).register();
         new Quad(1, TextureType.PLAYER_ATTACK, false, 5000.0f, -0.2f, 0.2f, 0, 0.2f, 0, 0, -0.2f, 0, 0, 0).register();
         new Quad(1, TextureType.PLAYER_ATTACK, false, 5000.0f, -0.1f, 0.2f, 0, 0.2f, 0, 0, -0.2f, 0, 0, 0).register();
-        //TODO
-        //If you have a 800x600 screen, and a 2D quad over the whole screen, that 2D quad will have 480000 fragment shader calls, although it has only 4 vertexes.
-        //Now, moving further, let's assume you have 10 such quads, on on top of another.
-        //If you don't sort your geometry Front to Back or if you are using alpha blend with no depth test, then you will end up with 10x800x600 = 4800000 fragment calls.
         for (int i = 0; i < 100; ++i)
             new Quad(1, TextureType.HOMER, false, 1000.0f, -0.4f, 0.2f, -0.2f, 0.2f, -0.2f, 0, -0.4f, 0, 0, 0).register();
         //new EntityQuad(1, TextureType.FONT, 1000.0f, -0.4f, 0.2f, -0.2f, 0.2f, -0.2f, 0, -0.4f, 0, 'c', 0).register();
@@ -143,6 +140,12 @@ public class Client implements Threadable {
                 }
             }
             entityStatistics.register();
+        }
+        new Light(0, 0, 1).register();
+        new Light(1, 1, 0.5f).register();
+
+        for (int i = 0; i < 100; ++i) {
+            new Light(2 + random.nextInt(25), 2 + random.nextInt(25), (float) (0.5f + random.nextDouble() * 2)).register();
         }
     }
 

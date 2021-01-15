@@ -22,7 +22,6 @@ import static org.lwjgl.opengl.GL44C.*;
  * https://www.bfilipek.com/2015/01/persistent-mapped-buffers-in-opengl.html
  * http://voidptr.io/blog/2016/04/28/ldEngine-Part-1.html
  */
-@Slf4j
 public class BufferLayout extends Locatable implements Finishable {
 
     private static final int FOUR_BYTES = 4;
@@ -50,18 +49,7 @@ public class BufferLayout extends Locatable implements Finishable {
 
     @Override
     public void locate(int programID, String name) {
-        int boxesResourceIndex = glGetProgramResourceIndex(programID, GL_SHADER_STORAGE_BLOCK, name);
-        if (boxesResourceIndex == NOT_LOCATED) {
-            log.error("Buffer layout not found - {}", name);
-        } else {
-            IntBuffer props = BufferUtils.createIntBuffer(1);
-            IntBuffer params = BufferUtils.createIntBuffer(1);
-            props.put(0, GL_BUFFER_BINDING);
-            glGetProgramResourceiv(programID, GL_SHADER_STORAGE_BLOCK, boxesResourceIndex, props, null, params);
-            int location = params.get(0);
-            setLocation(location);
-            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, getLocation(), ssbo);
-        }
+        locateSSBO(programID, name, ssbo);
     }
 
     public int readInt(int index) {

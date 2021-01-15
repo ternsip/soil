@@ -18,6 +18,10 @@ public class UniformSamplers2DArray extends Uniform {
         }
     }
 
+    public void load(int index, int value) {
+        uniformSampler2DArrays[index].load(value);
+    }
+
     public void load(int[] value) {
         for (int i = 0; i < value.length; i++) {
             uniformSampler2DArrays[i].load(value[i]);

@@ -5,6 +5,7 @@ import com.ternsip.soil.common.Finishable;
 import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.graph.display.Camera;
 import com.ternsip.soil.graph.display.Texture;
+import com.ternsip.soil.graph.display.Texture2D;
 import com.ternsip.soil.graph.display.TextureRepository;
 import lombok.SneakyThrows;
 import org.lwjgl.opengl.GL11;
@@ -17,24 +18,31 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.ternsip.soil.graph.display.WindowData.MAXIMUM_WINDOW;
 import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
+import static org.lwjgl.opengl.GL30.glBindFramebuffer;
 
 public final class Shader implements Finishable {
 
     public static final int MAX_MESHES = 16;
     public static final int MAX_QUADS = MAX_MESHES * Mesh.MAX_QUADS;
+    public static final int MAX_LIGHTS = 1 << 16;
     public static final int UNASSIGNED_INDEX = -1;
     public static final int QUAD_PINNED_FLAG = 0x1;
 
     private static final File VERTEX_SHADER = new File("soil/shaders/VertexShader.glsl");
     private static final File FRAGMENT_SHADER = new File("soil/shaders/FragmentShader.glsl");
     private final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length, 6);
+    private final BufferLayout lightBuffer = new BufferLayout(MAX_LIGHTS, 3);
     private final BufferLayout quadBuffer = new BufferLayout(MAX_QUADS, 14);
     private final BufferLayout quadOrderBuffer = new BufferLayout(MAX_QUADS, 1);
+    private final ArrayList<Light> lights = new ArrayList<>();
     private final ArrayList<Quad> quads = new ArrayList<>();
     private final ArrayList<Integer> quadOrder = new ArrayList<>();
     private final TreeMap<Integer, Integer> layerToQuadOrderOffset = new TreeMap<>(Collections.reverseOrder());
     private final int programID;
+    private final FrameBuffer frameBuffer = new FrameBuffer(MAXIMUM_WINDOW.x, MAXIMUM_WINDOW.y); // TODO this should be resolved
     private final Mesh mesh = new Mesh();
     private final UniformVec2 cameraPos = new UniformVec2();
     private final UniformVec2 cameraScale = new UniformVec2();
@@ -42,6 +50,8 @@ public final class Shader implements Finishable {
     private final UniformInteger meshIndex = new UniformInteger();
     private final UniformInteger time = new UniformInteger();
     private final UniformBoolean debugging = new UniformBoolean();
+    private final UniformBoolean processingLight = new UniformBoolean();
+    private final UniformSampler shadowTexture = new UniformSampler();
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
 
     public Shader() {
@@ -60,6 +70,7 @@ public final class Shader implements Finishable {
         this.programID = programID;
         glUseProgram(programID);
         loadDefaultData();
+        glClearColor(0, 0, 0, 0);
     }
 
     private static int loadShader(File file, int type) {
@@ -81,6 +92,23 @@ public final class Shader implements Finishable {
         debugging.load(camera.scale.x < 0.01 || camera.scale.y < 0.01);
         //debugging.load(true);
         time.load((int) (System.currentTimeMillis() % Integer.MAX_VALUE));
+
+        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.fbo);
+        glClear(GL_COLOR_BUFFER_BIT);
+        processingLight.load(true);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        int lightsToRender = lights.size();
+        for (int mshIdx = 0; lightsToRender > 0; ++mshIdx) {
+            int lights = Math.min(Mesh.MAX_QUADS, lightsToRender);
+            meshIndex.load(mshIdx);
+            mesh.render(lights);
+            lightsToRender -= lights;
+        }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClear(GL_COLOR_BUFFER_BIT);
+        processingLight.load(false);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         int quadsToRender = quads.size();
         for (int mshIdx = 0; quadsToRender > 0; ++mshIdx) {
             int quads = Math.min(Mesh.MAX_QUADS, quadsToRender);
@@ -88,6 +116,7 @@ public final class Shader implements Finishable {
             mesh.render(quads);
             quadsToRender -= quads;
         }
+
     }
 
     public void finish() {
@@ -191,6 +220,43 @@ public final class Shader implements Finishable {
         quadBuffer.writeFloat(quadOffset + 13, quad.y4);
     }
 
+    public void register(Light light) {
+        if (light.index != UNASSIGNED_INDEX) {
+            throw new IllegalArgumentException("Light is already registered");
+        }
+        if (lights.size() >= MAX_LIGHTS) {
+            throw new IllegalArgumentException("Trying to register too much lights");
+        }
+        light.index = lights.size();
+        lights.add(light);
+        updateBuffers(light);
+    }
+
+    public void unregister(Light light) {
+        if (light.index == UNASSIGNED_INDEX) {
+            throw new IllegalArgumentException("Light is not registered yet");
+        }
+        int lastElement = lights.size() - 1;
+        Light lastLight = lights.get(lastElement);
+        if (light.index < lastElement) {
+            lights.set(light.index, lastLight);
+            lastLight.index = light.index;
+            updateBuffers(lastLight);
+        }
+        light.index = UNASSIGNED_INDEX;
+        lights.remove(lastElement);
+    }
+
+    public void updateBuffers(Light light) {
+        if (light.index == UNASSIGNED_INDEX) {
+            throw new IllegalArgumentException("Light is not registered yet");
+        }
+        int offset = light.index * lightBuffer.structureLength;
+        lightBuffer.writeFloat(offset, light.x);
+        lightBuffer.writeFloat(offset + 1, light.y);
+        lightBuffer.writeFloat(offset + 2, light.radius);
+    }
+
     private void setQuadOrder(int quadOrderedIndex, int quadRealIndex) {
         quadOrder.set(quadOrderedIndex, quadRealIndex);
         quads.get(quadRealIndex).orderIndex = quadOrderedIndex;
@@ -210,7 +276,11 @@ public final class Shader implements Finishable {
             textureBuffer.writeInt(index + 5, textureType.textureStyle.ordinal());
             index += textureBuffer.structureLength;
         }
-        samplers.loadDefault();
+        Texture2D[] textures = Soil.THREADS.client.textureRepository.atlases;
+        for (int i = 0; i < textures.length; ++i) {
+            samplers.load(i, textures[i].activationId);
+        }
+        this.shadowTexture.load(frameBuffer.mainTexture.activationId);
     }
 
     @SneakyThrows

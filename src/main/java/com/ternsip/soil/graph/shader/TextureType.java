@@ -9,7 +9,7 @@ import static com.ternsip.soil.graph.shader.TextureStyle.*;
 @RequiredArgsConstructor
 public enum TextureType {
 
-    EMPTY(new File("soil/interface/button.png"), TEXTURE_STYLE_EMPTY),
+    EMPTY(new File("soil/interface/button.png"), TEXTURE_STYLE_NORMAL),
     FONT(new File("soil/fonts/default.png"), TEXTURE_STYLE_FONT256),
     SHADOW(new File("soil/interface/blocks.jpg"), TEXTURE_STYLE_SHADOW),
     PLAYER_IDLE(new File("soil/interface/player_idle.gif"), TEXTURE_STYLE_NORMAL),

@@ -24,7 +24,7 @@ import static org.lwjgl.opengl.GL43.*;
 public class WindowData {
 
     public static final Vector2i MINIMUM_WINDOW = new Vector2i(32, 32);
-    public static final Vector4fc BACKGROUND_COLOR = new Vector4f(0f, 0f, 0f, 0f);
+    public static final Vector2i MAXIMUM_WINDOW = new Vector2i(7680, 4320); // TODO fullscreen more than max?
     public final Cursor cursor;
     public final Joysticks joysticks;
     public final ArrayList<Callback> callbacks = new ArrayList<>();
@@ -52,7 +52,7 @@ public class WindowData {
         }
         glfwSetWindowPos(window, (int) (glfwVidMode.width() * 0.1), (int) (glfwVidMode.height() * 0.1));
         setWindowIcon(new File("soil/interface/lawn.png"));
-        glfwSetWindowSizeLimits(window, MINIMUM_WINDOW.x, MINIMUM_WINDOW.y, GLFW_DONT_CARE, GLFW_DONT_CARE);
+        glfwSetWindowSizeLimits(window, MINIMUM_WINDOW.x, MINIMUM_WINDOW.y, MAXIMUM_WINDOW.x, MAXIMUM_WINDOW.y);
         glfwSetWindowAspectRatio(window, GLFW_DONT_CARE, GLFW_DONT_CARE);
         this.cursor = new Cursor(window);
         this.joysticks = new Joysticks();
@@ -133,10 +133,6 @@ public class WindowData {
 
     public void pollEvents() {
         glfwPollEvents();
-    }
-
-    public void clear() {
-        glClear(GL_COLOR_BUFFER_BIT);
     }
 
     public void requestAttention() {
@@ -391,7 +387,6 @@ public class WindowData {
     private void glSettings() {
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DITHER);
         glDisable(GL_LIGHTING);
@@ -407,7 +402,6 @@ public class WindowData {
         glDisable(GL_RASTERIZER_DISCARD);
         glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
         glDisable(GL_SAMPLE_MASK);
-        glClearColor(BACKGROUND_COLOR.x(), BACKGROUND_COLOR.y(), BACKGROUND_COLOR.z(), BACKGROUND_COLOR.w());
     }
 
     private void registerErrorEvent() {

@@ -3,6 +3,8 @@
 const int MESH_MAX_QUADS = (1 << 16) / 4;
 const int[] TEXTURE_X = { 0, 1, 1, 0 };
 const int[] TEXTURE_Y = { 0, 0, 1, 1 };
+const int[] DELTA_X = { -1, 1, 1, -1 };
+const int[] DELTA_Y = { -1, -1, 1, 1 };
 
 const int QUAD_FLAG_PINNED = 0x1;
 
@@ -16,6 +18,12 @@ struct Quad {
     float vertices[8];
 };
 
+struct Light {
+    float x;
+    float y;
+    float radius;
+};
+
 layout (std430, binding = 0) buffer quadBuffer {
     Quad quadData[];
 };
@@ -24,15 +32,35 @@ layout (std430, binding = 2) buffer quadOrderBuffer {
     int quadOrder[];
 };
 
+layout (std430, binding = 4) buffer lightBuffer {
+    Light lights[];
+};
+
 uniform int meshIndex;
 uniform vec2 cameraPos;
 uniform vec2 cameraScale;
 uniform vec2 aspect;
+uniform bool processingLight;
 
 out float quadIndex;
 out vec2 texture_xy;
 
+vec2 applyCamera(vec2 pos) {
+    return (pos - cameraPos) * cameraScale * aspect;
+}
+
 void main(void) {
+
+    if (processingLight) {
+        int lightIndexi = gl_VertexID / 4;
+        Light light = lights[lightIndexi];
+        int indexMod = gl_VertexID % 4;
+        gl_Position.x = light.x + light.radius * DELTA_X[indexMod];
+        gl_Position.y = light.y + light.radius * DELTA_Y[indexMod];
+        gl_Position.xy = applyCamera(gl_Position.xy);
+        texture_xy = vec2(TEXTURE_X[indexMod], TEXTURE_Y[indexMod]);
+        return;
+    }
 
     int quadIndexi = MESH_MAX_QUADS * meshIndex + gl_VertexID / 4;
     quadIndexi = quadOrder[quadIndexi];

@@ -12,12 +12,14 @@ const float MAX_LIGHT_F = MAX_LIGHT;
 const int MAX_SAMPLERS = 16;
 const int POWER4 = 16;
 
-const int TEXTURE_STYLE_EMPTY = 0;
-const int TEXTURE_STYLE_NORMAL = 1;
-const int TEXTURE_STYLE_SHADOW = 2;
-const int TEXTURE_STYLE_FONT256 = 3;
+const int TEXTURE_STYLE_NORMAL = 0;
+const int TEXTURE_STYLE_SHADOW = 1;
+const int TEXTURE_STYLE_FONT256 = 2;
 
 const int QUAD_FLAG_PINNED = 0x1;
+
+const int SHADOW_TEXTURE_WIDTH = 7680;
+const int SHADOW_TEXTURE_HEIGHT = 4320;
 
 struct TextureData {
     int layerStart;
@@ -38,24 +40,28 @@ struct Quad {
     float vertices[8];
 };
 
-layout (std430, binding = 1) buffer textureBuffer {
-    TextureData textures[];
+layout(pixel_center_integer) in vec4 gl_FragCoord;
+
+layout (std430, binding = 0) readonly buffer quadBuffer {
+    Quad quadData[];
 };
 
-layout (std430, binding = 0) buffer quadBuffer {
-    Quad quadData[];
+layout (std430, binding = 1) readonly buffer textureBuffer {
+    TextureData textures[];
 };
 
 in float quadIndex;
 in vec2 texture_xy;
 
-out vec4 out_Color;
+layout(location = 0) out vec4 out_Color;
 
 uniform vec2 cameraPos;
 uniform vec2 cameraScale;
 uniform vec2 aspect;
 uniform int time;
 uniform bool debugging;
+uniform bool processingLight;
+uniform sampler2D shadowTexture;
 uniform sampler2DArray[MAX_SAMPLERS] samplers;
 
 int roundFloat(float value) {
@@ -127,23 +133,24 @@ vec4 resolveTexture(TextureData textureData, int animation_start, float animatio
     return texture(samplers[textureData.atlasNumber], vec3(pos * maxUV, textureLayer));
 }
 
-vec4 resolveQuadTexel() {
+void main(void) {
+    if (processingLight) {
+        float intensity = max(0, 1 - 2 * distance(texture_xy, vec2(0.5, 0.5)));
+        out_Color = vec4(0, 0, 0, intensity);
+        return;
+    }
     Quad quad = quadData[roundFloat(quadIndex)];
     vec2 pos = texture_xy;
     TextureData textureData = textures[quad.type];
-    int animation_start = quad.animation_start;
-    float realX = (texture_xy.x * 2 - 1) / (cameraScale.x * aspect.x) + cameraPos.x;
-    float realY = (texture_xy.y * 2 - 1) / (cameraScale.y * aspect.y) + cameraPos.y;
-    vec4 overlapTexel = vec4(0);
-    if (textureData.textureStyle == TEXTURE_STYLE_EMPTY) {
-        return overlapTexel;
-    }
     if (textureData.textureStyle == TEXTURE_STYLE_FONT256) {
         pos = translateSquareIndex(pos, POWER4, quad.meta1);
     }
-    return mix4(resolveTexture(textureData, animation_start, quad.animation_period, pos), overlapTexel);
-}
-
-void main(void) {
-    out_Color = resolveQuadTexel();
+    if (textureData.textureStyle == TEXTURE_STYLE_SHADOW) {
+        if (debugging) discard;
+        vec2 tex_coords = vec2(gl_FragCoord.x / SHADOW_TEXTURE_WIDTH, gl_FragCoord.y / SHADOW_TEXTURE_HEIGHT);
+        out_Color = texture2D(shadowTexture, tex_coords);
+        out_Color.a = 1 - out_Color.a;
+        return;
+    }
+    out_Color = resolveTexture(textureData, quad.animation_start, quad.animation_period, pos);
 }
