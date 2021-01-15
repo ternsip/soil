@@ -51,6 +51,7 @@ layout (std430, binding = 1) readonly buffer textureBuffer {
 };
 
 in float quadIndex;
+in float lightIndex;
 in vec2 texture_xy;
 
 layout(location = 0) out vec4 out_Color;
@@ -135,8 +136,14 @@ vec4 resolveTexture(TextureData textureData, int animation_start, float animatio
 
 void main(void) {
     if (processingLight) {
-        float intensity = max(0, 1 - 2 * distance(texture_xy, vec2(0.5, 0.5)));
-        out_Color = vec4(0, 0, 0, intensity);
+        float dist = 2 * distance(texture_xy, vec2(0.5, 0.5));
+        if (dist > 1) discard;
+        int lightIndex = roundFloat(lightIndex);
+        float intensity = 1 - dist;
+        float angle = atan(texture_xy.y - 0.5f, texture_xy.x - 0.5f);
+        float strobe = 1 + 2 * noise(vec3(loopValue(time + randInt(lightIndex), 100000) * 100, 2 + sin(angle) * 2, 2 + cos(angle) * 2));
+        intensity = intensity + pow(intensity, strobe);
+        out_Color = vec4(0, 0, 0, clamp(intensity, 0, 1));
         return;
     }
     Quad quad = quadData[roundFloat(quadIndex)];
@@ -146,7 +153,7 @@ void main(void) {
         pos = translateSquareIndex(pos, POWER4, quad.meta1);
     }
     if (textureData.textureStyle == TEXTURE_STYLE_SHADOW) {
-        if (debugging) discard;
+        //if (debugging) discard;
         vec2 tex_coords = vec2(gl_FragCoord.x / SHADOW_TEXTURE_WIDTH, gl_FragCoord.y / SHADOW_TEXTURE_HEIGHT);
         out_Color = texture2D(shadowTexture, tex_coords);
         out_Color.a = 1 - out_Color.a;

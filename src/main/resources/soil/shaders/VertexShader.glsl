@@ -43,6 +43,7 @@ uniform vec2 aspect;
 uniform bool processingLight;
 
 out float quadIndex;
+out float lightIndex;
 out vec2 texture_xy;
 
 vec2 applyCamera(vec2 pos) {
@@ -59,6 +60,7 @@ void main(void) {
         gl_Position.y = light.y + light.radius * DELTA_Y[indexMod];
         gl_Position.xy = applyCamera(gl_Position.xy);
         texture_xy = vec2(TEXTURE_X[indexMod], TEXTURE_Y[indexMod]);
+        lightIndex = lightIndexi;
         return;
     }
 
