@@ -7,11 +7,10 @@ import static com.ternsip.soil.graph.shader.Shader.UNASSIGNED_INDEX;
 
 public class Light {
 
-    int index = UNASSIGNED_INDEX;
-
     public float x;
     public float y;
     public float radius;
+    int index = UNASSIGNED_INDEX;
 
     public Light(float x, float y, float radius) {
         this.x = x;

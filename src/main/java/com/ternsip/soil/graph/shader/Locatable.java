@@ -9,7 +9,6 @@ import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL30C.glBindBufferBase;
 import static org.lwjgl.opengl.GL43C.*;
-import static org.lwjgl.opengl.GL43C.GL_SHADER_STORAGE_BUFFER;
 
 @Setter
 @Getter

@@ -1,15 +1,12 @@
 package com.ternsip.soil.graph.shader;
 
 import com.ternsip.soil.common.Finishable;
-import lombok.extern.slf4j.Slf4j;
-import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL43C.*;
-import static org.lwjgl.opengl.GL44C.*;
+import static org.lwjgl.opengl.GL44C.glBufferStorage;
 
 
 public class BufferLayoutServer extends Locatable implements Finishable {
