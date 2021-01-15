@@ -53,7 +53,7 @@ vec2 applyCamera(vec2 pos) {
 void main(void) {
 
     if (processingLight) {
-        int lightIndexi = gl_VertexID / 4;
+        int lightIndexi = MESH_MAX_QUADS * meshIndex + gl_VertexID / 4;
         Light light = lights[lightIndexi];
         int indexMod = gl_VertexID % 4;
         gl_Position.x = light.x + light.radius * DELTA_X[indexMod];
