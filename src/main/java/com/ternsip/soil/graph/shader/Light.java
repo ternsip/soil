@@ -10,12 +10,14 @@ public class Light {
     public float x;
     public float y;
     public float radius;
+    public float power;
     int index = UNASSIGNED_INDEX;
 
-    public Light(float x, float y, float radius) {
+    public Light(float x, float y, float radius, float power) {
         this.x = x;
         this.y = y;
         this.radius = radius;
+        this.power = power;
     }
 
     public boolean isRegistered() {

@@ -22,6 +22,7 @@ struct Light {
     float x;
     float y;
     float radius;
+    float power;
 };
 
 layout (std430, binding = 0) buffer quadBuffer {
@@ -44,6 +45,7 @@ uniform bool processingLight;
 
 out float quadIndex;
 out float lightIndex;
+out float lightPower;
 out vec2 texture_xy;
 
 vec2 applyCamera(vec2 pos) {
@@ -61,6 +63,7 @@ void main(void) {
         gl_Position.xy = applyCamera(gl_Position.xy);
         texture_xy = vec2(TEXTURE_X[indexMod], TEXTURE_Y[indexMod]);
         lightIndex = lightIndexi;
+        lightPower = light.power;
         return;
     }
 

@@ -27,14 +27,14 @@ public final class Shader implements Finishable {
 
     public static final int MAX_MESHES = 16;
     public static final int MAX_QUADS = MAX_MESHES * Mesh.MAX_QUADS;
-    public static final int MAX_LIGHTS = 1 << 16;
+    public static final int MAX_LIGHTS = 8 * (1 << 16);
     public static final int UNASSIGNED_INDEX = -1;
     public static final int QUAD_PINNED_FLAG = 0x1;
 
     private static final File VERTEX_SHADER = new File("soil/shaders/VertexShader.glsl");
     private static final File FRAGMENT_SHADER = new File("soil/shaders/FragmentShader.glsl");
     private final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length, 6);
-    private final BufferLayout lightBuffer = new BufferLayout(MAX_LIGHTS, 3);
+    private final BufferLayout lightBuffer = new BufferLayout(MAX_LIGHTS, 4);
     private final BufferLayout quadBuffer = new BufferLayout(MAX_QUADS, 14);
     private final BufferLayout quadOrderBuffer = new BufferLayout(MAX_QUADS, 1);
     private final ArrayList<Light> lights = new ArrayList<>();
@@ -255,6 +255,7 @@ public final class Shader implements Finishable {
         lightBuffer.writeFloat(offset, light.x);
         lightBuffer.writeFloat(offset + 1, light.y);
         lightBuffer.writeFloat(offset + 2, light.radius);
+        lightBuffer.writeFloat(offset + 3, light.power);
     }
 
     private void setQuadOrder(int quadOrderedIndex, int quadRealIndex) {

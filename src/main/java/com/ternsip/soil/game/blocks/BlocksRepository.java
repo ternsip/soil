@@ -5,13 +5,16 @@ import com.ternsip.soil.common.Finishable;
 import com.ternsip.soil.common.Maths;
 import com.ternsip.soil.common.Utils;
 import com.ternsip.soil.game.generators.ChunkGenerator;
+import com.ternsip.soil.graph.display.Image;
+import com.ternsip.soil.graph.shader.Light;
 import com.ternsip.soil.graph.shader.TextureType;
+import org.joml.Vector2i;
+import org.joml.Vector2ic;
 import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BlocksRepository implements Finishable {
@@ -21,6 +24,7 @@ public class BlocksRepository implements Finishable {
     public final int[][] rgbas = new int[SIZE_X][SIZE_Y];
     public final Material[][] materials = new Material[SIZE_X][SIZE_Y];
     public final ByteBuffer buffer = BufferUtils.createByteBuffer(SIZE_X * SIZE_Y * 4);
+    public final Map<Vector2ic, Light> posToLight = new HashMap<>();
 
     public void init() {
         List<ChunkGenerator> chunkGenerators = Utils.getAllClasses(ChunkGenerator.class).stream()
@@ -137,6 +141,38 @@ public class BlocksRepository implements Finishable {
 
     public void fullVisualUpdate() {
         visualUpdate(0, 0, SIZE_X, SIZE_Y);
+    }
+
+    public void fillMaterial(Image image, int color, Material material, double rotationRadians, int midX, int midY, float scale) {
+        float realSizeX = image.width * scale;
+        float realSizeY = image.height * scale;
+        int realSize = (int) Math.ceil(Math.sqrt(realSizeX * realSizeX + realSizeY * realSizeY));
+        int offsetX = midX - realSize / 2;
+        int offsetY = midY - realSize / 2;
+        float halfRealSizeX = realSizeX * 0.5f;
+        float halfRealSizeY = realSizeY * 0.5f;
+        float halfRealSize = realSize * 0.5f;
+        double cos = Math.cos(rotationRadians);
+        double sin = Math.sin(rotationRadians);
+        for (int x = offsetX, dx = 0; dx < realSize; ++x, ++dx) {
+            for (int y = offsetY, dy = 0; dy < realSize; ++y, ++dy) {
+                if (x < 0 || y < 0 || x >= SIZE_X || y >= SIZE_Y) continue;
+                double rotatedDx = halfRealSizeX + cos * (dx - halfRealSize) - sin * (dy - halfRealSize);
+                double rotatedDy = halfRealSizeY + sin * (dx - halfRealSize) + cos * (dy - halfRealSize);
+                int cx = (int) (rotatedDx / scale);
+                int cy = (int) (rotatedDy / scale);
+                if (cx >= image.width || cy >= image.height || cy < 0 || cx < 0) continue;
+                int offset = image.getOffset(cx, cy);
+                int r = image.frameData[0][offset] & 0xFF;
+                int g = image.frameData[0][offset] & 0xFF;
+                int b = image.frameData[0][offset] & 0xFF;
+                int a = image.frameData[0][offset] & 0xFF;
+                if (r >= 128 && g >= 128 && b >= 128) {
+                    materials[x][y] = material;
+                    rgbas[x][y] = color;
+                }
+            }
+        }
     }
 
     public void update() {

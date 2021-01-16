@@ -141,11 +141,11 @@ public class Client implements Threadable {
             }
             entityStatistics.register();
         }
-        new Light(0, 0, 1).register();
-        new Light(1, 1, 0.5f).register();
+        new Light(0, 0, 1, 3).register();
+        new Light(1, 1, 0.5f, 1).register();
 
         for (int i = 0; i < 100; ++i) {
-            new Light(2 + random.nextInt(25), 2 + random.nextInt(25), (float) (0.5f + random.nextDouble() * 2)).register();
+            new Light(2 + random.nextInt(25), 2 + random.nextInt(25), (float) (0.5f + random.nextDouble() * 2), 1).register();
         }
     }
 

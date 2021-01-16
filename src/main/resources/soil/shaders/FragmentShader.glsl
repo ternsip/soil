@@ -52,6 +52,7 @@ layout (std430, binding = 1) readonly buffer textureBuffer {
 
 in float quadIndex;
 in float lightIndex;
+in float lightPower;
 in vec2 texture_xy;
 
 layout(location = 0) out vec4 out_Color;
@@ -143,6 +144,7 @@ void main(void) {
         float angle = atan(texture_xy.y - 0.5f, texture_xy.x - 0.5f);
         float strobe = 1 + 2 * noise(vec3(loopValue(time + randInt(lightIndex), 100000) * 100, 2 + sin(angle) * 2, 2 + cos(angle) * 2));
         intensity = intensity + pow(intensity, strobe);
+        intensity *= lightPower;
         out_Color = vec4(0, 0, 0, clamp(intensity, 0, 1));
         return;
     }
