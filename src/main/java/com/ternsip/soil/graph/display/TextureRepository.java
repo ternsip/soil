@@ -1,7 +1,8 @@
 package com.ternsip.soil.graph.display;
 
+import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Utils;
-import com.ternsip.soil.graph.shader.TextureType;
+import com.ternsip.soil.graph.shader.BaseTextures;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -29,7 +30,7 @@ import static org.lwjgl.opengl.GL42.glTexStorage3D;
 public class TextureRepository {
 
     public final static File MISSING_TEXTURE = new File("soil/tools/missing.jpg");
-    public final static int[] ATLAS_RESOLUTIONS = new int[]{16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192};
+    public final static int[] ATLAS_RESOLUTIONS = new int[]{16, 32, 64, 128, 256, 512, 1024, 2048, 4096};
     public final Texture2D[] atlases;
     public final Map<File, Texture> fileToTexture;
     public final List<Texture2D> textures2D = new ArrayList<>();
@@ -40,6 +41,9 @@ public class TextureRepository {
                 .stream()
                 .map(Image::new)
                 .collect(Collectors.toCollection(ArrayList::new));
+
+        // TODO this is encapsulation problem (should be performed as DI)
+        images.addAll(Soil.THREADS.client.blocksRepository.getTextureImages());
 
         Set<Image> usedImages = new HashSet<>();
 
@@ -58,7 +62,6 @@ public class TextureRepository {
             glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP);
             glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
 
             ArrayList<Image> suitableImages = images
                     .stream()
@@ -79,10 +82,19 @@ public class TextureRepository {
                     cleanData.rewind();
                     // set the whole texture to transparent (so min/mag filters don't find bad data off the edge of the actual image data)
                     glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, atlasResolution, atlasResolution, 1, GL_RGBA, GL_UNSIGNED_BYTE, cleanData);
-                    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, image.width, image.height, 1, GL_RGBA, GL_UNSIGNED_BYTE, Utils.arrayToBuffer(image.frameData[frame]));
+                    if (image.frameData[frame] != null) {
+                        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, image.width, image.height, 1, GL_RGBA, GL_UNSIGNED_BYTE, Utils.arrayToBuffer(image.frameData[frame]));
+                    }
                     layer++;
                 }
-                Texture texture = new Texture(atlasNumber, layerStart, layer - 1, image.width / (float) atlasResolution, image.height / (float) atlasResolution);
+                Texture texture = new Texture(
+                        atlasNumber,
+                        layerStart,
+                        layer - 1,
+                        image.width / (float) atlasResolution,
+                        image.height / (float) atlasResolution,
+                        fileToTexture.size()
+                );
                 this.fileToTexture.put(image.file, texture);
             }
             glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
@@ -106,7 +118,7 @@ public class TextureRepository {
         glActiveTexture(GL_TEXTURE0);
     }
 
-    public Texture getTexture(TextureType textureType) {
+    public Texture getTexture(BaseTextures textureType) {
         return getTexture(textureType.file);
     }
 
@@ -144,6 +156,15 @@ public class TextureRepository {
             texture2D.unbind();
             texture2D.delete();
         }
+    }
+
+    public static int findMinResolution(int size) {
+        for (int atlasResolution : ATLAS_RESOLUTIONS) {
+            if (atlasResolution >= size) {
+                return atlasResolution;
+            }
+        }
+        return ATLAS_RESOLUTIONS[ATLAS_RESOLUTIONS.length - 1];
     }
 
 }

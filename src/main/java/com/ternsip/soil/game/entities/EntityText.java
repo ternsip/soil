@@ -1,7 +1,10 @@
 package com.ternsip.soil.game.entities;
 
+import com.ternsip.soil.graph.shader.BaseTextures;
 import com.ternsip.soil.graph.shader.Quad;
-import com.ternsip.soil.graph.shader.TextureType;
+
+import static com.ternsip.soil.graph.shader.Shader.QUAD_FLAG_FONT256;
+import static com.ternsip.soil.graph.shader.Shader.QUAD_FLAG_PINNED;
 
 public class EntityText extends Entity {
 
@@ -9,7 +12,7 @@ public class EntityText extends Entity {
     private Quad[] quads;
     private String text;
     private boolean centered;
-    private boolean pinned;
+    private boolean pinned; // TODO handle changes
     private float textCompression = 0.8f;
     private float posX;
     private float posY;
@@ -27,7 +30,7 @@ public class EntityText extends Entity {
         this.centered = centered;
         this.pinned = pinned;
         for (int i = 0; i < quads.length; ++i) {
-            quads[i] = new Quad(layer, TextureType.FONT, pinned);
+            quads[i] = new Quad(layer, BaseTextures.FONT, (pinned ? QUAD_FLAG_PINNED : 0) | QUAD_FLAG_FONT256);
         }
         applyText();
     }
@@ -42,7 +45,7 @@ public class EntityText extends Entity {
             }
             quads = new Quad[text.length()];
             for (int i = 0; i < quads.length; ++i) {
-                quads[i] = new Quad(layer, TextureType.FONT, pinned);
+                quads[i] = new Quad(layer, BaseTextures.FONT, (pinned ? QUAD_FLAG_PINNED : 0) | QUAD_FLAG_FONT256);
             }
         }
         for (int i = 0; i < text.length(); ++i) {

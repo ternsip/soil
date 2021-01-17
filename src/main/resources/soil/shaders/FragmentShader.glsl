@@ -17,6 +17,8 @@ const int TEXTURE_STYLE_SHADOW = 1;
 const int TEXTURE_STYLE_FONT256 = 2;
 
 const int QUAD_FLAG_PINNED = 0x1;
+const int QUAD_FLAG_SHADOW = 0x2;
+const int QUAD_FLAG_FONT256 = 0x4;
 
 const int SHADOW_TEXTURE_WIDTH = 7680;
 const int SHADOW_TEXTURE_HEIGHT = 4320;
@@ -27,7 +29,6 @@ struct TextureData {
     int atlasNumber;
     float maxU;
     float maxV;
-    int textureStyle;
 };
 
 struct Quad {
@@ -149,17 +150,17 @@ void main(void) {
         return;
     }
     Quad quad = quadData[roundFloat(quadIndex)];
-    vec2 pos = texture_xy;
-    TextureData textureData = textures[quad.type];
-    if (textureData.textureStyle == TEXTURE_STYLE_FONT256) {
-        pos = translateSquareIndex(pos, POWER4, quad.meta1);
-    }
-    if (textureData.textureStyle == TEXTURE_STYLE_SHADOW) {
-        //if (debugging) discard;
+    if ((quad.flags & QUAD_FLAG_SHADOW) != 0) {
+        if (debugging) discard;
         vec2 tex_coords = vec2(gl_FragCoord.x / SHADOW_TEXTURE_WIDTH, gl_FragCoord.y / SHADOW_TEXTURE_HEIGHT);
         out_Color = texture2D(shadowTexture, tex_coords);
         out_Color.a = 1 - out_Color.a;
         return;
     }
+    vec2 pos = texture_xy;
+    if ((quad.flags & QUAD_FLAG_FONT256) != 0) {
+        pos = translateSquareIndex(pos, POWER4, quad.meta1);
+    }
+    TextureData textureData = textures[quad.type];
     out_Color = resolveTexture(textureData, quad.animation_start, quad.animation_period, pos);
 }

@@ -1,13 +1,14 @@
 package com.ternsip.soil.graph.shader;
 
 import com.ternsip.soil.Soil;
+import com.ternsip.soil.graph.display.Texture;
 
 import static com.ternsip.soil.graph.shader.Shader.UNASSIGNED_INDEX;
 
 public class Quad {
 
-    public TextureType textureType;
-    public boolean pinned;
+    public int textureIndex;
+    public int flags;
     public float x1, y1, x2, y2, x3, y3, x4, y4;
     public int animationStart = 0;
     public float animationPeriod;
@@ -17,22 +18,34 @@ public class Quad {
     int index = UNASSIGNED_INDEX;
     int orderIndex = UNASSIGNED_INDEX;
 
-    public Quad(int layer, TextureType textureType, boolean pinned) {
-        this(layer, textureType, pinned, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    public Quad(int layer, BaseTextures textureType, int flags) {
+        this(layer, textureType, flags, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     public Quad(
             int layer,
-            TextureType textureType,
-            boolean pinned,
+            BaseTextures textureType,
+            int flags,
+            float animationPeriod,
+            float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
+            int metadata1,
+            int metadata2
+    ) {
+        this(layer, textureType.getTexture(), flags, animationPeriod, x1, y1, x2, y2, x3, y3, x4, y4, metadata1, metadata2);
+    }
+
+    public Quad(
+            int layer,
+            Texture texture,
+            int flags,
             float animationPeriod,
             float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
             int metadata1,
             int metadata2
     ) {
         this.layer = layer;
-        this.textureType = textureType;
-        this.pinned = pinned;
+        this.textureIndex = texture.index;
+        this.flags = flags;
         this.animationPeriod = animationPeriod;
         this.x1 = x1;
         this.y1 = y1;

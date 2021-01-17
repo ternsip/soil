@@ -11,7 +11,7 @@ import com.ternsip.soil.game.common.PhysicalPoint;
 import com.ternsip.soil.graph.display.Camera;
 import com.ternsip.soil.graph.display.CursorType;
 import com.ternsip.soil.graph.shader.Quad;
-import com.ternsip.soil.graph.shader.TextureType;
+import com.ternsip.soil.graph.shader.BaseTextures;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -33,7 +33,7 @@ public class EntityPlayer extends Entity implements Updatable {
 
     public EntityPlayer(int layer) {
         this.layer = layer;
-        this.body = new Quad(layer, TextureType.PLAYER_IDLE, false);
+        this.body = new Quad(layer, BaseTextures.PLAYER_IDLE, 0);
         for (int i = 0; i < points.length; ++i) {
             points[i] = new PhysicalPoint(0, 0);
         }

@@ -29,11 +29,13 @@ public final class Shader implements Finishable {
     public static final int MAX_QUADS = MAX_MESHES * Mesh.MAX_QUADS;
     public static final int MAX_LIGHTS = 8 * (1 << 16);
     public static final int UNASSIGNED_INDEX = -1;
-    public static final int QUAD_PINNED_FLAG = 0x1;
+    public static final int QUAD_FLAG_PINNED = 0x1;
+    public static final int QUAD_FLAG_SHADOW = 0x2;
+    public static final int QUAD_FLAG_FONT256 = 0x4;
 
     private static final File VERTEX_SHADER = new File("soil/shaders/VertexShader.glsl");
     private static final File FRAGMENT_SHADER = new File("soil/shaders/FragmentShader.glsl");
-    private final BufferLayout textureBuffer = new BufferLayout(TextureType.values().length, 6);
+    private final BufferLayout textureBuffer;
     private final BufferLayout lightBuffer = new BufferLayout(MAX_LIGHTS, 4);
     private final BufferLayout quadBuffer = new BufferLayout(MAX_QUADS, 14);
     private final BufferLayout quadOrderBuffer = new BufferLayout(MAX_QUADS, 1);
@@ -55,6 +57,7 @@ public final class Shader implements Finishable {
     private final UniformSamplers2DArray samplers = new UniformSamplers2DArray(TextureRepository.ATLAS_RESOLUTIONS.length);
 
     public Shader() {
+        this.textureBuffer = new BufferLayout(Soil.THREADS.client.textureRepository.fileToTexture.size(), 5);
         int vertexShaderID = loadShader(VERTEX_SHADER, GL_VERTEX_SHADER);
         int fragmentShaderID = loadShader(FRAGMENT_SHADER, GL_FRAGMENT_SHADER);
         int programID = glCreateProgram();
@@ -89,8 +92,8 @@ public final class Shader implements Finishable {
         cameraPos.load(camera.pos.x, camera.pos.y);
         cameraScale.load(camera.scale.x, camera.scale.y);
         aspect.load(camera.aspectX, camera.aspectY);
-        debugging.load(camera.scale.x < 0.01 || camera.scale.y < 0.01);
-        //debugging.load(true);
+        //debugging.load(camera.scale.x < 0.01 || camera.scale.y < 0.01);
+        debugging.load(false);
         time.load((int) (System.currentTimeMillis() % Integer.MAX_VALUE));
 
         glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.fbo);
@@ -204,10 +207,10 @@ public final class Shader implements Finishable {
             throw new IllegalArgumentException("Quad is not registered yet");
         }
         int quadOffset = quad.index * quadBuffer.structureLength;
-        quadBuffer.writeInt(quadOffset, quad.textureType.ordinal());
+        quadBuffer.writeInt(quadOffset, quad.textureIndex);
         quadBuffer.writeInt(quadOffset + 1, quad.animationStart);
         quadBuffer.writeFloat(quadOffset + 2, quad.animationPeriod);
-        quadBuffer.writeInt(quadOffset + 3, (quad.pinned ? QUAD_PINNED_FLAG : 0));
+        quadBuffer.writeInt(quadOffset + 3, quad.flags);
         quadBuffer.writeInt(quadOffset + 4, quad.metadata1);
         quadBuffer.writeInt(quadOffset + 5, quad.metadata2);
         quadBuffer.writeFloat(quadOffset + 6, quad.x1);
@@ -265,19 +268,16 @@ public final class Shader implements Finishable {
     }
 
     private void loadDefaultData() {
-        int index = 0;
         TextureRepository textureRepository = Soil.THREADS.client.textureRepository;
-        for (TextureType textureType : TextureType.values()) {
-            Texture texture = textureRepository.getTexture(textureType.file);
+        for (Texture texture : textureRepository.fileToTexture.values()) {
+            int index = texture.index * textureBuffer.structureLength;
             textureBuffer.writeInt(index, texture.layerStart);
             textureBuffer.writeInt(index + 1, texture.layerEnd);
             textureBuffer.writeInt(index + 2, texture.atlasNumber);
             textureBuffer.writeFloat(index + 3, texture.maxU);
             textureBuffer.writeFloat(index + 4, texture.maxV);
-            textureBuffer.writeInt(index + 5, textureType.textureStyle.ordinal());
-            index += textureBuffer.structureLength;
         }
-        Texture2D[] textures = Soil.THREADS.client.textureRepository.atlases;
+        Texture2D[] textures = textureRepository.atlases;
         for (int i = 0; i < textures.length; ++i) {
             samplers.load(i, textures[i].activationId);
         }

@@ -27,6 +27,14 @@ public class Image {
     public final byte[][] frameData;
     public final int[] frameDelay;
 
+    public Image(File file, int width, int height) {
+        this.file = file;
+        this.width = width;
+        this.height = height;
+        this.frameData = new byte[][]{null};
+        this.frameDelay = new int[]{0};
+    }
+
     @SneakyThrows
     public Image(File file) {
         this.file = file;

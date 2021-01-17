@@ -7,6 +7,8 @@ const int[] DELTA_X = { -1, 1, 1, -1 };
 const int[] DELTA_Y = { -1, -1, 1, 1 };
 
 const int QUAD_FLAG_PINNED = 0x1;
+const int QUAD_FLAG_SHADOW = 0x2;
+const int QUAD_FLAG_FONT256 = 0x4;
 
 struct Quad {
     int type;

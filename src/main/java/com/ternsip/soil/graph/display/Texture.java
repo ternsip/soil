@@ -10,5 +10,6 @@ public class Texture {
     public final int layerEnd;
     public final float maxU;
     public final float maxV;
+    public final int index;
 
 }

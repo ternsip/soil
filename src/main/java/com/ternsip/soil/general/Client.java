@@ -14,12 +14,13 @@ import com.ternsip.soil.graph.display.*;
 import com.ternsip.soil.graph.shader.Light;
 import com.ternsip.soil.graph.shader.Quad;
 import com.ternsip.soil.graph.shader.Shader;
-import com.ternsip.soil.graph.shader.TextureType;
+import com.ternsip.soil.graph.shader.BaseTextures;
 
 import java.util.Random;
 
 import static com.ternsip.soil.game.blocks.BlocksRepository.SIZE_X;
 import static com.ternsip.soil.game.blocks.BlocksRepository.SIZE_Y;
+import static com.ternsip.soil.graph.shader.Shader.*;
 
 /**
  * Provides full control over user Input/Output channels
@@ -46,6 +47,7 @@ public class Client implements Threadable {
         eventReceiver = new EventReceiver();
         windowData = new WindowData();
         camera = new Camera();
+        blocksRepository = new BlocksRepository();
         textureRepository = new TextureRepository();
         shader = new Shader();
         fpsCounter = new FpsCounter();
@@ -53,7 +55,6 @@ public class Client implements Threadable {
         settings = new Settings();
         soundRepository = new SoundRepository();
         entityRepository = new EntityRepository();
-        blocksRepository = new BlocksRepository();
         blocksRepository.init();
         blocksRepository.fullVisualUpdate();
         eventReceiver.registerWithSubObjects(this);
@@ -103,19 +104,17 @@ public class Client implements Threadable {
     private void spawnMenu() {
         EntityStatistics entityStatistics = new EntityStatistics();
         entityStatistics.register();
-        new Quad(-1, TextureType.BACKGROUND, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
-        new Quad(7, TextureType.SHADOW, true, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
-        new Quad(1, TextureType.PLAYER_IDLE, false, 1000.0f, 0, 0, 0.9f, 0, 0.9f, 0.5f, 0, 0.5f, 0, 0).register();
-        new Quad(1, TextureType.PLAYER_ATTACK, false, 5000.0f, -0.2f, 0.2f, 0, 0.2f, 0, 0, -0.2f, 0, 0, 0).register();
-        new Quad(1, TextureType.PLAYER_ATTACK, false, 5000.0f, -0.1f, 0.2f, 0, 0.2f, 0, 0, -0.2f, 0, 0, 0).register();
+        new Quad(-1, BaseTextures.BACKGROUND, QUAD_FLAG_PINNED, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
+        new Quad(7, BaseTextures.SHADOW, QUAD_FLAG_PINNED | QUAD_FLAG_SHADOW, 1000.0f, -1, -1, 1, -1, 1, 1, -1, 1, 0, 0).register();
+        new Quad(1, BaseTextures.PLAYER_IDLE, 0, 1000.0f, 0, 0, 0.9f, 0, 0.9f, 0.5f, 0, 0.5f, 0, 0).register();
+        new Quad(1, BaseTextures.PLAYER_ATTACK, 0, 5000.0f, -0.2f, 0.2f, 0, 0.2f, 0, 0, -0.2f, 0, 0, 0).register();
+        new Quad(1, BaseTextures.PLAYER_ATTACK, 0, 5000.0f, -0.1f, 0.2f, 0, 0.2f, 0, 0, -0.2f, 0, 0, 0).register();
         for (int i = 0; i < 100; ++i)
-            new Quad(1, TextureType.HOMER, false, 1000.0f, -0.4f, 0.2f, -0.2f, 0.2f, -0.2f, 0, -0.4f, 0, 0, 0).register();
-        //new EntityQuad(1, TextureType.FONT, 1000.0f, -0.4f, 0.2f, -0.2f, 0.2f, -0.2f, 0, -0.4f, 0, 'c', 0).register();
-        new Quad(1, TextureType.TEST, false, 3000.0f, -0.8f, 0.2f, -0.4f, 0.2f, -0.4f, 0, -0.8f, 0, 0, 0).register();
-        new Quad(1, TextureType.KITTY, false, 1000.0f, -0.8f, 0.4f, -0.4f, 0.4f, -0.4f, 0.2f, -0.8f, 0.2f, 0, 0).register();
-        new Quad(2, TextureType.PLAYER_IDLE, false, 1000.0f, 0, 0, -0.9f, -0, -0.9f, -0.5f, 0, -0.5f, 0, 0).register();
-        Quad overlay = new Quad(5, TextureType.OVERLAY, false, 1000.0f, -0.5f, -1, 0.5f, -1, 1, 1, -1, 1, 0, 0);
-        new Quad(6, TextureType.SOIL, false, 1000.0f, 0, 0, SIZE_X, 0, SIZE_X, SIZE_Y, 0, SIZE_Y, 0, 0).register();
+            new Quad(1, BaseTextures.HOMER, 0, 1000.0f, -0.4f, 0.2f, -0.2f, 0.2f, -0.2f, 0, -0.4f, 0, 0, 0).register();
+        new Quad(1, BaseTextures.TEST, 0, 3000.0f, -0.8f, 0.2f, -0.4f, 0.2f, -0.4f, 0, -0.8f, 0, 0, 0).register();
+        new Quad(1, BaseTextures.KITTY, 0, 1000.0f, -0.8f, 0.4f, -0.4f, 0.4f, -0.4f, 0.2f, -0.8f, 0.2f, 0, 0).register();
+        new Quad(2, BaseTextures.PLAYER_IDLE, 0, 1000.0f, 0, 0, -0.9f, -0, -0.9f, -0.5f, 0, -0.5f, 0, 0).register();
+        Quad overlay = new Quad(5, BaseTextures.OVERLAY, 0, 1000.0f, -0.5f, -1, 0.5f, -1, 1, 1, -1, 1, 0, 0);
         new EntityPlayer(1).register();
         overlay.register();
         overlay.setLayer(0);
@@ -124,7 +123,7 @@ public class Client implements Threadable {
         Random random = new Random(333);
         Quad[] e = new Quad[100];
         for (int i = 0; i < e.length; ++i) {
-            e[i] = new Quad(Math.abs(random.nextInt()) % 25, TextureType.HOMER, false, 1000.0f, -0.4f + i * 0.1f, 0.2f + i * 0.1f, -0.2f + i * 0.1f, 0.2f + i * 0.1f, -0.2f + i * 0.1f, 0 + i * 0.1f, -0.4f + i * 0.1f, +i * 0.1f, 0, 0);
+            e[i] = new Quad(Math.abs(random.nextInt()) % 25, BaseTextures.HOMER, 0, 1000.0f, -0.4f + i * 0.1f, 0.2f + i * 0.1f, -0.2f + i * 0.1f, 0.2f + i * 0.1f, -0.2f + i * 0.1f, 0 + i * 0.1f, -0.4f + i * 0.1f, +i * 0.1f, 0, 0);
             e[i].register();
             e[i].unregister();
             e[i].register();
