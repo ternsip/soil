@@ -3,10 +3,7 @@ package com.ternsip.soil.graph.shader;
 import com.ternsip.soil.Soil;
 import com.ternsip.soil.common.Finishable;
 import com.ternsip.soil.common.Utils;
-import com.ternsip.soil.graph.display.Camera;
-import com.ternsip.soil.graph.display.Texture;
-import com.ternsip.soil.graph.display.Texture2D;
-import com.ternsip.soil.graph.display.TextureRepository;
+import com.ternsip.soil.graph.display.*;
 import lombok.SneakyThrows;
 import org.lwjgl.opengl.GL11;
 
@@ -74,6 +71,7 @@ public final class Shader implements Finishable {
         glUseProgram(programID);
         loadDefaultData();
         glClearColor(0, 0, 0, 0);
+        GLInfo.logInfo(programID);
     }
 
     private static int loadShader(File file, int type) {
@@ -98,7 +96,7 @@ public final class Shader implements Finishable {
 
         glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.fbo);
         glClear(GL_COLOR_BUFFER_BIT);
-        processingLight.load(true);
+        processingLight.load(false);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
         int lightsToRender = lights.size();
         for (int mshIdx = 0; lightsToRender > 0; ++mshIdx) {

@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 
 public class BlocksRepository implements Finishable {
 
-    public static final int SIZE_X = 16384;
-    public static final int SIZE_Y = 8192;
+    public static final int SIZE_X = 16;
+    public static final int SIZE_Y = 16;
     public static final int TEXTURE_RESOLUTION = TextureRepository.findMinResolution(Math.max(SIZE_X, SIZE_Y));
     public static final int TEXTURES_X = Maths.divideRoundUp(SIZE_X, TEXTURE_RESOLUTION);
     public static final int TEXTURES_Y = Maths.divideRoundUp(SIZE_Y, TEXTURE_RESOLUTION);
