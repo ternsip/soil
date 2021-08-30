@@ -85,6 +85,7 @@ public class WindowData {
         registerEvent(new FramebufferSizeEvent(width, height));
         logInfo();
         GLInfo.logInfo();
+        GLInfo.logSettings();
     }
 
     public float getRatio() {

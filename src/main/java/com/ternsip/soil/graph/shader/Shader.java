@@ -71,7 +71,7 @@ public final class Shader implements Finishable {
         glUseProgram(programID);
         loadDefaultData();
         glClearColor(0, 0, 0, 0);
-        GLInfo.logInfo(programID);
+        GLInfo.logAttributeInfo(programID);
     }
 
     private static int loadShader(File file, int type) {
