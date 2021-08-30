@@ -14,7 +14,8 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL14.*;
-import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER_BINDING;
+import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER_BINDING;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL43.*;
 
@@ -34,17 +35,74 @@ public class GLInfo {
     }
 
     public static void logShaderStorageInfo() {
+
         // When used with indexed variants of glGet (such as glGetInteger64i_v), data returns a single value, the start offset of the binding range for each indexed shader storage buffer binding. The initial value is 0 for all bindings. See glBindBufferRange.
-        log.info("Shader storage buffer start: {}", glGetInteger(GL_SHADER_STORAGE_BUFFER_START));
+        log.info("Shader storage buffer start: {}", glGetInteger64i(GL_SHADER_STORAGE_BUFFER_START, 0));
 
         // When used with indexed variants of glGet (such as glGetInteger64i_v), data returns a single value, the size of the binding range for each indexed shader storage buffer binding. The initial value is 0 for all bindings. See glBindBufferRange.
-        log.info("Shader storage buffer size: {}", glGetInteger(GL_SHADER_STORAGE_BUFFER_SIZE));
+        log.info("Shader storage buffer size: {}", glGetInteger64i(GL_SHADER_STORAGE_BUFFER_SIZE, 0));
+
+    }
+
+    public static void logFeedbackInfo() {
+        // When used with non-indexed variants of glGet (such as glGetIntegerv), data returns a single value, the name of the buffer object currently bound to the target GL_TRANSFORM_FEEDBACK_BUFFER. If no buffer object is bound to this target, 0 is returned. When used with indexed variants of glGet (such as glGetIntegeri_v), data returns a single value, the name of the buffer object bound to the indexed transform feedback attribute stream. The initial value is 0 for all targets. See glBindBuffer, glBindBufferBase, and glBindBufferRange.
+        log.info("Transform feedback buffer binding: {}", glGetInteger(GL_TRANSFORM_FEEDBACK_BUFFER_BINDING));
+
+        // When used with indexed variants of glGet (such as glGetInteger64i_v), data returns a single value, the start offset of the binding range for each transform feedback attribute stream. The initial value is 0 for all streams. See glBindBufferRange.
+        log.info("Transform feedback buffer start: {}", glGetInteger64i(GL_TRANSFORM_FEEDBACK_BUFFER_START, 0));
+
+        // When used with indexed variants of glGet (such as glGetInteger64i_v), data returns a single value, the size of the binding range for each transform feedback attribute stream. The initial value is 0 for all streams. See glBindBufferRange.
+        log.info("Transform feedback buffer size: {}", glGetInteger64i(GL_TRANSFORM_FEEDBACK_BUFFER_SIZE, 0));
+
     }
 
     public static void logTextureInfo() {
+
+        // data returns a single value indicating the active multitexture unit. The initial value is GL_TEXTURE0. See glActiveTexture.
         log.info("Active texture: {}", glGetInteger(GL_ACTIVE_TEXTURE));
+
+        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_1D. The initial value is 0. See glBindTexture.
+        log.info("Texture binding 1D: {}", glGetInteger(GL_TEXTURE_BINDING_1D));
+
+        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_1D_ARRAY. The initial value is 0. See glBindTexture.
+        log.info("Texture binding 1D array: {}", glGetInteger(GL_TEXTURE_BINDING_1D_ARRAY));
+
+        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_2D. The initial value is 0. See glBindTexture.
+        log.info("Texture binding 2D: {}", glGetInteger(GL_TEXTURE_BINDING_2D));
+
+        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_2D_ARRAY. The initial value is 0. See glBindTexture.
+        log.info("Texture binding 2D array: {}", glGetInteger(GL_TEXTURE_BINDING_2D_ARRAY));
+
+        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_2D_MULTISAMPLE. The initial value is 0. See glBindTexture.
+        log.info("Texture binding 2D multi sample: {}", glGetInteger(GL_TEXTURE_BINDING_2D_MULTISAMPLE));
+
+        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_2D_MULTISAMPLE_ARRAY. The initial value is 0. See glBindTexture.
+        log.info("Texture binding 2D multi sample array: {}", glGetInteger(GL_TEXTURE_BINDING_2D_MULTISAMPLE_ARRAY));
+
+        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_3D. The initial value is 0. See glBindTexture.
+        log.info("Texture binding 3D: {}", glGetInteger(GL_TEXTURE_BINDING_3D));
+
+        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_BUFFER. The initial value is 0. See glBindTexture.
+        log.info("Texture binding buffer: {}", glGetInteger(GL_TEXTURE_BINDING_BUFFER));
+
+        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_CUBE_MAP. The initial value is 0. See glBindTexture.
+        log.info("Texture binding cube map: {}", glGetInteger(GL_TEXTURE_BINDING_CUBE_MAP));
+
+        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_RECTANGLE. The initial value is 0. See glBindTexture.
+        log.info("Texture binding rectangle: {}", glGetInteger(GL_TEXTURE_BINDING_RECTANGLE));
+
+        // data returns a single value indicating the mode of the texture compression hint. The initial value is GL_DONT_CARE.
+        log.info("Texture compression hint: {}", glGetInteger(GL_TEXTURE_COMPRESSION_HINT));
+
+        // data returns a single value, the name of the buffer object currently bound to the GL_TEXTURE_BUFFER buffer binding point. The initial value is 0. See glBindBuffer.
+        log.info("Texture binding buffer: {}", glGetInteger(GL_TEXTURE_BINDING_BUFFER));
+
+        // data returns a single value, the minimum required alignment for texture buffer sizes and offset. The initial value is 1. See glUniformBlockBinding.
+        log.info("Texture buffer offset alignment: {}", glGetInteger(GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT));
+
     }
 
+    // TODO should not work, it's just bunch for sorting
     public static void logBufferInfo() {
 
         // data returns a single value, the name of the buffer object currently bound to the target GL_ARRAY_BUFFER. If no buffer object is bound to this target, 0 is returned. The initial value is 0. See glBindBuffer.
@@ -79,6 +137,30 @@ public class GLInfo {
 
         // When used with non-indexed variants of glGet (such as glGetIntegerv), data returns a single value, the name of the buffer object currently bound to the target GL_SHADER_STORAGE_BUFFER. If no buffer object is bound to this target, 0 is returned. When used with indexed variants of glGet (such as glGetIntegeri_v), data returns a single value, the name of the buffer object bound to the indexed shader storage buffer binding points. The initial value is 0 for all targets. See glBindBuffer, glBindBufferBase, and glBindBufferRange.
         log.info("Shader storage buffer binding: {}", glGetInteger(GL_SHADER_STORAGE_BUFFER_BINDING));
+
+        // When used with non-indexed variants of glGet (such as glGetIntegerv), data returns a single value, the name of the buffer object currently bound to the target GL_UNIFORM_BUFFER. If no buffer object is bound to this target, 0 is returned. When used with indexed variants of glGet (such as glGetIntegeri_v), data returns a single value, the name of the buffer object bound to the indexed uniform buffer binding point. The initial value is 0 for all targets. See glBindBuffer, glBindBufferBase, and glBindBufferRange.
+        log.info("Uniform buffer binding: {}", glGetInteger(GL_UNIFORM_BUFFER_BINDING));
+
+        // data returns a single value, the name of the vertex array object currently bound to the context. If no vertex array object is bound to the context, 0 is returned. The initial value is 0. See glBindVertexArray.
+        log.info("Unpack vertex array binding: {}", glGetInteger(GL_VERTEX_ARRAY_BINDING));
+
+        // When used with indexed variants of glGet (such as glGetInteger64i_v), data returns a single value, the size of the binding range for each indexed uniform buffer binding. The initial value is 0 for all bindings. See glBindBufferRange.
+        log.info("Uniform buffer size: {}", glGetInteger64i(GL_UNIFORM_BUFFER_SIZE, 0));
+
+        // When used with indexed variants of glGet (such as glGetInteger64i_v), data returns a single value, the start offset of the binding range for each indexed uniform buffer binding. The initial value is 0 for all bindings. See glBindBufferRange.
+        log.info("Uniform buffer start: {}", glGetInteger64i(GL_UNIFORM_BUFFER_START, 0));
+
+        // Accepted by the indexed forms. data returns a single integer value representing the instance step divisor of the first element in the bound buffer's data store for vertex attribute bound to index.
+        log.info("Vertex binding divisor: {}", glGetIntegeri(GL_VERTEX_BINDING_DIVISOR, 0));
+
+        // Accepted by the indexed forms. data returns a single integer value representing the byte offset of the first element in the bound buffer's data store for vertex attribute bound to index.
+        log.info("Vertex binding offset: {}", glGetIntegeri(GL_VERTEX_BINDING_OFFSET, 0));
+
+        // Accepted by the indexed forms. data returns a single integer value representing the byte offset between the start of each element in the bound buffer's data store for vertex attribute bound to index.
+        log.info("Vertex binding stride: {}", glGetIntegeri(GL_VERTEX_BINDING_STRIDE, 0));
+
+        // Accepted by the indexed forms. data returns a single integer value representing the name of the buffer bound to vertex binding index.
+        log.info("Vertex binding buffer: {}", glGetIntegeri(GL_VERTEX_BINDING_BUFFER, 0));
 
     }
 
@@ -254,6 +336,54 @@ public class GLInfo {
 
         // data returns one value, a symbolic constant indicating what action is taken when the stencil test fails. The initial value is GL_KEEP. See glStencilOp. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilOpSeparate.
         log.info("Stencil fail: {}", glGetInteger(GL_STENCIL_FAIL));
+
+        // data returns one value, a symbolic constant indicating what function is used to compare the stencil reference value with the stencil buffer value. The initial value is GL_ALWAYS. See glStencilFunc. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilFuncSeparate.
+        log.info("Stencil func: {}", glGetInteger(GL_STENCIL_FUNC));
+
+        // data returns one value, a symbolic constant indicating what action is taken when the stencil test passes, but the depth test fails. The initial value is GL_KEEP. See glStencilOp. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilOpSeparate.
+        log.info("Stencil pass depth fail: {}", glGetInteger(GL_STENCIL_PASS_DEPTH_FAIL));
+
+        // data returns one value, a symbolic constant indicating what action is taken when the stencil test passes and the depth test passes. The initial value is GL_KEEP. See glStencilOp. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilOpSeparate.
+        log.info("Stencil pass depth pass: {}", glGetInteger(GL_STENCIL_PASS_DEPTH_PASS));
+
+        // data returns one value, the reference value that is compared with the contents of the stencil buffer. The initial value is 0. See glStencilFunc. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilFuncSeparate.
+        log.info("Stencil ref: {}", glGetInteger(GL_STENCIL_REF));
+
+        // data returns a single boolean value indicating whether stencil testing of fragments is enabled. The initial value is GL_FALSE. See glStencilFunc and glStencilOp.
+        log.info("Stencil test: {}", glGetInteger(GL_STENCIL_TEST));
+
+        // data returns one value, the mask that is used to mask both the stencil reference value and the stencil buffer value before they are compared. The initial value is all 1's. See glStencilFunc. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilFuncSeparate.
+        log.info("Stencil value mask: {}", glGetInteger(GL_STENCIL_VALUE_MASK));
+
+        // data returns one value, the mask that controls writing of the stencil bitplanes. The initial value is all 1's. See glStencilMask. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilMaskSeparate.
+        log.info("Stencil write mask: {}", glGetInteger(GL_STENCIL_WRITEMASK));
+
+        // data returns one value, the byte alignment used for reading pixel data from memory. The initial value is 4. See glPixelStore.
+        log.info("Unpack alignment: {}", glGetInteger(GL_UNPACK_ALIGNMENT));
+
+        // data returns one value, the image height used for reading pixel data from memory. The initial is 0. See glPixelStore.
+        log.info("Unpack image height: {}", glGetInteger(GL_UNPACK_IMAGE_HEIGHT));
+
+        // data returns a single boolean value indicating whether single-bit pixels being read from memory are read first from the least significant bit of each unsigned byte. The initial value is GL_FALSE. See glPixelStore.
+        log.info("Unpack LSB first: {}", glGetInteger(GL_UNPACK_LSB_FIRST));
+
+        // data returns one value, the row length used for reading pixel data from memory. The initial value is 0. See glPixelStore.
+        log.info("Unpack row length: {}", glGetInteger(GL_UNPACK_ROW_LENGTH));
+
+        // data returns one value, the number of pixel images skipped before the first pixel is read from memory. The initial value is 0. See glPixelStore.
+        log.info("Unpack skip images: {}", glGetInteger(GL_UNPACK_SKIP_IMAGES));
+
+        // data returns one value, the number of pixel locations skipped before the first pixel is read from memory. The initial value is 0. See glPixelStore.
+        log.info("Unpack skip pixels: {}", glGetInteger(GL_UNPACK_SKIP_PIXELS));
+
+        // data returns one value, the number of rows of pixel locations skipped before the first pixel is read from memory. The initial value is 0. See glPixelStore.
+        log.info("Unpack skip rows: {}", glGetInteger(GL_UNPACK_SKIP_ROWS));
+
+        // data returns a single boolean value indicating whether the bytes of two-byte and four-byte pixel indices and components are swapped after being read from memory. The initial value is GL_FALSE. See glPixelStore.
+        log.info("Unpack swap bytes: {}", glGetInteger(GL_UNPACK_SWAP_BYTES));
+
+        // data returns a single value, the minimum required alignment for uniform buffer sizes and offset. The initial value is 1. See glUniformBlockBinding.
+        log.info("Uniform buffer offset alignment: {}", glGetInteger(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT));
 
     }
 
@@ -545,6 +675,19 @@ public class GLInfo {
         // data returns one value, the maximum number of simultaneous viewports that are supported. The value must be at least 16. See glViewportIndexed.
         log.info("Max viewports: {}", glGetInteger(GL_MAX_VIEWPORTS));
 
+        // When used with non-indexed variants of glGet (such as glGetIntegerv), data returns four values: the x and y window coordinates of the viewport, followed by its width and height. Initially the x and y window coordinates are both set to 0, and the width and height are set to the width and height of the window into which the GL will do its rendering. See glViewport.
+        // When used with indexed variants of glGet (such as glGetIntegeri_v), data returns four values: the x and y window coordinates of the indexed viewport, followed by its width and height. Initially the x and y window coordinates are both set to 0, and the width and height are set to the width and height of the window into which the GL will do its rendering. See glViewportIndexedf.
+        log.info("Viewport: {}", glGetVector4i(GL_VIEWPORT).toString(NUMBER_FORMAT_INT));
+
+        // data returns two values, the minimum and maximum viewport bounds range. The minimum range should be at least [-32768, 32767].
+        log.info("Viewport bounds range: {}", glGetVector2i(GL_VIEWPORT_BOUNDS_RANGE).toString(NUMBER_FORMAT_INT));
+
+        // data returns one value, the implementation dependent specifc vertex of a primitive that is used to select the viewport index. If the value returned is equivalent to GL_PROVOKING_VERTEX, then the vertex selection follows the convention specified by glProvokingVertex. If the value returned is equivalent to GL_FIRST_VERTEX_CONVENTION, then the selection is always taken from the first vertex in the primitive. If the value returned is equivalent to GL_LAST_VERTEX_CONVENTION, then the selection is always taken from the last vertex in the primitive. If the value returned is equivalent to GL_UNDEFINED_VERTEX, then the selection is not guaranteed to be taken from any specific vertex in the primitive.
+        log.info("Viewport index provoking vertex: {}", glGetInteger(GL_VIEWPORT_INDEX_PROVOKING_VERTEX));
+
+        // data returns a single value, the number of bits of sub-pixel precision which the GL uses to interpret the floating point viewport bounds. The minimum value is 0.
+        log.info("Viewport subpixel bits: {}", glGetInteger(GL_VIEWPORT_SUBPIXEL_BITS));
+
         // data returns one value, the minor version number of the OpenGL API supported by the current context.
         log.info("Minor version: {}", glGetInteger(GL_MINOR_VERSION));
 
@@ -596,157 +739,23 @@ public class GLInfo {
         // data returns a single value indicating the level of quantization applied to smooth line width parameters.
         log.info("Smooth line width granularity: {}", glGetInteger(GL_SMOOTH_LINE_WIDTH_GRANULARITY));
 
-//
-//        // data returns one value, a symbolic constant indicating what function is used to compare the stencil reference value with the stencil buffer value. The initial value is GL_ALWAYS. See glStencilFunc. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilFuncSeparate.
-//        log.info("Stencil func: {}", glGetInteger(GL_STENCIL_FUNC));
-//
-//        // data returns one value, a symbolic constant indicating what action is taken when the stencil test passes, but the depth test fails. The initial value is GL_KEEP. See glStencilOp. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilOpSeparate.
-//        log.info("Stencil pass depth fail: {}", glGetInteger(GL_STENCIL_PASS_DEPTH_FAIL));
-//
-//        // data returns one value, a symbolic constant indicating what action is taken when the stencil test passes and the depth test passes. The initial value is GL_KEEP. See glStencilOp. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilOpSeparate.
-//        log.info("Stencil pass depth pass: {}", glGetInteger(GL_STENCIL_PASS_DEPTH_PASS));
-//
-//        // data returns one value, the reference value that is compared with the contents of the stencil buffer. The initial value is 0. See glStencilFunc. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilFuncSeparate.
-//        log.info("Stencil ref: {}", glGetInteger(GL_STENCIL_REF));
-//
-//        // data returns a single boolean value indicating whether stencil testing of fragments is enabled. The initial value is GL_FALSE. See glStencilFunc and glStencilOp.
-//        log.info("Stencil test: {}", glGetInteger(GL_STENCIL_TEST));
-//
-//        // data returns one value, the mask that is used to mask both the stencil reference value and the stencil buffer value before they are compared. The initial value is all 1's. See glStencilFunc. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilFuncSeparate.
-//        log.info("Stencil value mask: {}", glGetInteger(GL_STENCIL_VALUE_MASK));
-//
-//        // data returns one value, the mask that controls writing of the stencil bitplanes. The initial value is all 1's. See glStencilMask. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilMaskSeparate.
-//        log.info("Stencil write mask: {}", glGetInteger(GL_STENCIL_WRITEMASK));
-//
-//        // data returns a single boolean value indicating whether stereo buffers (left and right) are supported.
-//        log.info("Stereo: {}", glGetInteger(GL_STEREO));
-//
-//        // data returns one value, an estimate of the number of bits of subpixel resolution that are used to position rasterized geometry in window coordinates. The value must be at least 4.
-//        log.info("Subpixel bits: {}", glGetInteger(GL_SUBPIXEL_BITS));
-//
-//        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_1D. The initial value is 0. See glBindTexture.
-//        log.info("Texture binding 1D: {}", glGetInteger(GL_TEXTURE_BINDING_1D));
-//
-//        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_1D_ARRAY. The initial value is 0. See glBindTexture.
-//        log.info("Texture binding 1D array: {}", glGetInteger(GL_TEXTURE_BINDING_1D_ARRAY));
-//
-//        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_2D. The initial value is 0. See glBindTexture.
-//        log.info("Texture binding 2D: {}", glGetInteger(GL_TEXTURE_BINDING_2D));
-//
-//        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_2D_ARRAY. The initial value is 0. See glBindTexture.
-//        log.info("Texture binding 2D array: {}", glGetInteger(GL_TEXTURE_BINDING_2D_ARRAY));
-//
-//        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_2D_MULTISAMPLE. The initial value is 0. See glBindTexture.
-//        log.info("Texture binding 2D multi sample: {}", glGetInteger(GL_TEXTURE_BINDING_2D_MULTISAMPLE));
-//
-//        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_2D_MULTISAMPLE_ARRAY. The initial value is 0. See glBindTexture.
-//        log.info("Texture binding 2D multi sample array: {}", glGetInteger(GL_TEXTURE_BINDING_2D_MULTISAMPLE_ARRAY));
-//
-//        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_3D. The initial value is 0. See glBindTexture.
-//        log.info("Texture binding 3D: {}", glGetInteger(GL_TEXTURE_BINDING_3D));
-//
-//        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_BUFFER. The initial value is 0. See glBindTexture.
-//        log.info("Texture binding buffer: {}", glGetInteger(GL_TEXTURE_BINDING_BUFFER));
-//
-//        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_CUBE_MAP. The initial value is 0. See glBindTexture.
-//        log.info("Texture binding cube map: {}", glGetInteger(GL_TEXTURE_BINDING_CUBE_MAP));
-//
-//        // data returns a single value, the name of the texture currently bound to the target GL_TEXTURE_RECTANGLE. The initial value is 0. See glBindTexture.
-//        log.info("Texture binding rectangle: {}", glGetInteger(GL_TEXTURE_BINDING_RECTANGLE));
-//
-//        // data returns a single value indicating the mode of the texture compression hint. The initial value is GL_DONT_CARE.
-//        log.info("Texture compression hint: {}", glGetInteger(GL_TEXTURE_COMPRESSION_HINT));
-//
-//        // data returns a single value, the name of the buffer object currently bound to the GL_TEXTURE_BUFFER buffer binding point. The initial value is 0. See glBindBuffer.
-//        log.info("Texture binding buffer: {}", glGetInteger(GL_TEXTURE_BINDING_BUFFER));
-//
-//        // data returns a single value, the minimum required alignment for texture buffer sizes and offset. The initial value is 1. See glUniformBlockBinding.
-//        log.info("Texture buffer offset alignment: {}", glGetInteger(GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT));
-//
-//        // data returns a single value, the 64-bit value of the current GL time. See glQueryCounter.
-//        log.info("Timestamp: {}", glGetInteger(GL_TIMESTAMP));
-//
-//        // When used with non-indexed variants of glGet (such as glGetIntegerv), data returns a single value, the name of the buffer object currently bound to the target GL_TRANSFORM_FEEDBACK_BUFFER. If no buffer object is bound to this target, 0 is returned. When used with indexed variants of glGet (such as glGetIntegeri_v), data returns a single value, the name of the buffer object bound to the indexed transform feedback attribute stream. The initial value is 0 for all targets. See glBindBuffer, glBindBufferBase, and glBindBufferRange.
-//        log.info("Transform feedback buffer binding: {}", glGetInteger(GL_TRANSFORM_FEEDBACK_BUFFER_BINDING));
-//
-//        // When used with indexed variants of glGet (such as glGetInteger64i_v), data returns a single value, the start offset of the binding range for each transform feedback attribute stream. The initial value is 0 for all streams. See glBindBufferRange.
-//        //log.info("Transform feedback buffer start: {}", glGetInteger(GL_TRANSFORM_FEEDBACK_BUFFER_START));
-//
-//        // When used with indexed variants of glGet (such as glGetInteger64i_v), data returns a single value, the size of the binding range for each transform feedback attribute stream. The initial value is 0 for all streams. See glBindBufferRange.
-//        //log.info("Transform feedback buffer size: {}", glGetInteger(GL_TRANSFORM_FEEDBACK_BUFFER_SIZE));
-//
-//        // When used with non-indexed variants of glGet (such as glGetIntegerv), data returns a single value, the name of the buffer object currently bound to the target GL_UNIFORM_BUFFER. If no buffer object is bound to this target, 0 is returned. When used with indexed variants of glGet (such as glGetIntegeri_v), data returns a single value, the name of the buffer object bound to the indexed uniform buffer binding point. The initial value is 0 for all targets. See glBindBuffer, glBindBufferBase, and glBindBufferRange.
-//        log.info("Uniform buffer binding: {}", glGetInteger(GL_UNIFORM_BUFFER_BINDING));
-//
-//        // data returns a single value, the minimum required alignment for uniform buffer sizes and offset. The initial value is 1. See glUniformBlockBinding.
-//        log.info("Uniform buffer offset alignment: {}", glGetInteger(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT));
-//
-//        // When used with indexed variants of glGet (such as glGetInteger64i_v), data returns a single value, the size of the binding range for each indexed uniform buffer binding. The initial value is 0 for all bindings. See glBindBufferRange.
-//        //log.info("Uniform buffer size: {}", glGetInteger(GL_UNIFORM_BUFFER_SIZE));
-//
-//        // When used with indexed variants of glGet (such as glGetInteger64i_v), data returns a single value, the start offset of the binding range for each indexed uniform buffer binding. The initial value is 0 for all bindings. See glBindBufferRange.
-//        //log.info("Uniform buffer start: {}", glGetInteger(GL_UNIFORM_BUFFER_START));
-//
-//        // data returns one value, the byte alignment used for reading pixel data from memory. The initial value is 4. See glPixelStore.
-//        log.info("Unpack alignment: {}", glGetInteger(GL_UNPACK_ALIGNMENT));
-//
-//        // data returns one value, the image height used for reading pixel data from memory. The initial is 0. See glPixelStore.
-//        log.info("Unpack image height: {}", glGetInteger(GL_UNPACK_IMAGE_HEIGHT));
-//
-//        // data returns a single boolean value indicating whether single-bit pixels being read from memory are read first from the least significant bit of each unsigned byte. The initial value is GL_FALSE. See glPixelStore.
-//        log.info("Unpack LSB first: {}", glGetInteger(GL_UNPACK_LSB_FIRST));
-//
-//        // data returns one value, the row length used for reading pixel data from memory. The initial value is 0. See glPixelStore.
-//        log.info("Unpack row length: {}", glGetInteger(GL_UNPACK_ROW_LENGTH));
-//
-//        // data returns one value, the number of pixel images skipped before the first pixel is read from memory. The initial value is 0. See glPixelStore.
-//        log.info("Unpack skip images: {}", glGetInteger(GL_UNPACK_SKIP_IMAGES));
-//
-//        // data returns one value, the number of pixel locations skipped before the first pixel is read from memory. The initial value is 0. See glPixelStore.
-//        log.info("Unpack skip pixels: {}", glGetInteger(GL_UNPACK_SKIP_PIXELS));
-//
-//        // data returns one value, the number of rows of pixel locations skipped before the first pixel is read from memory. The initial value is 0. See glPixelStore.
-//        log.info("Unpack skip rows: {}", glGetInteger(GL_UNPACK_SKIP_ROWS));
-//
-//        // data returns a single boolean value indicating whether the bytes of two-byte and four-byte pixel indices and components are swapped after being read from memory. The initial value is GL_FALSE. See glPixelStore.
-//        log.info("Unpack swap bytes: {}", glGetInteger(GL_UNPACK_SWAP_BYTES));
-//
-//        // data returns a single value, the name of the vertex array object currently bound to the context. If no vertex array object is bound to the context, 0 is returned. The initial value is 0. See glBindVertexArray.
-//        log.info("Unpack vertex array binding: {}", glGetInteger(GL_VERTEX_ARRAY_BINDING));
-//
-//        // Accepted by the indexed forms. data returns a single integer value representing the instance step divisor of the first element in the bound buffer's data store for vertex attribute bound to index.
-//        //log.info("Vertex binding divisor: {}", glGetInteger(GL_VERTEX_BINDING_DIVISOR));
-//
-//        // Accepted by the indexed forms. data returns a single integer value representing the byte offset of the first element in the bound buffer's data store for vertex attribute bound to index.
-//        //log.info("Vertex binding offset: {}", glGetInteger(GL_VERTEX_BINDING_OFFSET));
-//
-//        // Accepted by the indexed forms. data returns a single integer value representing the byte offset between the start of each element in the bound buffer's data store for vertex attribute bound to index.
-//        //log.info("Vertex binding stride: {}", glGetInteger(GL_VERTEX_BINDING_STRIDE));
-//
-//        // Accepted by the indexed forms. data returns a single integer value representing the name of the buffer bound to vertex binding index.
-//        //log.info("Vertex binding buffer: {}", glGetInteger(GL_VERTEX_BINDING_BUFFER));
-//
-//        // data returns a single integer value containing the maximum offset that may be added to a vertex binding offset.
-//        log.info("Max vertex attribute relative offset: {}", glGetInteger(GL_MAX_VERTEX_ATTRIB_RELATIVE_OFFSET));
-//
-//        // data returns a single integer value containing the maximum number of vertex buffers that may be bound.
-//        log.info("Max vertex attribute bindings: {}", glGetInteger(GL_MAX_VERTEX_ATTRIB_BINDINGS));
-//
-//        // When used with non-indexed variants of glGet (such as glGetIntegerv), data returns four values: the x and y window coordinates of the viewport, followed by its width and height. Initially the x and y window coordinates are both set to 0, and the width and height are set to the width and height of the window into which the GL will do its rendering. See glViewport.
-//        // When used with indexed variants of glGet (such as glGetIntegeri_v), data returns four values: the x and y window coordinates of the indexed viewport, followed by its width and height. Initially the x and y window coordinates are both set to 0, and the width and height are set to the width and height of the window into which the GL will do its rendering. See glViewportIndexedf.
-//        log.info("Viewport: {}", glGetVector2i(GL_VIEWPORT).toString(NUMBER_FORMAT_INT));
-//
-//        // data returns two values, the minimum and maximum viewport bounds range. The minimum range should be at least [-32768, 32767].
-//        log.info("Viewport bounds range: {}", glGetVector2i(GL_VIEWPORT_BOUNDS_RANGE).toString(NUMBER_FORMAT_INT));
-//
-//        // data returns one value, the implementation dependent specifc vertex of a primitive that is used to select the viewport index. If the value returned is equivalent to GL_PROVOKING_VERTEX, then the vertex selection follows the convention specified by glProvokingVertex. If the value returned is equivalent to GL_FIRST_VERTEX_CONVENTION, then the selection is always taken from the first vertex in the primitive. If the value returned is equivalent to GL_LAST_VERTEX_CONVENTION, then the selection is always taken from the last vertex in the primitive. If the value returned is equivalent to GL_UNDEFINED_VERTEX, then the selection is not guaranteed to be taken from any specific vertex in the primitive.
-//        log.info("Viewport index provoking vertex: {}", glGetInteger(GL_VIEWPORT_INDEX_PROVOKING_VERTEX));
-//
-//        // data returns a single value, the number of bits of sub-pixel precision which the GL uses to interpret the floating point viewport bounds. The minimum value is 0.
-//        log.info("Viewport subpixel bits: {}", glGetInteger(GL_VIEWPORT_SUBPIXEL_BITS));
-//
-//        // data returns a single value, the maximum index that may be specified during the transfer of generic vertex attributes to the GL.
-//        log.info("Max element index: {}", glGetInteger(GL_MAX_ELEMENT_INDEX));
+        // data returns a single boolean value indicating whether stereo buffers (left and right) are supported.
+        log.info("Stereo: {}", glGetInteger(GL_STEREO));
+
+        // data returns one value, an estimate of the number of bits of subpixel resolution that are used to position rasterized geometry in window coordinates. The value must be at least 4.
+        log.info("Subpixel bits: {}", glGetInteger(GL_SUBPIXEL_BITS));
+
+        // data returns a single value, the 64-bit value of the current GL time. See glQueryCounter.
+        log.info("Timestamp: {}", glGetInteger(GL_TIMESTAMP));
+
+        // data returns a single integer value containing the maximum offset that may be added to a vertex binding offset.
+        log.info("Max vertex attribute relative offset: {}", glGetInteger(GL_MAX_VERTEX_ATTRIB_RELATIVE_OFFSET));
+
+        // data returns a single integer value containing the maximum number of vertex buffers that may be bound.
+        log.info("Max vertex attribute bindings: {}", glGetInteger(GL_MAX_VERTEX_ATTRIB_BINDINGS));
+
+        // data returns a single value, the maximum index that may be specified during the transfer of generic vertex attributes to the GL.
+        log.info("Max element index: {}", glGetInteger(GL_MAX_ELEMENT_INDEX));
 
     }
 
