@@ -33,6 +33,14 @@ public class GLInfo {
         }
     }
 
+    public static void logShaderStorageInfo() {
+        // When used with indexed variants of glGet (such as glGetInteger64i_v), data returns a single value, the start offset of the binding range for each indexed shader storage buffer binding. The initial value is 0 for all bindings. See glBindBufferRange.
+        log.info("Shader storage buffer start: {}", glGetInteger(GL_SHADER_STORAGE_BUFFER_START));
+
+        // When used with indexed variants of glGet (such as glGetInteger64i_v), data returns a single value, the size of the binding range for each indexed shader storage buffer binding. The initial value is 0 for all bindings. See glBindBufferRange.
+        log.info("Shader storage buffer size: {}", glGetInteger(GL_SHADER_STORAGE_BUFFER_SIZE));
+    }
+
     public static void logTextureInfo() {
         log.info("Active texture: {}", glGetInteger(GL_ACTIVE_TEXTURE));
     }
@@ -59,6 +67,18 @@ public class GLInfo {
 
         // data returns a single value, the name of the buffer object currently bound to the target GL_ELEMENT_ARRAY_BUFFER. If no buffer object is bound to this target, 0 is returned. The initial value is 0. See glBindBuffer.
         log.info("Element array buffer binding: {}", glGetInteger(GL_ELEMENT_ARRAY_BUFFER_BINDING));
+
+        // data returns a single value, the name of the buffer object currently bound to the target GL_PIXEL_PACK_BUFFER. If no buffer object is bound to this target, 0 is returned. The initial value is 0. See glBindBuffer.
+        log.info("Pixel pack buffer binding: {}", glGetInteger(GL_PIXEL_PACK_BUFFER_BINDING));
+
+        // data returns a single value, the name of the buffer object currently bound to the target GL_PIXEL_UNPACK_BUFFER. If no buffer object is bound to this target, 0 is returned. The initial value is 0. See glBindBuffer.
+        log.info("Pixel unpack buffer bindign: {}", glGetInteger(GL_PIXEL_UNPACK_BUFFER_BINDING));
+
+        // data returns a single value, the name of the renderbuffer object currently bound to the target GL_RENDERBUFFER. If no renderbuffer object is bound to this target, 0 is returned. The initial value is 0. See glBindRenderbuffer.
+        log.info("Render buffer binding: {}", glGetInteger(GL_RENDERBUFFER_BINDING));
+
+        // When used with non-indexed variants of glGet (such as glGetIntegerv), data returns a single value, the name of the buffer object currently bound to the target GL_SHADER_STORAGE_BUFFER. If no buffer object is bound to this target, 0 is returned. When used with indexed variants of glGet (such as glGetIntegeri_v), data returns a single value, the name of the buffer object bound to the indexed shader storage buffer binding points. The initial value is 0 for all targets. See glBindBuffer, glBindBufferBase, and glBindBufferRange.
+        log.info("Shader storage buffer binding: {}", glGetInteger(GL_SHADER_STORAGE_BUFFER_BINDING));
 
     }
 
@@ -135,6 +155,105 @@ public class GLInfo {
 
         // data returns one value, a symbolic constant indicating the selected logic operation mode. The initial value is GL_COPY. See glLogicOp.
         log.info("Logic op mode: {}", glGetInteger(GL_LOGIC_OP_MODE));
+
+        // data returns one value, the byte alignment used for writing pixel data to memory. The initial value is 4. See glPixelStore.
+        log.info("Pack alignment: {}", glGetInteger(GL_PACK_ALIGNMENT));
+
+        // data returns one value, the image height used for writing pixel data to memory. The initial value is 0. See glPixelStore.
+        log.info("Pack image height: {}", glGetInteger(GL_PACK_IMAGE_HEIGHT));
+
+        // data returns a single boolean value indicating whether single-bit pixels being written to memory are written first to the least significant bit of each unsigned byte. The initial value is GL_FALSE. See glPixelStore.
+        log.info("Pack lsb first: {}", glGetInteger(GL_PACK_LSB_FIRST));
+
+        // data returns one value, the row length used for writing pixel data to memory. The initial value is 0. See glPixelStore.
+        log.info("Pack row length: {}", glGetInteger(GL_PACK_ROW_LENGTH));
+
+        // data returns one value, the number of pixel images skipped before the first pixel is written into memory. The initial value is 0. See glPixelStore.
+        log.info("Pack skip images: {}", glGetInteger(GL_PACK_SKIP_IMAGES));
+
+        // data returns one value, the number of pixel locations skipped before the first pixel is written into memory. The initial value is 0. See glPixelStore.
+        log.info("Pack skip pixels: {}", glGetInteger(GL_PACK_SKIP_PIXELS));
+
+        // data returns one value, the number of rows of pixel locations skipped before the first pixel is written into memory. The initial value is 0. See glPixelStore.
+        log.info("Pack skip rows: {}", glGetInteger(GL_PACK_SKIP_ROWS));
+
+        // data returns a single boolean value indicating whether the bytes of two-byte and four-byte pixel indices and components are swapped before being written to memory. The initial value is GL_FALSE. See glPixelStore.
+        log.info("Pack swap bytes: {}", glGetInteger(GL_PACK_SWAP_BYTES));
+
+        // data returns one value, the current primitive restart index. The initial value is 0. See glPrimitiveRestartIndex.
+        log.info("Primitive restart index: {}", glGetInteger(GL_PRIMITIVE_RESTART_INDEX));
+
+        // data returns one value, the currently selected provoking vertex convention. The initial value is GL_LAST_VERTEX_CONVENTION. See glProvokingVertex.
+        log.info("Provoking vertex: {}", glGetInteger(GL_PROVOKING_VERTEX));
+
+        // data returns one value, the point size as specified by glPointSize. The initial value is 1.
+        log.info("Point size: {}", glGetInteger(GL_POINT_SIZE));
+
+        // data returns a single boolean value indicating whether vertex program point size mode is enabled. If enabled, then the point size is taken from the shader built-in gl_PointSize. If disabled, then the point size is taken from the point state as specified by glPointSize. The initial value is GL_FALSE.
+        log.info("Program point size: {}", glGetInteger(GL_PROGRAM_POINT_SIZE));
+
+        // data returns one value, the scaling factor used to determine the variable offset that is added to the depth value of each fragment generated when a polygon is rasterized. The initial value is 0. See glPolygonOffset.
+        log.info("Polygon offset factor: {}", glGetInteger(GL_POLYGON_OFFSET_FACTOR));
+
+        // data returns one value. This value is multiplied by an implementation-specific value and then added to the depth value of each fragment generated when a polygon is rasterized. The initial value is 0. See glPolygonOffset.
+        log.info("Polygon offset units: {}", glGetInteger(GL_POLYGON_OFFSET_UNITS));
+
+        // data returns a single boolean value indicating whether polygon offset is enabled for polygons in fill mode. The initial value is GL_FALSE. See glPolygonOffset.
+        log.info("Polygon offset fill: {}", glGetInteger(GL_POLYGON_OFFSET_FILL));
+
+        // data returns a single boolean value indicating whether polygon offset is enabled for polygons in line mode. The initial value is GL_FALSE. See glPolygonOffset.
+        log.info("Polygon offset line: {}", glGetInteger(GL_POLYGON_OFFSET_LINE));
+
+        // data returns a single boolean value indicating whether polygon offset is enabled for polygons in point mode. The initial value is GL_FALSE. See glPolygonOffset.
+        log.info("Polygon offset point: {}", glGetInteger(GL_POLYGON_OFFSET_POINT));
+
+        // data returns a single boolean value indicating whether antialiasing of polygons is enabled. The initial value is GL_FALSE. See glPolygonMode.
+        log.info("Polygon smooth: {}", glGetInteger(GL_POLYGON_SMOOTH));
+
+        // data returns one value, a symbolic constant indicating the mode of the polygon antialiasing hint. The initial value is GL_DONT_CARE. See glHint.
+        log.info("Polygon smooth hint: {}", glGetInteger(GL_POLYGON_SMOOTH_HINT));
+
+        // data returns one value, a symbolic constant indicating which color buffer is selected for reading. The initial value is GL_BACK if there is a back buffer, otherwise it is GL_FRONT. See glReadPixels.
+        log.info("Read buffer: {}", glGetInteger(GL_READ_BUFFER));
+
+        // data returns a single value, the name of the sampler object currently bound to the active texture unit. The initial value is 0. See glBindSampler.
+        log.info("Sampler binding: {}", glGetInteger(GL_SAMPLER_BINDING));
+
+        // data returns four values: the x and y window coordinates of the scissor box, followed by its width and height. Initially the x and y window coordinates are both 0 and the width and height are set to the size of the window. See glScissor.
+        log.info("Scissor box: {}", glGetVector4i(GL_SCISSOR_BOX).toString(NUMBER_FORMAT_INT));
+
+        // data returns a single boolean value indicating whether scissoring is enabled. The initial value is GL_FALSE. See glScissor.
+        log.info("Scissor test: {}", glGetInteger(GL_SCISSOR_TEST));
+
+        // data returns a single value, the minimum required alignment for shader storage buffer sizes and offset. The initial value is 1. See glShaderStorageBlockBinding.
+        log.info("Shader storage buffer offset alignment: {}", glGetInteger(GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT));
+
+        // data returns one value, a symbolic constant indicating what action is taken for back-facing polygons when the stencil test fails. The initial value is GL_KEEP. See glStencilOpSeparate.
+        log.info("Stencil back fail: {}", glGetInteger(GL_STENCIL_BACK_FAIL));
+
+        // data returns one value, a symbolic constant indicating what function is used for back-facing polygons to compare the stencil reference value with the stencil buffer value. The initial value is GL_ALWAYS. See glStencilFuncSeparate.
+        log.info("Stencil back func: {}", glGetInteger(GL_STENCIL_BACK_FUNC));
+
+        // data returns one value, a symbolic constant indicating what action is taken for back-facing polygons when the stencil test passes, but the depth test fails. The initial value is GL_KEEP. See glStencilOpSeparate.
+        log.info("Stencil back pass depth fail: {}", glGetInteger(GL_STENCIL_BACK_PASS_DEPTH_FAIL));
+
+        // data returns one value, a symbolic constant indicating what action is taken for back-facing polygons when the stencil test passes and the depth test passes. The initial value is GL_KEEP. See glStencilOpSeparate.
+        log.info("Stencil back pass depth pass: {}", glGetInteger(GL_STENCIL_BACK_PASS_DEPTH_PASS));
+
+        // data returns one value, the reference value that is compared with the contents of the stencil buffer for back-facing polygons. The initial value is 0. See glStencilFuncSeparate.
+        log.info("Stencil back ref: {}", glGetInteger(GL_STENCIL_BACK_REF));
+
+        // data returns one value, the mask that is used for back-facing polygons to mask both the stencil reference value and the stencil buffer value before they are compared. The initial value is all 1's. See glStencilFuncSeparate.
+        log.info("Stencil back value mask: {}", glGetInteger(GL_STENCIL_BACK_VALUE_MASK));
+
+        // data returns one value, the mask that controls writing of the stencil bitplanes for back-facing polygons. The initial value is all 1's. See glStencilMaskSeparate.
+        log.info("Stencil back write mask: {}", glGetInteger(GL_STENCIL_BACK_WRITEMASK));
+
+        // data returns one value, the index to which the stencil bitplanes are cleared. The initial value is 0. See glClearStencil.
+        log.info("Stencil clear value: {}", glGetInteger(GL_STENCIL_CLEAR_VALUE));
+
+        // data returns one value, a symbolic constant indicating what action is taken when the stencil test fails. The initial value is GL_KEEP. See glStencilOp. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilOpSeparate.
+        log.info("Stencil fail: {}", glGetInteger(GL_STENCIL_FAIL));
 
     }
 
@@ -439,157 +558,44 @@ public class GLInfo {
         log.info("Program binary formats: {}", glGetArray(GL_PROGRAM_BINARY_FORMATS, glGetInteger(GL_NUM_PROGRAM_BINARY_FORMATS)));
 
         // data returns one value, the number of binary shader formats supported by the implementation. If this value is greater than zero, then the implementation supports loading binary shaders. If it is zero, then the loading of binary shaders by the implementation is not supported.
-//        log.info("Number of shader binary formats: {}", glGetInteger(GL_NUM_SHADER_BINARY_FORMATS));
-//
-//        // data returns one value, the byte alignment used for writing pixel data to memory. The initial value is 4. See glPixelStore.
-//        log.info("Pack alignment: {}", glGetInteger(GL_PACK_ALIGNMENT));
-//
-//        // data returns one value, the image height used for writing pixel data to memory. The initial value is 0. See glPixelStore.
-//        log.info("Pack image height: {}", glGetInteger(GL_PACK_IMAGE_HEIGHT));
-//
-//        // data returns a single boolean value indicating whether single-bit pixels being written to memory are written first to the least significant bit of each unsigned byte. The initial value is GL_FALSE. See glPixelStore.
-//        log.info("Pack lsb first: {}", glGetInteger(GL_PACK_LSB_FIRST));
-//
-//        // data returns one value, the row length used for writing pixel data to memory. The initial value is 0. See glPixelStore.
-//        log.info("Pack row length: {}", glGetInteger(GL_PACK_ROW_LENGTH));
-//
-//        // data returns one value, the number of pixel images skipped before the first pixel is written into memory. The initial value is 0. See glPixelStore.
-//        log.info("Pack skip images: {}", glGetInteger(GL_PACK_SKIP_IMAGES));
-//
-//        // data returns one value, the number of pixel locations skipped before the first pixel is written into memory. The initial value is 0. See glPixelStore.
-//        log.info("Pack skip pixels: {}", glGetInteger(GL_PACK_SKIP_PIXELS));
-//
-//        // data returns one value, the number of rows of pixel locations skipped before the first pixel is written into memory. The initial value is 0. See glPixelStore.
-//        log.info("Pack skip rows: {}", glGetInteger(GL_PACK_SKIP_ROWS));
-//
-//        // data returns a single boolean value indicating whether the bytes of two-byte and four-byte pixel indices and components are swapped before being written to memory. The initial value is GL_FALSE. See glPixelStore.
-//        log.info("Pack swap bytes: {}", glGetInteger(GL_PACK_SWAP_BYTES));
-//
-//        // data returns a single value, the name of the buffer object currently bound to the target GL_PIXEL_PACK_BUFFER. If no buffer object is bound to this target, 0 is returned. The initial value is 0. See glBindBuffer.
-//        log.info("Pixel pack buffer binding: {}", glGetInteger(GL_PIXEL_PACK_BUFFER_BINDING));
-//
-//        // data returns a single value, the name of the buffer object currently bound to the target GL_PIXEL_UNPACK_BUFFER. If no buffer object is bound to this target, 0 is returned. The initial value is 0. See glBindBuffer.
-//        log.info("Pixel unpack buffer bindign: {}", glGetInteger(GL_PIXEL_UNPACK_BUFFER_BINDING));
-//
-//        // data returns one value, the point size threshold for determining the point size. See glPointParameter.
-//        log.info("Point fade threshold size: {}", glGetInteger(GL_POINT_FADE_THRESHOLD_SIZE));
-//
-//        // data returns one value, the current primitive restart index. The initial value is 0. See glPrimitiveRestartIndex.
-//        log.info("Primitive restart index: {}", glGetInteger(GL_PRIMITIVE_RESTART_INDEX));
-//
-//        // data a single value, the name of the currently bound program pipeline object, or zero if no program pipeline object is bound. See glBindProgramPipeline.
-//        log.info("Program pipeline binding: {}", glGetInteger(GL_PROGRAM_PIPELINE_BINDING));
-//
-//        // data returns a single boolean value indicating whether vertex program point size mode is enabled. If enabled, then the point size is taken from the shader built-in gl_PointSize. If disabled, then the point size is taken from the point state as specified by glPointSize. The initial value is GL_FALSE.
-//        log.info("Program point size: {}", glGetInteger(GL_PROGRAM_POINT_SIZE));
-//
-//        // data returns one value, the currently selected provoking vertex convention. The initial value is GL_LAST_VERTEX_CONVENTION. See glProvokingVertex.
-//        log.info("Provoking vertex: {}", glGetInteger(GL_PROVOKING_VERTEX));
-//
-//        // data returns one value, the point size as specified by glPointSize. The initial value is 1.
-//        log.info("Point size: {}", glGetInteger(GL_POINT_SIZE));
-//
-//        // data returns one value, the size difference between adjacent supported sizes for antialiased points. See glPointSize.
-//        log.info("Point size granularity {}", glGetInteger(GL_POINT_SIZE_GRANULARITY));
-//
-//        // data returns two values: the smallest and largest supported sizes for antialiased points. The smallest size must be at most 1, and the largest size must be at least 1. See glPointSize.
-//        log.info("Point size range: {}", glGetInteger(GL_POINT_SIZE_RANGE));
-//
-//        // data returns one value, the scaling factor used to determine the variable offset that is added to the depth value of each fragment generated when a polygon is rasterized. The initial value is 0. See glPolygonOffset.
-//        log.info("Polygon offset factor: {}", glGetInteger(GL_POLYGON_OFFSET_FACTOR));
-//
-//        // data returns one value. This value is multiplied by an implementation-specific value and then added to the depth value of each fragment generated when a polygon is rasterized. The initial value is 0. See glPolygonOffset.
-//        log.info("Polygon offset units: {}", glGetInteger(GL_POLYGON_OFFSET_UNITS));
-//
-//        // data returns a single boolean value indicating whether polygon offset is enabled for polygons in fill mode. The initial value is GL_FALSE. See glPolygonOffset.
-//        log.info("Polygon offset fill: {}", glGetInteger(GL_POLYGON_OFFSET_FILL));
-//
-//        // data returns a single boolean value indicating whether polygon offset is enabled for polygons in line mode. The initial value is GL_FALSE. See glPolygonOffset.
-//        log.info("Polygon offset line: {}", glGetInteger(GL_POLYGON_OFFSET_LINE));
-//
-//        // data returns a single boolean value indicating whether polygon offset is enabled for polygons in point mode. The initial value is GL_FALSE. See glPolygonOffset.
-//        log.info("Polygon offset point: {}", glGetInteger(GL_POLYGON_OFFSET_POINT));
-//
-//        // data returns a single boolean value indicating whether antialiasing of polygons is enabled. The initial value is GL_FALSE. See glPolygonMode.
-//        log.info("Polygon smooth: {}", glGetInteger(GL_POLYGON_SMOOTH));
-//
-//        // data returns one value, a symbolic constant indicating the mode of the polygon antialiasing hint. The initial value is GL_DONT_CARE. See glHint.
-//        log.info("Polygon smooth hint: {}", glGetInteger(GL_POLYGON_SMOOTH_HINT));
-//
-//        // data returns one value, a symbolic constant indicating which color buffer is selected for reading. The initial value is GL_BACK if there is a back buffer, otherwise it is GL_FRONT. See glReadPixels.
-//        log.info("Read buffer: {}", glGetInteger(GL_READ_BUFFER));
-//
-//        // data returns a single value, the name of the renderbuffer object currently bound to the target GL_RENDERBUFFER. If no renderbuffer object is bound to this target, 0 is returned. The initial value is 0. See glBindRenderbuffer.
-//        log.info("Render buffer binding: {}", glGetInteger(GL_RENDERBUFFER_BINDING));
-//
-//        // data returns a single integer value indicating the number of sample buffers associated with the framebuffer. See glSampleCoverage.
-//        log.info("Sample buffers: {}", glGetInteger(GL_SAMPLE_BUFFERS));
-//
-//        // data returns a single positive floating-point value indicating the current sample coverage value. See glSampleCoverage.
-//        log.info("Sample coverage value: {}", glGetInteger(GL_SAMPLE_COVERAGE_VALUE));
-//
-//        // data returns a single boolean value indicating if the temporary coverage value should be inverted. See glSampleCoverage.
-//        log.info("Sample coverage invert: {}", glGetInteger(GL_SAMPLE_COVERAGE_INVERT));
-//
-//        // data returns a single value, the name of the sampler object currently bound to the active texture unit. The initial value is 0. See glBindSampler.
-//        log.info("Sampler binding: {}", glGetInteger(GL_SAMPLER_BINDING));
-//
-//        // data returns a single integer value indicating the coverage mask size. See glSampleCoverage.
-//        log.info("Samples: {}", glGetInteger(GL_SAMPLES));
-//
-//        // data returns four values: the x and y window coordinates of the scissor box, followed by its width and height. Initially the x and y window coordinates are both 0 and the width and height are set to the size of the window. See glScissor.
-//        log.info("Scissor box: {}", glGetVector4i(GL_SCISSOR_BOX).toString(NUMBER_FORMAT_INT));
-//
-//        // data returns a single boolean value indicating whether scissoring is enabled. The initial value is GL_FALSE. See glScissor.
-//        log.info("Scissor test: {}", glGetInteger(GL_SCISSOR_TEST));
-//
-//        // data returns a single boolean value indicating whether an online shader compiler is present in the implementation. All desktop OpenGL implementations must support online shader compilations, and therefore the value of GL_SHADER_COMPILER will always be GL_TRUE.
-//        log.info("Shader compiler: {}", glGetInteger(GL_SHADER_COMPILER));
-//
-//        // When used with non-indexed variants of glGet (such as glGetIntegerv), data returns a single value, the name of the buffer object currently bound to the target GL_SHADER_STORAGE_BUFFER. If no buffer object is bound to this target, 0 is returned. When used with indexed variants of glGet (such as glGetIntegeri_v), data returns a single value, the name of the buffer object bound to the indexed shader storage buffer binding points. The initial value is 0 for all targets. See glBindBuffer, glBindBufferBase, and glBindBufferRange.
-//        log.info("Shader storage buffer binding: {}", glGetInteger(GL_SHADER_STORAGE_BUFFER_BINDING));
-//
-//        // data returns a single value, the minimum required alignment for shader storage buffer sizes and offset. The initial value is 1. See glShaderStorageBlockBinding.
-//        log.info("Shader storage buffer offset alignment: {}", glGetInteger(GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT));
-//
-//        // When used with indexed variants of glGet (such as glGetInteger64i_v), data returns a single value, the start offset of the binding range for each indexed shader storage buffer binding. The initial value is 0 for all bindings. See glBindBufferRange.
-//        //log.info("Shader storage buffer start: {}", glGetInteger(GL_SHADER_STORAGE_BUFFER_START));
-//
-//        // When used with indexed variants of glGet (such as glGetInteger64i_v), data returns a single value, the size of the binding range for each indexed shader storage buffer binding. The initial value is 0 for all bindings. See glBindBufferRange.
-//        //log.info("Shader storage buffer size: {}", glGetInteger(GL_SHADER_STORAGE_BUFFER_SIZE));
-//
-//        // data returns a pair of values indicating the range of widths supported for smooth (antialiased) lines. See glLineWidth.
-//        log.info("Smooth line width range: {}", glGetVector2i(GL_SMOOTH_LINE_WIDTH_RANGE).toString(NUMBER_FORMAT_INT));
-//
-//        // data returns a single value indicating the level of quantization applied to smooth line width parameters.
-//        log.info("Smooth line width granularity: {}", glGetInteger(GL_SMOOTH_LINE_WIDTH_GRANULARITY));
-//
-//        // data returns one value, a symbolic constant indicating what action is taken for back-facing polygons when the stencil test fails. The initial value is GL_KEEP. See glStencilOpSeparate.
-//        log.info("Stencil back fail: {}", glGetInteger(GL_STENCIL_BACK_FAIL));
-//
-//        // data returns one value, a symbolic constant indicating what function is used for back-facing polygons to compare the stencil reference value with the stencil buffer value. The initial value is GL_ALWAYS. See glStencilFuncSeparate.
-//        log.info("Stencil back func: {}", glGetInteger(GL_STENCIL_BACK_FUNC));
-//
-//        // data returns one value, a symbolic constant indicating what action is taken for back-facing polygons when the stencil test passes, but the depth test fails. The initial value is GL_KEEP. See glStencilOpSeparate.
-//        log.info("Stencil back pass depth fail: {}", glGetInteger(GL_STENCIL_BACK_PASS_DEPTH_FAIL));
-//
-//        // data returns one value, a symbolic constant indicating what action is taken for back-facing polygons when the stencil test passes and the depth test passes. The initial value is GL_KEEP. See glStencilOpSeparate.
-//        log.info("Stencil back pass depth pass: {}", glGetInteger(GL_STENCIL_BACK_PASS_DEPTH_PASS));
-//
-//        // data returns one value, the reference value that is compared with the contents of the stencil buffer for back-facing polygons. The initial value is 0. See glStencilFuncSeparate.
-//        log.info("Stencil back ref: {}", glGetInteger(GL_STENCIL_BACK_REF));
-//
-//        // data returns one value, the mask that is used for back-facing polygons to mask both the stencil reference value and the stencil buffer value before they are compared. The initial value is all 1's. See glStencilFuncSeparate.
-//        log.info("Stencil back value mask: {}", glGetInteger(GL_STENCIL_BACK_VALUE_MASK));
-//
-//        // data returns one value, the mask that controls writing of the stencil bitplanes for back-facing polygons. The initial value is all 1's. See glStencilMaskSeparate.
-//        log.info("Stencil back write mask: {}", glGetInteger(GL_STENCIL_BACK_WRITEMASK));
-//
-//        // data returns one value, the index to which the stencil bitplanes are cleared. The initial value is 0. See glClearStencil.
-//        log.info("Stencil clear value: {}", glGetInteger(GL_STENCIL_CLEAR_VALUE));
-//
-//        // data returns one value, a symbolic constant indicating what action is taken when the stencil test fails. The initial value is GL_KEEP. See glStencilOp. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilOpSeparate.
-//        log.info("Stencil fail: {}", glGetInteger(GL_STENCIL_FAIL));
+        log.info("Number of shader binary formats: {}", glGetInteger(GL_NUM_SHADER_BINARY_FORMATS));
+
+        // params returns a list of symbolic constants of length GL_NUM_SHADER_BINARY_FORMATS indicating which shader binary formats are available. See glShaderBinary.
+        log.info("Program binary formats: {}", glGetArray(GL_SHADER_BINARY_FORMATS, glGetInteger(GL_NUM_SHADER_BINARY_FORMATS)));
+
+        // data returns one value, the point size threshold for determining the point size. See glPointParameter.
+        log.info("Point fade threshold size: {}", glGetInteger(GL_POINT_FADE_THRESHOLD_SIZE));
+
+        // data a single value, the name of the currently bound program pipeline object, or zero if no program pipeline object is bound. See glBindProgramPipeline.
+        log.info("Program pipeline binding: {}", glGetInteger(GL_PROGRAM_PIPELINE_BINDING));
+
+        // data returns one value, the size difference between adjacent supported sizes for antialiased points. See glPointSize.
+        log.info("Point size granularity {}", glGetInteger(GL_POINT_SIZE_GRANULARITY));
+
+        // data returns two values: the smallest and largest supported sizes for antialiased points. The smallest size must be at most 1, and the largest size must be at least 1. See glPointSize.
+        log.info("Point size range: {}", glGetInteger(GL_POINT_SIZE_RANGE));
+
+        // data returns a single integer value indicating the number of sample buffers associated with the framebuffer. See glSampleCoverage.
+        log.info("Sample buffers: {}", glGetInteger(GL_SAMPLE_BUFFERS));
+
+        // data returns a single positive floating-point value indicating the current sample coverage value. See glSampleCoverage.
+        log.info("Sample coverage value: {}", glGetInteger(GL_SAMPLE_COVERAGE_VALUE));
+
+        // data returns a single boolean value indicating if the temporary coverage value should be inverted. See glSampleCoverage.
+        log.info("Sample coverage invert: {}", glGetInteger(GL_SAMPLE_COVERAGE_INVERT));
+
+        // data returns a single integer value indicating the coverage mask size. See glSampleCoverage.
+        log.info("Samples: {}", glGetInteger(GL_SAMPLES));
+
+        // data returns a single boolean value indicating whether an online shader compiler is present in the implementation. All desktop OpenGL implementations must support online shader compilations, and therefore the value of GL_SHADER_COMPILER will always be GL_TRUE.
+        log.info("Shader compiler: {}", glGetInteger(GL_SHADER_COMPILER));
+
+        // data returns a pair of values indicating the range of widths supported for smooth (antialiased) lines. See glLineWidth.
+        log.info("Smooth line width range: {}", glGetVector2i(GL_SMOOTH_LINE_WIDTH_RANGE).toString(NUMBER_FORMAT_INT));
+
+        // data returns a single value indicating the level of quantization applied to smooth line width parameters.
+        log.info("Smooth line width granularity: {}", glGetInteger(GL_SMOOTH_LINE_WIDTH_GRANULARITY));
+
 //
 //        // data returns one value, a symbolic constant indicating what function is used to compare the stencil reference value with the stencil buffer value. The initial value is GL_ALWAYS. See glStencilFunc. This stencil state only affects non-polygons and front-facing polygons. Back-facing polygons use separate stencil state. See glStencilFuncSeparate.
 //        log.info("Stencil func: {}", glGetInteger(GL_STENCIL_FUNC));
