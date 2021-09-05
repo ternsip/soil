@@ -61,6 +61,10 @@ public final class Shader implements Finishable {
         glAttachShader(programID, vertexShaderID);
         glAttachShader(programID, fragmentShaderID);
         glLinkProgram(programID);
+        if (glGetProgrami(programID, GL_LINK_STATUS) == GL11.GL_FALSE) {
+            String error = glGetProgramInfoLog(programID, 1024);
+            throw new IllegalArgumentException(String.format("Can not compile program %s - %s", getClass().getSimpleName(), error));
+        }
         glDetachShader(programID, vertexShaderID);
         glDetachShader(programID, fragmentShaderID);
         glDeleteShader(vertexShaderID);
@@ -80,7 +84,7 @@ public final class Shader implements Finishable {
         glCompileShader(shaderID);
         if (glGetShaderi(shaderID, GL_COMPILE_STATUS) == GL11.GL_FALSE) {
             String error = glGetShaderInfoLog(shaderID, 1024);
-            throw new IllegalArgumentException(String.format("Could not compile shader %s - %s", file.getName(), error));
+            throw new IllegalArgumentException(String.format("Can not compile shader %s - %s", file.getName(), error));
         }
         return shaderID;
     }
